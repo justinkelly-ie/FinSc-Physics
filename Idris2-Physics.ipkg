@@ -4,11 +4,7 @@ authors = "Justin Kelly"
 brief   = "Layer 3b Fundamental Constructive Physical Laws & Conservation Theorems."
 
 depends = base
-        , Idris2-Multiset-Core
-        , Idris2-Multiset-Transform
-        , Idris2-Multiset-Binary
         , Idris2-Geometry
-        , Idris2-Topology
 
 
 sourcedir = "src"
