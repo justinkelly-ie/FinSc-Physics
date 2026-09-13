@@ -23,7 +23,7 @@ rationalSnellRefraction n1 s1 n2 s2 =
 %inline
 public export
 isSnellRefracted : BoxInt -> BoxInt -> BoxInt -> BoxInt -> Bool
-isSnellRefracted n1 s1 n2 s2 = unwrapBox (rationalSnellRefraction n1 s1 n2 s2) == 0
+isSnellRefracted n1 s1 n2 s2 = boxZero (rationalSnellRefraction n1 s1 n2 s2)
 
 ------------------------------------------------------------------------
 -- 2. FORMAL INVARIANT AUDIT PROOFS

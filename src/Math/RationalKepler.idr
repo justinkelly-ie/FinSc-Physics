@@ -20,7 +20,7 @@ keplerHarmonicRatio t a = (t * t) - (a * a * a)
 %inline
 public export
 isKeplerStableOrbit : BoxInt -> BoxInt -> Bool
-isKeplerStableOrbit t a = unwrapBox (keplerHarmonicRatio t a) == 0
+isKeplerStableOrbit t a = boxZero (keplerHarmonicRatio t a)
 
 ------------------------------------------------------------------------
 -- 2. FORMAL INVARIANT AUDIT PROOFS
