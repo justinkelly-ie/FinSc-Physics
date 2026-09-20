@@ -6,7 +6,8 @@ brief   = "Layer 3b Fundamental Constructive Physical Laws & Conservation Theore
 depends = Idris2-Geometry, Idris2-Multiset-Core, Idris2-Multiset-Transform, base, linear
 sourcedir = "src"
 
-modules = Empirical.Comparison,
+modules = Physics,
+          Empirical.Comparison,
           Empirical.Measurements,
           Empirical.Ratio,
           Math.ActionPrinciple,

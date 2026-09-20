@@ -1,10 +1,9 @@
 module Math.LawFunctor
 
-import Core.BoxInt
-import Core.ScaleTransform
-import Core.Category.Adjunction
+import Core
+import Transform
 import Math.ActionPrinciple
-import Math.FourGeometries
+import Core
 
 %default total
 
@@ -21,7 +20,7 @@ interface (Functor stateCarrier, ScaleTransform (stateCarrier a) (stateCarrier b
   lawPullback g container = map g container
 
   ||| Computes the discrete entropy change ΔS across the law application
-  lawEntropyDelta : stateCarrier a -> Core.BoxInt.BoxInt
+  lawEntropyDelta : stateCarrier a -> BoxInt
 
 ||| Category-Theoretic Adjoint Physical Law Functor (L ⊣ R) between micro and macro state carriers.
 public export
@@ -30,7 +29,7 @@ interface AdjointLawFunctor (lawIndex : Nat) (0 l : Type -> Type) (0 r : Type ->
   lawAdjunction : MultisetAdjunction l r
 
   ||| Computes discrete entropy change ΔS along left adjoint forward pushforward
-  pushforwardEntropyDelta : l a -> Core.BoxInt.BoxInt
+  pushforwardEntropyDelta : l a -> BoxInt
 
 ||| Category-theoretic Functor Identity Property: map id x == x
 public export

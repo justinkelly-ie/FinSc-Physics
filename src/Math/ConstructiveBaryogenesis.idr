@@ -3,7 +3,7 @@ module Math.ConstructiveBaryogenesis
 import Core.BoxInt
 import Core.VexelMaxel
 import Core.UnixelFraction
-import Math.FourGeometries
+import Core
 import Data.Nat
 import Data.List
 

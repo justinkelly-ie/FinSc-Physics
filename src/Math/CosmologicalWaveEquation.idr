@@ -3,7 +3,7 @@ module Math.CosmologicalWaveEquation
 import Core.BoxInt
 import Core.UnixelFraction
 import Core.Multiset
-import Math.FourGeometries
+import Core
 import Math.LinAlgebra.MetricTensor
 
 %default total

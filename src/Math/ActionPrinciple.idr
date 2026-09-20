@@ -1,13 +1,11 @@
 module Math.ActionPrinciple
 
-import Core.BoxInt
-import Core.VexelMaxel
-import Math.LinAlgebra.MetricTensor
-import Math.FourGeometries
+import Core
+import Transform
+import Geometry
 import Data.Vect
 import Data.List
 import Language.Reflection
-import Core.TypeTheory.TwoLevel
 import Math.OnSeq.ConjugateAdjunction
 import Data.Fuel
 

@@ -3,7 +3,7 @@ module Math.ElectromagneticEnergyFlow
 import Core.BoxInt
 import Core.UnixelFraction
 import Core.Goh
-import Math.FourGeometries
+import Core
 import Geometry.Applicative
 import Math.MotivicProof
 import Data.List

@@ -3,7 +3,7 @@ module Math.ChiralAnomaly
 import Core.BoxInt
 import Core.UnixelFraction
 import Core.Multiset
-import Math.FourGeometries
+import Core
 import Math.RelativisticSpinor
 
 %default total

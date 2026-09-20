@@ -2,7 +2,7 @@ module Math.InformationErasureCost
 
 import Core.BoxInt
 import Core.UnixelFraction
-import Math.FourGeometries
+import Core
 import Data.List
 import Data.Nat
 

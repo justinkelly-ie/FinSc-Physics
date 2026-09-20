@@ -1,16 +1,15 @@
 module Math.PhysicsScaleTransforms
 
-import Core.ScaleTransform
-import Core.BoxInt
-import Core.Category.Adjunction
+import Core
+import Transform
 import Math.ActionPrinciple
-import Math.FourGeometries
+import Core
 
 %default total
 
 ||| ScaleTransform instance: Maps a 2D physical coordinate (Coord2D) to its spatial quadrance (BoxInt)
 public export
-ScaleTransform Coord2D Core.BoxInt.BoxInt where
+ScaleTransform Coord2D BoxInt where
   scaleTransform (MkCoord2D x y) = (x * x) + (y * y)
 
 ||| Property 1: Physical Spatial Coordinate ScaleTransform Quadrance Invariant

@@ -5,7 +5,7 @@ import Core.Multiset
 import Core.Polynumber
 import Core.VexelMaxel
 import Core.UnixelFraction
-import Math.FourGeometries
+import Core
 import Data.List
 import Data.Vect
 

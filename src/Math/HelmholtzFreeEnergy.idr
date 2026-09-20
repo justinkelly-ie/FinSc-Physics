@@ -5,7 +5,7 @@ import Core.Multiset
 import Core.VexelMaxel
 import Core.UnixelFraction
 import Core.Polynumber
-import Math.FourGeometries
+import Core
 import Math.ThermalDistribution
 import Data.List
 

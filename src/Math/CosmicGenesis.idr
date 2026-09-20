@@ -5,7 +5,7 @@ import Core.Multiset
 import Core.VexelMaxel
 import Core.UnixelFraction
 import Math.LinAlgebra.MetricTensor
-import Math.FourGeometries
+import Core
 import Math.ConstructiveBaryogenesis
 import Math.InformationErasureCost
 import Math.HelmholtzFreeEnergy

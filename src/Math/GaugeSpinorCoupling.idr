@@ -5,7 +5,7 @@ import Core.VexelMaxel
 import Core.UnixelFraction
 import Math.RelativisticSpinor
 import Math.GravitationalWaveDynamics
-import Math.FourGeometries
+import Core
 import Data.List
 
 %default total

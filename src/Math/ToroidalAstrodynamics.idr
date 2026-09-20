@@ -3,7 +3,7 @@ module Math.ToroidalAstrodynamics
 import Core.BoxInt
 import Core.VexelMaxel
 import Core.UnixelFraction
-import Math.FourGeometries
+import Core
 import Math.ActionPrinciple
 import Data.List
 import Math.OnSeq.FusedStream

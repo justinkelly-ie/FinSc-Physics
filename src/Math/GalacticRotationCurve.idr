@@ -3,7 +3,7 @@ module Math.GalacticRotationCurve
 import Core.BoxInt
 import Core.VexelMaxel
 import Core.UnixelFraction
-import Math.FourGeometries
+import Core
 import Data.List
 
 %default total

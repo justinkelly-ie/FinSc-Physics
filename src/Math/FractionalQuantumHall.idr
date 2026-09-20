@@ -4,7 +4,7 @@ import Core.BoxInt
 import Core.VexelMaxel
 import Core.UnixelFraction
 import Core.Multiset
-import Math.FourGeometries
+import Core
 
 %default total
 

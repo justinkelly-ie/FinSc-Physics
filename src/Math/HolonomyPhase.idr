@@ -2,7 +2,7 @@ module Math.HolonomyPhase
 
 import Core.BoxInt
 import Core.UnixelFraction
-import Math.FourGeometries
+import Core
 
 %default total
 

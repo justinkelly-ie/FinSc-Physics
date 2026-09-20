@@ -3,7 +3,7 @@ module Math.ThermalDistribution
 import Core.BoxInt
 import Core.Polynumber
 import Core.UnixelFraction
-import Math.FourGeometries
+import Core
 import Data.Vect
 import Data.List
 
