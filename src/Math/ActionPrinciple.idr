@@ -270,4 +270,88 @@ auditFusedDiscreteActionProof =
       a2 = fusedDiscreteAction (limit 100) EllipticGeom path zeroPotential
   in a1 == a2 && unwrapBox a2 == 4
 
+------------------------------------------------------------------------
+-- 6. COMPILE-TIME NOETHER CONSERVATION WITNESSES & VERIFIED TRAJECTORIES
+------------------------------------------------------------------------
+
+||| Evaluates discrete momentum conservation along consecutive trajectory steps:
+||| p_0 == p_1 where p_0 = g · (x_1 - x_0) and p_1 = g · (x_2 - x_1).
+public export
+isMomentumConserved : Core.VexelMaxel.Maxel -> Coord2D -> Coord2D -> Coord2D -> Bool
+isMomentumConserved m p0 p1 p2 =
+  let m0 = discreteCanonicalMomentum m p0 p1
+      m1 = discreteCanonicalMomentum m p1 p2
+  in (unwrapBox (posX m0) == unwrapBox (posX m1)) && (unwrapBox (posY m0) == unwrapBox (posY m1))
+
+||| Erased compile-time proof witness verifying Noether momentum conservation along a trajectory step.
+public export
+0 ActionConservationWitness : Core.VexelMaxel.Maxel -> Coord2D -> Coord2D -> Coord2D -> Type
+ActionConservationWitness m p0 p1 p2 = isMomentumConserved m p0 p1 p2 = True
+
+||| Static compile-time witness for free particle motion along straight geodesic [(0,0), (1,1), (2,2)].
+public export
+0 prfGeodesicNoetherConservation : ActionConservationWitness Math.LinAlgebra.MetricTensor.gBlue 
+                                     (MkCoord2D (Core.BoxInt.intToBoxInt 0) (Core.BoxInt.intToBoxInt 0))
+                                     (MkCoord2D (Core.BoxInt.intToBoxInt 1) (Core.BoxInt.intToBoxInt 1))
+                                     (MkCoord2D (Core.BoxInt.intToBoxInt 2) (Core.BoxInt.intToBoxInt 2))
+prfGeodesicNoetherConservation = Refl
+
+||| Verified physical trajectory step carrying compile-time erased Noether momentum conservation witness.
+public export
+record VerifiedPhysicalTrajectory (m : Core.VexelMaxel.Maxel) (p0 : Coord2D) (p1 : Coord2D) (p2 : Coord2D) where
+  constructor MkVerifiedTrajectory
+  startCoord : Coord2D
+  midCoord   : Coord2D
+  endCoord   : Coord2D
+  0 noetherPrf : ActionConservationWitness m p0 p1 p2
+
+------------------------------------------------------------------------
+-- 7. DEFORESTED TRAJECTORY STREAM TRANSDUCERS
+------------------------------------------------------------------------
+
+||| Discrete trajectory step carrying velocity vector Δx = x_{k+1} - x_k and kinetic quadrance.
+public export
+record TrajectoryStep where
+  constructor MkTrajectoryStep
+  stepId   : Int
+  diff     : Coord2D
+  lagrange : Core.BoxInt.BoxInt
+
+public export
+Eq TrajectoryStep where
+  (MkTrajectoryStep id1 d1 l1) == (MkTrajectoryStep id2 d2 l2) =
+    id1 == id2 && d1 == d2 && l1 == l2
+
+||| O(1) allocation deforested trajectory stream transducer folding discrete Lagrangian sum across steps.
+public export covering
+fusedActionTrajectoryStream : Fuel -> FundamentalGeometry -> List Coord2D -> (Coord2D -> Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
+fusedActionTrajectoryStream f geom coords vPot =
+  fusedHylomorphism f
+    (\(idx, st) => case st of
+                     [] => Done
+                     [_] => Done
+                     (x0 :: x1 :: rest) =>
+                       let lVal = discreteLagrangian geom x0 x1 vPot
+                       in Yield (MkTrajectoryStep idx (coordDiff x1 x0) lVal) (idx + 1, x1 :: rest))
+    (\step, acc => lagrange step + acc)
+    (Core.BoxInt.intToBoxInt 0)
+    (1, coords)
+
+||| O(1) allocation deforested stream transducer evaluating total trajectory kinetic quadrance sum.
+public export covering
+fusedComputeTotalKineticQuadrance : Fuel -> Core.VexelMaxel.Maxel -> List Coord2D -> Core.BoxInt.BoxInt
+fusedComputeTotalKineticQuadrance f m coords =
+  fusedHylomorphism f
+    (\(idx, st) => case st of
+                     [] => Done
+                     [_] => Done
+                     (x0 :: x1 :: rest) =>
+                       let d = coordDiff x1 x0
+                           kQuadrance = metricKineticQuadrance m d
+                       in Yield (MkTrajectoryStep idx d kQuadrance) (idx + 1, x1 :: rest))
+    (\step, acc => lagrange step + acc)
+    (Core.BoxInt.intToBoxInt 0)
+    (1, coords)
+
+
 
