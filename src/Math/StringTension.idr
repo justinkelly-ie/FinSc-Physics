@@ -15,9 +15,9 @@ import Data.List
 ||| Evaluates linear QCD confinement potential V(r) = sigma * r over discrete distance r.
 ||| String tension sigma is represented in fundamental energy units per cell step.
 public export
-linearQCDConfinementPotential : (sigma : BoxInt) -> (distance : Nat) -> BoxInt
+linearQCDConfinementPotential : (sigma : Core.BoxInt.BoxInt) -> (distance : Nat) -> Core.BoxInt.BoxInt
 linearQCDConfinementPotential sigma dist =
-  sigma * natToBoxInt dist
+  sigma * Core.BoxInt.natToBoxInt dist
 
 ||| Evaluates discrete spin angular momentum J along a linear Regge trajectory:
 ||| J = alpha_0 + alpha_prime * M^2.
@@ -46,5 +46,5 @@ verifyReggeLinearity m1 m2 =
 public export
 auditQCDStringTensionProof : Bool
 auditQCDStringTensionProof =
-  let v5 = linearQCDConfinementPotential (intToBoxInt 10) 5
+  let v5 = linearQCDConfinementPotential (Core.BoxInt.intToBoxInt 10) 5
   in unwrapBox v5 == 50 && verifyReggeLinearity 2 4

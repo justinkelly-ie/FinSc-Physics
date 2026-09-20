@@ -3,83 +3,75 @@ version = 0.3.0
 authors = "Justin Kelly"
 brief   = "Layer 3b Fundamental Constructive Physical Laws & Conservation Theorems."
 
-depends = base
-        , Idris2-Geometry
-
-
+depends = Idris2-Geometry, Idris2-Multiset-Core, Idris2-Multiset-Transform, base, linear
 sourcedir = "src"
 
-modules =         Empirical.Comparison
-        , Empirical.Measurements
-        , Empirical.Ratio
-        , Math.ActionPotentialKinetics
-        , Math.ActionPrinciple
-        , Math.AllostericCooperativity
-        , Math.BlackHolePhaseTransition
-        , Math.CavityQuantumElectrodynamics
-        , Math.ChiralAnomaly
-        , Math.ConstructiveBaryogenesis
-        , Math.CosmicGenesis
-        , Math.CosmologicalWaveEquation
-        , Math.DegeneracyMassLimit
-        , Math.DensityMatrix
-        , Math.ElectromagneticEnergyFlow
-        , Math.EntanglementAreaLaw
-        , Math.EnzymeKinetics
-        , Math.EvaporationEntropyCurve
-        , Math.ExclusionPrinciple
-        , Math.FlavorMixing
-        , Math.FluctuationTheorem
-        , Math.FractionalQuantumHall
-        , Math.GalacticRotationCurve
-        , Math.GaugeSpinorCoupling
-        , Math.GravitationalCollapseLimit
-        , Math.GravitationalWaveDynamics
-        , Math.HallViscosity
-        , Math.HelmholtzFreeEnergy
-        , Math.HolographicBound
-        , Math.HolonomyPhase
-        , Math.HorizonRadiation
-        , Math.HydrogenBonding
-        , Math.InformationErasureCost
-        , Math.LatticeFluidTransport
-        , Math.MacromolecularChirality
-        , Math.Magnetohydrodynamics
-        , Math.MultiTerminalConduction
-        , Math.NeutrinoOscillation
-        , Math.NucleicAcidBasePairing
-        , Math.OscillatingReactions
-        , Math.PeakBindingEnergy
-        , Math.PhaseInvarianceMeasure
-        , Math.LawFunctor
-        , Math.ApplicativeHomomorphism
-        , Math.PhysicsMonad
-        , Math.MotivicProof
-        , Math.PhysicsScaleTransforms
-        , Math.PlasmaRecombination
-        , Math.PrefixCodeOptimality
-        , Math.QuantumPotential
-        , Math.QuantumTeleportation
-        , Math.RGDecimator
-        , Math.RationalKepler
-        , Math.RationalRefraction
-        , Math.ReciprocalTransport
-        , Math.RelativisticSpinor
-        , Math.RenormalizationInformationFlow
-        , Math.RetardedDipoleForce
-        , Math.RibosomalTranslation
-        , Math.RotatingSpacetime
-        , Math.StringTension
-        , Math.SuperconductingFluxQuantization
-        , Math.SuperconductingGap
-        , Math.SymmetryBreakingMass
-        , Math.ThermalDistribution
-        , Math.TopologicalChernNumber
-        , Math.TopologicalGaugeMass
-        , Math.TopologicalInsulator
-        , Math.ToricCode
-        , Math.ToroidalAstrodynamics
-        , Math.TripleAlphaNucleosynthesis
-        , Math.VacuumDispersion
-        , Math.VacuumPolarization
-        , Math.WorkFreeEnergyEquality
+modules = Empirical.Comparison,
+          Empirical.Measurements,
+          Empirical.Ratio,
+          Math.ActionPrinciple,
+          Math.ApplicativeHomomorphism,
+          Math.BlackHolePhaseTransition,
+          Math.CavityQuantumElectrodynamics,
+          Math.ChiralAnomaly,
+          Math.ChromoLawFunctor,
+          Math.ConstructiveBaryogenesis,
+          Math.CosmicGenesis,
+          Math.CosmologicalWaveEquation,
+          Math.DegeneracyMassLimit,
+          Math.DensityMatrix,
+          Math.ElectromagneticEnergyFlow,
+          Math.EntanglementAreaLaw,
+          Math.EvaporationEntropyCurve,
+          Math.FlavorMixing,
+          Math.FluctuationTheorem,
+          Math.FractionalQuantumHall,
+          Math.GalacticRotationCurve,
+          Math.GaugeSpinorCoupling,
+          Math.GravitationalCollapseLimit,
+          Math.GravitationalWaveDynamics,
+          Math.HallViscosity,
+          Math.HelmholtzFreeEnergy,
+          Math.HolographicBound,
+          Math.HolonomyPhase,
+          Math.HorizonRadiation,
+          Math.InformationErasureCost,
+          Math.LatticeFluidTransport,
+          Math.LawFunctor,
+          Math.MacromolecularChirality,
+          Math.Magnetohydrodynamics,
+          Math.MultiTerminalConduction,
+          Math.NeutrinoOscillation,
+          Math.OscillatingReactions,
+          Math.PeakBindingEnergy,
+          Math.PhaseInvarianceMeasure,
+          Math.PhysicsLaw,
+          Math.PhysicsMonad,
+          Math.PhysicsScaleTransforms,
+          Math.PlasmaRecombination,
+          Math.PrefixCodeOptimality,
+          Math.QuantumPotential,
+          Math.QuantumTeleportation,
+          Math.RGDecimator,
+          Math.RationalKepler,
+          Math.RationalRefraction,
+          Math.ReciprocalTransport,
+          Math.RelativisticSpinor,
+          Math.RenormalizationInformationFlow,
+          Math.RetardedDipoleForce,
+          Math.RotatingSpacetime,
+          Math.StringTension,
+          Math.SuperconductingFluxQuantization,
+          Math.SuperconductingGap,
+          Math.SymmetryBreakingMass,
+          Math.ThermalDistribution,
+          Math.TopologicalChernNumber,
+          Math.TopologicalGaugeMass,
+          Math.TopologicalInsulator,
+          Math.ToricCode,
+          Math.ToroidalAstrodynamics,
+          Math.TripleAlphaNucleosynthesis,
+          Math.VacuumDispersion,
+          Math.VacuumPolarization,
+          Math.WorkFreeEnergyEquality
+

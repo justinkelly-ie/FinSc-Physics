@@ -26,21 +26,21 @@ import Data.Nat
 public export
 record GenesisState where
   constructor MkGenesisState
-  vmTokens     : BoxInt
+  vmTokens     : Core.BoxInt.BoxInt
   deSlots      : Nat
   dmSlots      : Nat
   masterBudget : Nat
 
 public export
 genesisVacuum : GenesisState
-genesisVacuum = MkGenesisState (intToBoxInt 0) 128 55 210
+genesisVacuum = MkGenesisState (Core.BoxInt.intToBoxInt 0) 128 55 210
 
 ||| Audits the Primordial Genesis Budget Partition: 0 + 128 + 55 == 183 <= 210,
 ||| with full capacity allocated as 27 (VM Basis) + 128 (DE ROM) + 55 (DM Sink) = 210.
 public export
 isValidGenesisPartition : GenesisState -> Bool
 isValidGenesisPartition (MkGenesisState vm de dm tot) =
-  unwrapBox vm == 0 &&
+  Core.BoxInt.unwrapBox vm == 0 &&
   de == 128 &&
   dm == 55 &&
   (27 + de + dm == tot) &&
@@ -58,16 +58,16 @@ isValidGenesisPartition (MkGenesisState vm de dm tot) =
 public export
 freezeOutAntimatterAnnihilation : BaryonState -> BaryonState
 freezeOutAntimatterAnnihilation (MkBaryonState p n g) =
-  let pVal = unwrapBox p
-      nVal = unwrapBox n
-      gVal = unwrapBox g
+  let pVal = Core.BoxInt.unwrapBox p
+      nVal = Core.BoxInt.unwrapBox n
+      gVal = Core.BoxInt.unwrapBox g
       annihilatedPairs = if pVal >= nVal then nVal else pVal
       survivingP = pVal - annihilatedPairs
       survivingN = nVal - annihilatedPairs
       newPhotons = gVal + 2 * annihilatedPairs
-  in MkBaryonState (intToBoxInt survivingP) 
-                   (intToBoxInt survivingN) 
-                   (intToBoxInt newPhotons)
+  in MkBaryonState (Core.BoxInt.intToBoxInt survivingP) 
+                   (Core.BoxInt.intToBoxInt survivingN) 
+                   (Core.BoxInt.intToBoxInt newPhotons)
 
 ------------------------------------------------------------------------
 -- 3. UNIDIRECTIONAL LANDAUER DISSIPATION & DARK MATTER LOGGING
@@ -90,7 +90,7 @@ landauerFreezeOutStep bits tScale dmCount =
 
 ||| Aggregates a list of multiset token bags using Monoid concat.
 public export
-aggregateMultisets : List (Multiset BoxInt String) -> Multiset BoxInt String
+aggregateMultisets : List (Multiset Core.BoxInt.BoxInt String) -> Multiset Core.BoxInt.BoxInt String
 aggregateMultisets = concat
 
 
@@ -104,15 +104,15 @@ public export
 auditCosmicGenesisRelicFreezeOutProof : Bool
 auditCosmicGenesisRelicFreezeOutProof =
   let validPart = isValidGenesisPartition genesisVacuum
-      initBaryon = MkBaryonState (intToBoxInt 1000) (intToBoxInt 900) (intToBoxInt 0)
+      initBaryon = MkBaryonState (Core.BoxInt.intToBoxInt 1000) (Core.BoxInt.intToBoxInt 900) (Core.BoxInt.intToBoxInt 0)
       finalBaryon = freezeOutAntimatterAnnihilation initBaryon
-      passAnnihilation = unwrapBox (baryonPos finalBaryon) == 100 &&
-                         unwrapBox (baryonNeg finalBaryon) == 0 &&
-                         unwrapBox (photonTokens finalBaryon) == 1800
+      passAnnihilation = Core.BoxInt.unwrapBox (baryonPos finalBaryon) == 100 &&
+                         Core.BoxInt.unwrapBox (baryonNeg finalBaryon) == 0 &&
+                         Core.BoxInt.unwrapBox (photonTokens finalBaryon) == 1800
       (dissTokens, newDM) = landauerFreezeOutStep 5 3 55
       passLandauer = dissTokens == 15 && newDM == 70
-      bag1 = AddM "Baryon" (intToBoxInt 10) ZeroM
-      bag2 = AddM "Photon" (intToBoxInt 20) ZeroM
+      bag1 = AddM "Baryon" (Core.BoxInt.intToBoxInt 10) ZeroM
+      bag2 = AddM "Photon" (Core.BoxInt.intToBoxInt 20) ZeroM
       passMonoid = aggregateMultisets [bag1, bag2] == addMultiset bag1 bag2
   in validPart && passAnnihilation && passLandauer && passMonoid
 

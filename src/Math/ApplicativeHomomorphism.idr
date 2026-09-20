@@ -25,16 +25,6 @@ interface (Applicative f, Applicative g) => ApplicativeHomomorphism (0 f : Type 
 -- DOMAIN HOMOMORPHISM INSTANCES (LIST & MULTISET)
 -----------------------------------------------------------------------
 
-||| Applicative Instance for RLE Multiset BoxInt
-public export
-Applicative (Multiset BoxInt) where
-  pure x = AddM x (intToBoxInt 1) ZeroM
-  ZeroM <*> _ = ZeroM
-  _ <*> ZeroM = ZeroM
-  (AddM f cf fs) <*> xs =
-    let mappedXs = mapMultiset f (scaleMultiset cf xs)
-        restApp  = fs <*> xs
-    in addMultiset mappedXs restApp
 
 ||| Converts a Maybe passband context into a Non-deterministic List bag context.
 public export

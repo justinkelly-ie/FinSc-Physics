@@ -18,8 +18,8 @@ import Data.List
 public export
 record MetricShearTT where
   constructor MkMetricShearTT
-  hPlus  : BoxInt
-  hCross : BoxInt
+  hPlus  : Core.BoxInt.BoxInt
+  hCross : Core.BoxInt.BoxInt
 
 public export
 Eq MetricShearTT where
@@ -33,7 +33,7 @@ Show MetricShearTT where
 
 ||| Traceless invariant: Tr(h) = h_11 + h_22 = h_+ + (-h_+) == 0.
 public export
-traceMetricShear : MetricShearTT -> BoxInt
+traceMetricShear : MetricShearTT -> Core.BoxInt.BoxInt
 traceMetricShear (MkMetricShearTT p _) = p + (negate p)
 
 ------------------------------------------------------------------------
@@ -43,12 +43,12 @@ traceMetricShear (MkMetricShearTT p _) = p + (negate p)
 ||| Evaluates 1D/3D discrete d'Alembert wave operator box(h) = laplacian(h) - d2t(h) at speed c=1:
 ||| For plane wave h(x, t) = cos(k x - omega t), box(h) == 0 when k = omega.
 public export
-evalWaveOperator : (laplacian : BoxInt) -> (d2t : BoxInt) -> BoxInt
+evalWaveOperator : (laplacian : Core.BoxInt.BoxInt) -> (d2t : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 evalWaveOperator lap d2 = lap - d2
 
 ||| Quadrupole radiation power loss dE/dt = - Q_triple_dot^2 <= 0:
 public export
-quadrupolePowerLoss : (qTripleDot : BoxInt) -> BoxInt
+quadrupolePowerLoss : (qTripleDot : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 quadrupolePowerLoss q = negate (q * q)
 
 ------------------------------------------------------------------------
@@ -61,7 +61,7 @@ quadrupolePowerLoss q = negate (q * q)
 public export
 auditGravitationalWaveTracelessProof : Bool
 auditGravitationalWaveTracelessProof =
-  let shear = MkMetricShearTT (intToBoxInt 42) (intToBoxInt 17)
+  let shear = MkMetricShearTT (Core.BoxInt.intToBoxInt 42) (Core.BoxInt.intToBoxInt 17)
   in unwrapBox (traceMetricShear shear) == 0
 
 ||| Audits Discrete d'Alembert Wave Propagation (c = 1 dispersion):
@@ -70,7 +70,7 @@ auditGravitationalWaveTracelessProof =
 public export
 auditGravitationalWavePropagationProof : Bool
 auditGravitationalWavePropagationProof =
-  let boxH = evalWaveOperator (intToBoxInt 100) (intToBoxInt 100)
+  let boxH = evalWaveOperator (Core.BoxInt.intToBoxInt 100) (Core.BoxInt.intToBoxInt 100)
   in unwrapBox boxH == 0
 
 ||| Audits Quadrupole Gravitational Energy Loss Non-Positivity:
@@ -79,5 +79,5 @@ auditGravitationalWavePropagationProof =
 public export
 auditQuadrupoleRadiationLossProof : Bool
 auditQuadrupoleRadiationLossProof =
-  let loss = quadrupolePowerLoss (intToBoxInt 7)
+  let loss = quadrupolePowerLoss (Core.BoxInt.intToBoxInt 7)
   in unwrapBox loss == (-49) && unwrapBox loss <= 0

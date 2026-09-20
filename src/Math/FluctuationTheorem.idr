@@ -15,13 +15,17 @@ import Data.Nat
 -- 1. LAW 25: DISCRETE CROOKS FLUCTUATION THEOREM
 ------------------------------------------------------------------------
 
+------------------------------------------------------------------------
+-- 1. LAW 25: DISCRETE CROOKS FLUCTUATION THEOREM
+------------------------------------------------------------------------
+
 ||| Microscopic Trajectory Work Pair (Forward work w_F, Backward work w_B):
 public export
 record TrajectoryWork where
   constructor MkTrajectoryWork
-  workForward  : BoxInt
-  workBackward : BoxInt
-  freeEnergyChange : BoxInt
+  workForward  : Core.BoxInt.BoxInt
+  workBackward : Core.BoxInt.BoxInt
+  freeEnergyChange : Core.BoxInt.BoxInt
 
 public export
 Eq TrajectoryWork where
@@ -30,11 +34,11 @@ Eq TrajectoryWork where
 
 ||| Computes the microscopic dissipated work: w_diss = w_F - Delta F
 public export
-microscopicDissipatedWork : TrajectoryWork -> BoxInt
+microscopicDissipatedWork : TrajectoryWork -> Core.BoxInt.BoxInt
 microscopicDissipatedWork (MkTrajectoryWork wf _ df) =
-  let wVal = unwrapBox wf
-      dfVal = unwrapBox df
-  in intToBoxInt (wVal - dfVal)
+  let wVal = Core.BoxInt.unwrapBox wf
+      dfVal = Core.BoxInt.unwrapBox df
+  in Core.BoxInt.intToBoxInt (wVal - dfVal)
 
 ||| Validates the Discrete Crooks Theorem:
 ||| 1. For reversible processes (w_F = Delta F), forward and backward probabilities are equal (ratio = 1).
@@ -42,9 +46,9 @@ microscopicDissipatedWork (MkTrajectoryWork wf _ df) =
 public export
 isCrooksTheoremSatisfied : TrajectoryWork -> Bool
 isCrooksTheoremSatisfied (MkTrajectoryWork wf wb df) =
-  let wFVal = unwrapBox wf
-      wBVal = unwrapBox wb
-      dfVal = unwrapBox df
+  let wFVal = Core.BoxInt.unwrapBox wf
+      wBVal = Core.BoxInt.unwrapBox wb
+      dfVal = Core.BoxInt.unwrapBox df
       wDiss = wFVal - dfVal
   in if wDiss == 0
         then wFVal == - wBVal && wFVal == dfVal
@@ -62,10 +66,10 @@ isCrooksTheoremSatisfied (MkTrajectoryWork wf wb df) =
 public export
 auditFluctuationTheoremProof : Bool
 auditFluctuationTheoremProof =
-  let revTraj = MkTrajectoryWork (intToBoxInt 5) (intToBoxInt (-5)) (intToBoxInt 5)
-      irrevTraj = MkTrajectoryWork (intToBoxInt 9) (intToBoxInt (-9)) (intToBoxInt 5)
-      wDissRev = unwrapBox (microscopicDissipatedWork revTraj)
-      wDissIrrev = unwrapBox (microscopicDissipatedWork irrevTraj)
+  let revTraj = MkTrajectoryWork (Core.BoxInt.intToBoxInt 5) (Core.BoxInt.intToBoxInt (-5)) (Core.BoxInt.intToBoxInt 5)
+      irrevTraj = MkTrajectoryWork (Core.BoxInt.intToBoxInt 9) (Core.BoxInt.intToBoxInt (-9)) (Core.BoxInt.intToBoxInt 5)
+      wDissRev = Core.BoxInt.unwrapBox (microscopicDissipatedWork revTraj)
+      wDissIrrev = Core.BoxInt.unwrapBox (microscopicDissipatedWork irrevTraj)
   in isCrooksTheoremSatisfied revTraj &&
      isCrooksTheoremSatisfied irrevTraj &&
      wDissRev == 0 &&

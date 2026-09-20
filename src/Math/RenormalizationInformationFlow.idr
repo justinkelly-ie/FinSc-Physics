@@ -37,7 +37,7 @@ discreteFisherQuadrance w1 w2 =
   let diff = (natToInteger w1) - (natToInteger w2)
       sqDiff = diff * diff
       den = if w1 == 0 then 1 else w1
-  in MkUnixelFraction (intToBoxInt sqDiff) (MkUnixel den)
+  in MkUnixelFraction (Core.BoxInt.intToBoxInt sqDiff) (MkUnixel den)
 
 ------------------------------------------------------------------------
 -- 3. TOPOLOGICAL RG FIXED POINT COARSE-GRAINING
@@ -46,8 +46,8 @@ discreteFisherQuadrance w1 w2 =
 ||| Coarse-graining decimation operator on 2D Berry curvature grid:
 ||| Aggregates 2x2 fine plaquettes into 1 coarse plaquette while preserving total First Chern Number.
 public export
-decimateBerryCurvature : (finePlaquettes : List BoxInt) -> BoxInt
-decimateBerryCurvature = foldl (+) (intToBoxInt 0)
+decimateBerryCurvature : (finePlaquettes : List Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
+decimateBerryCurvature = foldl (+) (Core.BoxInt.intToBoxInt 0)
 
 ------------------------------------------------------------------------
 -- 4. CONSTRUCTIVE FORMAL AUDIT PROOFS
@@ -59,9 +59,9 @@ decimateBerryCurvature = foldl (+) (intToBoxInt 0)
 public export
 auditDiscreteBetaFlowProof : Bool
 auditDiscreteBetaFlowProof =
-  case discreteBetaStep (MkUnixelFraction (intToBoxInt 1) (MkUnixel 1)) 3 of
+  case discreteBetaStep (MkUnixelFraction (Core.BoxInt.intToBoxInt 1) (MkUnixel 1)) 3 of
     MkUnixelFraction bNum (MkUnixel bDen) =>
-      (bNum == intToBoxInt (-3)) && natEq bDen 4
+      (bNum == Core.BoxInt.intToBoxInt (-3)) && natEq bDen 4
 
 ||| Audits Discrete Fisher Information Metric Positivity:
 ||| Proves I_F(w1=10, w2=6) = (10 - 6)^2 / 10 = 16/10 >= 0, and I_F(w, w) == 0.
@@ -70,8 +70,8 @@ auditDiscreteFisherMetricProof : Bool
 auditDiscreteFisherMetricProof =
   case (discreteFisherQuadrance 10 6, discreteFisherQuadrance 10 10) of
     (MkUnixelFraction f1Num (MkUnixel f1Den), MkUnixelFraction f0Num (MkUnixel f0Den)) =>
-      (f1Num == intToBoxInt 16) && natEq f1Den 10 &&
-      (f0Num == intToBoxInt 0) && natEq f0Den 10
+      (f1Num == Core.BoxInt.intToBoxInt 16) && natEq f1Den 10 &&
+      (f0Num == Core.BoxInt.intToBoxInt 0) && natEq f0Den 10
 
 ||| Audits Scale-Invariance of Topological First Chern Number under RG Decimation:
 ||| Proves that a 4-cell fine Berry grid with fluxes [1, 2, -1, 1] (sum = 3)
@@ -79,7 +79,7 @@ auditDiscreteFisherMetricProof =
 public export
 auditTopologicalRGFixedPointProof : Bool
 auditTopologicalRGFixedPointProof =
-  let fineGrid = [intToBoxInt 1, intToBoxInt 2, intToBoxInt (-1), intToBoxInt 1]
-      cFine = foldl (+) (intToBoxInt 0) fineGrid
+  let fineGrid = [Core.BoxInt.intToBoxInt 1, Core.BoxInt.intToBoxInt 2, Core.BoxInt.intToBoxInt (-1), Core.BoxInt.intToBoxInt 1]
+      cFine = foldl (+) (Core.BoxInt.intToBoxInt 0) fineGrid
       cMacro = decimateBerryCurvature fineGrid
   in cFine == cMacro && unwrapBox cMacro == 3

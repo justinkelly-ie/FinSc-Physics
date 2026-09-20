@@ -17,6 +17,10 @@ import Data.Vect
 -- 1. LAW 19: DISCRETE HAWKING-UNRUH BOUNDARY RADIATION
 ------------------------------------------------------------------------
 
+------------------------------------------------------------------------
+-- 1. LAW 19: DISCRETE HAWKING-UNRUH BOUNDARY RADIATION
+------------------------------------------------------------------------
+
 ||| Discrete Horizon State:
 ||| - horizonArea: boundary Maxel count (e.g. 54 on 3x3x3 Boxel)
 ||| - blackHoleMass: active bound-state token mass M
@@ -25,8 +29,8 @@ public export
 record HorizonState where
   constructor MkHorizonState
   horizonArea      : Nat
-  blackHoleMass    : BoxInt
-  emittedRadiation : BoxInt
+  blackHoleMass    : Core.BoxInt.BoxInt
+  emittedRadiation : Core.BoxInt.BoxInt
 
 public export
 Eq HorizonState where
@@ -39,7 +43,7 @@ public export
 discreteHawkingTemperature : (horizonArea : Nat) -> UnixelFraction
 discreteHawkingTemperature area =
   let denom = if area == 0 then 1 else 2 * area
-  in MkUnixelFraction (intToBoxInt 1) (MkUnixel denom)
+  in MkUnixelFraction (Core.BoxInt.intToBoxInt 1) (MkUnixel denom)
 
 ||| Executes one discrete Hawking evaporation quantum step
 ||| parameterized by QTT 0 metric space parameter (0 space : VexelSpace d c):
@@ -47,13 +51,13 @@ discreteHawkingTemperature area =
 public export
 stepHawkingEvaporation : {d : Nat} -> {c : MetricColor} -> (0 space : VexelSpace d c) -> HorizonState -> HorizonState
 stepHawkingEvaporation space (MkHorizonState area m r) =
-  let mVal = unwrapBox m
-      rVal = unwrapBox r
+  let mVal = Core.BoxInt.unwrapBox m
+      rVal = Core.BoxInt.unwrapBox r
       dM = if mVal > 0 then 1 else 0
       newM = mVal - dM
       newR = rVal + dM
       newArea = if area > 0 && mVal > 0 then minus area 1 else area
-  in MkHorizonState newArea (intToBoxInt newM) (intToBoxInt newR)
+  in MkHorizonState newArea (Core.BoxInt.intToBoxInt newM) (Core.BoxInt.intToBoxInt newR)
 
 ------------------------------------------------------------------------
 -- 2. CONSTRUCTIVE FORMAL AUDIT PROOFS
@@ -69,10 +73,10 @@ auditHorizonRadiationProof : Bool
 auditHorizonRadiationProof =
   let blankTensor = Metric (replicate 3 (replicate 3 zeroUnixelFraction))
       0 blankSpace = Space {color = Elliptic} blankTensor
-  in case (discreteHawkingTemperature 54, stepHawkingEvaporation blankSpace (MkHorizonState 54 (intToBoxInt 10) (intToBoxInt 0))) of
+  in case (discreteHawkingTemperature 54, stepHawkingEvaporation blankSpace (MkHorizonState 54 (Core.BoxInt.intToBoxInt 10) (Core.BoxInt.intToBoxInt 0))) of
     (MkUnixelFraction tNum (MkUnixel tDen), MkHorizonState _ m r) =>
-      (tNum == intToBoxInt 1) && natEq tDen 108 &&
-      (m == intToBoxInt 9) &&
-      (r == intToBoxInt 1) &&
-      ((m + r) == intToBoxInt 10)
+      (tNum == Core.BoxInt.intToBoxInt 1) && natEq tDen 108 &&
+      (m == Core.BoxInt.intToBoxInt 9) &&
+      (r == Core.BoxInt.intToBoxInt 1) &&
+      ((m + r) == Core.BoxInt.intToBoxInt 10)
 

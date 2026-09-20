@@ -22,10 +22,10 @@ import Data.List
 public export
 record DiscreteEMCell where
   constructor MkDiscreteEMCell
-  electricEnergy : BoxInt
-  magneticEnergy : BoxInt
-  poyntingFluxOut: BoxInt
-  jouleWork      : BoxInt
+  electricEnergy : Core.BoxInt.BoxInt
+  magneticEnergy : Core.BoxInt.BoxInt
+  poyntingFluxOut: Core.BoxInt.BoxInt
+  jouleWork      : Core.BoxInt.BoxInt
 
 public export
 Eq DiscreteEMCell where
@@ -35,12 +35,12 @@ Eq DiscreteEMCell where
 public export
 Show DiscreteEMCell where
   show (MkDiscreteEMCell e b s j) =
-    "EMCell(E^2=" ++ show (unwrapBox e) ++ ", B^2=" ++ show (unwrapBox b) ++ 
-    ", divS=" ++ show (unwrapBox s) ++ ", J·E=" ++ show (unwrapBox j) ++ ")"
+    "EMCell(E^2=" ++ show (Core.BoxInt.unwrapBox e) ++ ", B^2=" ++ show (Core.BoxInt.unwrapBox b) ++ 
+    ", divS=" ++ show (Core.BoxInt.unwrapBox s) ++ ", J·E=" ++ show (Core.BoxInt.unwrapBox j) ++ ")"
 
 ||| Total electromagnetic energy density u = E^2 + B^2.
 public export
-electromagneticEnergyDensity : (1 cell : DiscreteEMCell) -> BoxInt
+electromagneticEnergyDensity : (1 cell : DiscreteEMCell) -> Core.BoxInt.BoxInt
 electromagneticEnergyDensity (MkDiscreteEMCell e b _ _) = e + b
 
 ------------------------------------------------------------------------
@@ -50,7 +50,7 @@ electromagneticEnergyDensity (MkDiscreteEMCell e b _ _) = e + b
 ||| Evaluates the local discrete Poynting energy balance on a cell:
 ||| Δu + div(S) + (J · E) == 0  ==>  u(t+1) = u(t) - div(S) - (J · E)
 public export
-stepPoyntingEnergy : (1 cell : DiscreteEMCell) -> BoxInt
+stepPoyntingEnergy : (1 cell : DiscreteEMCell) -> Core.BoxInt.BoxInt
 stepPoyntingEnergy (MkDiscreteEMCell e b s j) =
   (e + b) - s - j
 
@@ -76,11 +76,11 @@ verifyLocalPoyntingBalance (MkDiscreteEMCell e b s j) =
 public export
 auditLocalPoyntingBalanceProof : Bool
 auditLocalPoyntingBalanceProof =
-  let cell = MkDiscreteEMCell (intToBoxInt 50) (intToBoxInt 50) (intToBoxInt 15) (intToBoxInt 5)
-      u0 = electromagneticEnergyDensity (MkDiscreteEMCell (intToBoxInt 50) (intToBoxInt 50) (intToBoxInt 15) (intToBoxInt 5))
-      u1 = stepPoyntingEnergy (MkDiscreteEMCell (intToBoxInt 50) (intToBoxInt 50) (intToBoxInt 15) (intToBoxInt 5))
-  in unwrapBox u0 == 100 &&
-     unwrapBox u1 == 80 &&
+  let cell = MkDiscreteEMCell (Core.BoxInt.intToBoxInt 50) (Core.BoxInt.intToBoxInt 50) (Core.BoxInt.intToBoxInt 15) (Core.BoxInt.intToBoxInt 5)
+      u0 = electromagneticEnergyDensity (MkDiscreteEMCell (Core.BoxInt.intToBoxInt 50) (Core.BoxInt.intToBoxInt 50) (Core.BoxInt.intToBoxInt 15) (Core.BoxInt.intToBoxInt 5))
+      u1 = stepPoyntingEnergy (MkDiscreteEMCell (Core.BoxInt.intToBoxInt 50) (Core.BoxInt.intToBoxInt 50) (Core.BoxInt.intToBoxInt 15) (Core.BoxInt.intToBoxInt 5))
+  in Core.BoxInt.unwrapBox u0 == 100 &&
+     Core.BoxInt.unwrapBox u1 == 80 &&
      verifyLocalPoyntingBalance cell
 
 ||| Audits Vacuum Poynting Conservation (No Current J = 0):
@@ -89,10 +89,10 @@ auditLocalPoyntingBalanceProof =
 public export
 auditVacuumPoyntingInvarianceProof : Bool
 auditVacuumPoyntingInvarianceProof =
-  let cell = MkDiscreteEMCell (intToBoxInt 64) (intToBoxInt 64) (intToBoxInt 0) (intToBoxInt 0)
-      u0 = electromagneticEnergyDensity (MkDiscreteEMCell (intToBoxInt 64) (intToBoxInt 64) (intToBoxInt 0) (intToBoxInt 0))
-      u1 = stepPoyntingEnergy (MkDiscreteEMCell (intToBoxInt 64) (intToBoxInt 64) (intToBoxInt 0) (intToBoxInt 0))
-  in u0 == u1 && unwrapBox u0 == 128
+  let cell = MkDiscreteEMCell (Core.BoxInt.intToBoxInt 64) (Core.BoxInt.intToBoxInt 64) (Core.BoxInt.intToBoxInt 0) (Core.BoxInt.intToBoxInt 0)
+      u0 = electromagneticEnergyDensity (MkDiscreteEMCell (Core.BoxInt.intToBoxInt 64) (Core.BoxInt.intToBoxInt 64) (Core.BoxInt.intToBoxInt 0) (Core.BoxInt.intToBoxInt 0))
+      u1 = stepPoyntingEnergy (MkDiscreteEMCell (Core.BoxInt.intToBoxInt 64) (Core.BoxInt.intToBoxInt 64) (Core.BoxInt.intToBoxInt 0) (Core.BoxInt.intToBoxInt 0))
+  in u0 == u1 && Core.BoxInt.unwrapBox u0 == 128
 
 ||| Audits Toroidal Boundaryless Flux Closure (Global div S = 0):
 ||| Proves that on the discrete 3-torus, the sum of outgoing Poynting fluxes over opposite faces cancels:
@@ -100,9 +100,9 @@ auditVacuumPoyntingInvarianceProof =
 public export
 auditToroidalPoyntingClosureProof : Bool
 auditToroidalPoyntingClosureProof =
-  let fluxEast = intToBoxInt 10
-      fluxWest = intToBoxInt (-10)
-  in unwrapBox (fluxEast + fluxWest) == 0
+  let fluxEast = Core.BoxInt.intToBoxInt 10
+      fluxWest = Core.BoxInt.intToBoxInt (-10)
+  in Core.BoxInt.unwrapBox (fluxEast + fluxWest) == 0
 
 ------------------------------------------------------------------------
 -- 4. MOTIVIC GALOIS POYNTING LAW LIFTING

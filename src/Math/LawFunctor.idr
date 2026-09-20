@@ -2,6 +2,7 @@ module Math.LawFunctor
 
 import Core.BoxInt
 import Core.ScaleTransform
+import Core.Category.Adjunction
 import Math.ActionPrinciple
 import Math.FourGeometries
 
@@ -15,12 +16,21 @@ interface (Functor stateCarrier, ScaleTransform (stateCarrier a) (stateCarrier b
   lawPushforward : (a -> b) -> stateCarrier a -> stateCarrier b
   lawPushforward f container = map f container
 
-  ||| Computes the inverse physical pull-back map (Galois reconstruction)
+  ||| Computes the inverse physical pull-back map (Galois reconstruction - DEPRECATED: Use MultisetAdjunction right adjoint)
   lawPullback : (b -> a) -> stateCarrier b -> stateCarrier a
   lawPullback g container = map g container
 
   ||| Computes the discrete entropy change ΔS across the law application
-  lawEntropyDelta : stateCarrier a -> BoxInt
+  lawEntropyDelta : stateCarrier a -> Core.BoxInt.BoxInt
+
+||| Category-Theoretic Adjoint Physical Law Functor (L ⊣ R) between micro and macro state carriers.
+public export
+interface AdjointLawFunctor (lawIndex : Nat) (0 l : Type -> Type) (0 r : Type -> Type) where
+  ||| Adjunction definition grounding the physical law in Hom-Tensor Natural Isomorphism
+  lawAdjunction : MultisetAdjunction l r
+
+  ||| Computes discrete entropy change ΔS along left adjoint forward pushforward
+  pushforwardEntropyDelta : l a -> Core.BoxInt.BoxInt
 
 ||| Category-theoretic Functor Identity Property: map id x == x
 public export

@@ -130,25 +130,25 @@ ladderToPolynumber levels =
       coeffList = map (\d => findCoeff d levels) [0 .. maxDegree]
   in MkPolynumber coeffList
   where
-    findCoeff : Nat -> List EnergyLevel -> BoxInt
-    findCoeff _ [] = intToBoxInt 0
+    findCoeff : Nat -> List EnergyLevel -> Core.BoxInt.BoxInt
+    findCoeff _ [] = Core.BoxInt.intToBoxInt 0
     findCoeff d (MkEnergyLevel e w :: rest) =
-      if d == e then intToBoxInt (cast w) else findCoeff d rest
+      if d == e then Core.BoxInt.intToBoxInt (cast w) else findCoeff d rest
 
 ||| Generating Polynumber for the Elliptic Sector (Z_Ell = 1 + 3q + 6q^2):
 public export
 ellipticPartitionPoly : Polynumber
-ellipticPartitionPoly = MkPolynumber [intToBoxInt 1, intToBoxInt 3, intToBoxInt 6]
+ellipticPartitionPoly = MkPolynumber [Core.BoxInt.intToBoxInt 1, Core.BoxInt.intToBoxInt 3, Core.BoxInt.intToBoxInt 6]
 
 ||| Generating Polynumber for the Hyperbolic Sector (Z_Hyp = 1 + 8q + 27q^2):
 public export
 hyperbolicPartitionPoly : Polynumber
-hyperbolicPartitionPoly = MkPolynumber [intToBoxInt 1, intToBoxInt 8, intToBoxInt 27]
+hyperbolicPartitionPoly = MkPolynumber [Core.BoxInt.intToBoxInt 1, Core.BoxInt.intToBoxInt 8, Core.BoxInt.intToBoxInt 27]
 
 ||| Generating Polynumber for the Parabolic Sector (Z_Par = 1 + 2q + 4q^2):
 public export
 parabolicPartitionPoly : Polynumber
-parabolicPartitionPoly = MkPolynumber [intToBoxInt 1, intToBoxInt 2, intToBoxInt 4]
+parabolicPartitionPoly = MkPolynumber [Core.BoxInt.intToBoxInt 1, Core.BoxInt.intToBoxInt 2, Core.BoxInt.intToBoxInt 4]
 
 ||| Computes the joint multi-sector Cosmic Partition Function via the Caret Product:
 ||| Z_Cosmic = Z_Ell ^ Z_Hyp ^ Z_Par.
@@ -226,4 +226,3 @@ auditCaretBoltzmannPartitionProof =
           d2 : Nat = case c2 of (_ :: r2) => length r2; [] => Z
           d3 : Nat = case c3 of (_ :: r3) => length r3; [] => Z
       in natEq (d1 * d2 * d3) 8
-

@@ -16,7 +16,7 @@ import Math.HelmholtzFreeEnergy
 public export
 record NonEquilibriumPath where
   constructor MkNonEquilibriumPath
-  pathWork   : BoxInt
+  pathWork   : Core.BoxInt.BoxInt
   pathWeight : Nat
 
 public export
@@ -26,15 +26,15 @@ Eq NonEquilibriumPath where
 
 ||| Computes dissipated work W_diss = <W> - ΔF:
 public export
-computeDissipatedWork : (averageWork : BoxInt) -> (freeEnergyDiff : BoxInt) -> BoxInt
+computeDissipatedWork : (averageWork : Core.BoxInt.BoxInt) -> (freeEnergyDiff : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 computeDissipatedWork avgW deltaF =
   avgW - deltaF
 
 ||| Computes fluctuation-dissipation relation: W_diss = (β * σ_W^2) / 2:
 public export
-fluctuationDissipationWork : (beta : BoxInt) -> (varianceW : BoxInt) -> BoxInt
+fluctuationDissipationWork : (beta : Core.BoxInt.BoxInt) -> (varianceW : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 fluctuationDissipationWork beta varW =
-  (beta * varW) `div` intToBoxInt 2
+  (beta * varW) `div` Core.BoxInt.intToBoxInt 2
 
 ||| Evaluates scaled Jarzynski exponential identity over discrete paths:
 ||| Sum_{i} p_i * exp(-β (W_i - ΔF)) = 1 (represented in scaled integer basis).
@@ -54,8 +54,8 @@ checkJarzynskiNormalization num totalWt =
 public export
 auditDiscreteSecondLawProof : Bool
 auditDiscreteSecondLawProof =
-  let wDiss = computeDissipatedWork (intToBoxInt 100) (intToBoxInt 75)
-  in unwrapBox wDiss == 25 && unwrapBox wDiss >= 0
+  let wDiss = computeDissipatedWork (Core.BoxInt.intToBoxInt 100) (Core.BoxInt.intToBoxInt 75)
+  in Core.BoxInt.unwrapBox wDiss == 25 && Core.BoxInt.unwrapBox wDiss >= 0
 
 ||| Audits Discrete Jarzynski Normalization Identity:
 ||| For normalized trajectory weights summing to 100, the Jarzynski sum yields exactly 100 / 100 = 1.
@@ -70,5 +70,5 @@ auditWorkFreeEnergyEqualityProof =
 public export
 auditFluctuationDissipationProof : Bool
 auditFluctuationDissipationProof =
-  let wDiss = fluctuationDissipationWork (intToBoxInt 2) (intToBoxInt 50)
-  in unwrapBox wDiss == 50
+  let wDiss = fluctuationDissipationWork (Core.BoxInt.intToBoxInt 2) (Core.BoxInt.intToBoxInt 50)
+  in Core.BoxInt.unwrapBox wDiss == 50

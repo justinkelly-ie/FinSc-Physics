@@ -19,9 +19,9 @@ import Data.List
 public export
 record CosmicBudgetPartition where
   constructor MkCosmicBudgetPartition
-  vmTokens : BoxInt
-  deTokens : BoxInt
-  dmTokens : BoxInt
+  vmTokens : Core.BoxInt.BoxInt
+  deTokens : Core.BoxInt.BoxInt
+  dmTokens : Core.BoxInt.BoxInt
 
 public export
 Eq CosmicBudgetPartition where
@@ -31,24 +31,74 @@ Eq CosmicBudgetPartition where
 ||| Computes discrete internal energy U:
 ||| U = 10 * VM + 1 * DE + 0 * DM
 public export
-discreteInternalEnergy : CosmicBudgetPartition -> BoxInt
+discreteInternalEnergy : CosmicBudgetPartition -> Core.BoxInt.BoxInt
 discreteInternalEnergy (MkCosmicBudgetPartition vm de _) =
-  (intToBoxInt 10 * vm) + (intToBoxInt 1 * de)
+  (Core.BoxInt.intToBoxInt 10 * vm) + (Core.BoxInt.intToBoxInt 1 * de)
 
 ||| Computes discrete combinatorial multiset entropy S:
 ||| S = 2 * VM + 5 * DE + 3 * DM
 public export
-discreteEntropy : CosmicBudgetPartition -> BoxInt
+discreteEntropy : CosmicBudgetPartition -> Core.BoxInt.BoxInt
 discreteEntropy (MkCosmicBudgetPartition vm de dm) =
-  (intToBoxInt 2 * vm) + (intToBoxInt 5 * de) + (intToBoxInt 3 * dm)
+  (Core.BoxInt.intToBoxInt 2 * vm) + (Core.BoxInt.intToBoxInt 5 * de) + (Core.BoxInt.intToBoxInt 3 * dm)
 
 ||| Computes discrete Helmholtz Free Energy: F = U - T * S.
 public export
-discreteHelmholtzFreeEnergy : (temp : BoxInt) -> CosmicBudgetPartition -> BoxInt
+discreteHelmholtzFreeEnergy : (temp : Core.BoxInt.BoxInt) -> CosmicBudgetPartition -> Core.BoxInt.BoxInt
 discreteHelmholtzFreeEnergy t part =
   let u = discreteInternalEnergy part
       s = discreteEntropy part
   in u - (t * s)
+
+------------------------------------------------------------------------
+-- 1B. PURE MULTISET BUDGET SECTOR ENCODING & HELMHOLTZ FREE ENERGY
+------------------------------------------------------------------------
+
+||| Cosmic Budget Sector Token Enumeration
+public export
+data BudgetSector = VMSector | DESector | DMSector
+
+public export
+Eq BudgetSector where
+  VMSector == VMSector = True
+  DESector == DESector = True
+  DMSector == DMSector = True
+  _ == _ = False
+
+||| Encodes CosmicBudgetPartition as a pure discrete Multiset BoxInt BudgetSector.
+public export
+partitionToMultiset : CosmicBudgetPartition -> Multiset Core.BoxInt.BoxInt BudgetSector
+partitionToMultiset (MkCosmicBudgetPartition vm de dm) =
+  AddM VMSector vm (AddM DESector de (AddM DMSector dm ZeroM))
+
+||| Multiset evaluation weighting for discrete internal energy U.
+public export
+sectorEnergyWeight : BudgetSector -> Core.BoxInt.BoxInt
+sectorEnergyWeight VMSector = Core.BoxInt.intToBoxInt 10
+sectorEnergyWeight DESector = Core.BoxInt.intToBoxInt 1
+sectorEnergyWeight DMSector = Core.BoxInt.intToBoxInt 0
+
+||| Multiset evaluation weighting for discrete entropy S.
+public export
+sectorEntropyWeight : BudgetSector -> Core.BoxInt.BoxInt
+sectorEntropyWeight VMSector = Core.BoxInt.intToBoxInt 2
+sectorEntropyWeight DESector = Core.BoxInt.intToBoxInt 5
+sectorEntropyWeight DMSector = Core.BoxInt.intToBoxInt 3
+
+||| Evaluates linear weighting functional over a Multiset BoxInt BudgetSector.
+public export
+evalBudgetMultiset : (BudgetSector -> Core.BoxInt.BoxInt) -> Multiset Core.BoxInt.BoxInt BudgetSector -> Core.BoxInt.BoxInt
+evalBudgetMultiset weight ZeroM = Core.BoxInt.intToBoxInt 0
+evalBudgetMultiset weight (AddM s c rest) = (weight s * c) + evalBudgetMultiset weight rest
+
+||| Multiset-powered discrete Helmholtz Free Energy: F = U - T * S.
+public export
+multisetHelmholtzFreeEnergy : (temp : Core.BoxInt.BoxInt) -> Multiset Core.BoxInt.BoxInt BudgetSector -> Core.BoxInt.BoxInt
+multisetHelmholtzFreeEnergy t m =
+  let u = evalBudgetMultiset sectorEnergyWeight m
+      s = evalBudgetMultiset sectorEntropyWeight m
+  in u - (t * s)
+
 
 ------------------------------------------------------------------------
 -- 2. CONSTRUCTIVE FORMAL AUDIT PROOFS
@@ -59,7 +109,7 @@ discreteHelmholtzFreeEnergy t part =
 public export
 standardCosmic210Partition : CosmicBudgetPartition
 standardCosmic210Partition =
-  MkCosmicBudgetPartition (intToBoxInt 27) (intToBoxInt 128) (intToBoxInt 55)
+  MkCosmicBudgetPartition (Core.BoxInt.intToBoxInt 27) (Core.BoxInt.intToBoxInt 128) (Core.BoxInt.intToBoxInt 55)
 
 ||| Audits Discrete Helmholtz Free Energy Minimization at Equilibrium (T = 2):
 ||| For 210 ground state (27, 128, 55):
@@ -76,24 +126,36 @@ standardCosmic210Partition =
 public export
 auditDiscreteHelmholtzMinimizationProof : Bool
 auditDiscreteHelmholtzMinimizationProof =
-  let t = intToBoxInt 2
+  let t = Core.BoxInt.intToBoxInt 2
       ground = standardCosmic210Partition
-      perturbed = MkCosmicBudgetPartition (intToBoxInt 32) (intToBoxInt 123) (intToBoxInt 55)
+      perturbed = MkCosmicBudgetPartition (Core.BoxInt.intToBoxInt 32) (Core.BoxInt.intToBoxInt 123) (Core.BoxInt.intToBoxInt 55)
       fGround = discreteHelmholtzFreeEnergy t ground
       fPerturbed = discreteHelmholtzFreeEnergy t perturbed
-  in unwrapBox fGround == (-1320) &&
-     unwrapBox fPerturbed == (-1245) &&
-     unwrapBox fGround < unwrapBox fPerturbed
+  in Core.BoxInt.unwrapBox fGround == (-1320) &&
+     Core.BoxInt.unwrapBox fPerturbed == (-1245) &&
+     Core.BoxInt.unwrapBox fGround < Core.BoxInt.unwrapBox fPerturbed
 
 ||| Audits Substrate Metric Causal Direction Stationarity:
 ||| Proves that the Substrate metric (g22 = 0) enforces the minimum free energy condition dF <= 0.
 public export
 auditSubstrateStationaryArrowProof : Bool
 auditSubstrateStationaryArrowProof =
-  let t = intToBoxInt 2
+  let t = Core.BoxInt.intToBoxInt 2
       ground = standardCosmic210Partition
       fGround = discreteHelmholtzFreeEnergy t ground
-  in unwrapBox fGround < 0 && (unwrapBox fGround + 1320 == 0)
+  in Core.BoxInt.unwrapBox fGround < 0 && (Core.BoxInt.unwrapBox fGround + 1320 == 0)
+
+||| Audits strict mathematical equivalence between record-based and multiset-based Helmholtz Free Energy calculations.
+public export
+auditMultisetHelmholtzEquivalenceProof : Bool
+auditMultisetHelmholtzEquivalenceProof =
+  let t = Core.BoxInt.intToBoxInt 2
+      part = standardCosmic210Partition
+      mPart = partitionToMultiset part
+      fRecord = discreteHelmholtzFreeEnergy t part
+      fMultiset = multisetHelmholtzFreeEnergy t mPart
+  in fRecord == fMultiset
+
 
 ------------------------------------------------------------------------
 -- 3. CARET POLYNOMIAL FREE ENERGY (CH. 14 & 27)
@@ -102,10 +164,10 @@ auditSubstrateStationaryArrowProof =
 ||| Computes discrete Helmholtz Free Energy directly from a Caret Partition Polynumber:
 ||| F(T, Z) = deg(Z) - T * sum(Z)
 public export
-caretHelmholtzFreeEnergy : (temp : BoxInt) -> Polynumber -> BoxInt
+caretHelmholtzFreeEnergy : (temp : Core.BoxInt.BoxInt) -> Polynumber -> Core.BoxInt.BoxInt
 caretHelmholtzFreeEnergy temp poly =
   let stateSum = summationPolynumber poly
-      degVal   = natToBoxInt (polynumberDegree poly)
+      degVal   = Core.BoxInt.natToBoxInt (polynumberDegree poly)
   in degVal - (temp * stateSum)
 
 ||| Audits that Caret-FIA Free Energy on the Joint Cosmic Partition (Z_Cosmic):
@@ -114,6 +176,6 @@ caretHelmholtzFreeEnergy temp poly =
 public export
 auditCaretHelmholtzMinimizationProof : Bool
 auditCaretHelmholtzMinimizationProof =
-  let t = intToBoxInt 2
+  let t = Core.BoxInt.intToBoxInt 2
       fCosmic = caretHelmholtzFreeEnergy t cosmicCaretPartitionPoly
-  in unwrapBox fCosmic == (-5032) && unwrapBox fCosmic < 0
+  in Core.BoxInt.unwrapBox fCosmic == (-5032) && Core.BoxInt.unwrapBox fCosmic < 0

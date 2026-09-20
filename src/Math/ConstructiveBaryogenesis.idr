@@ -20,9 +20,9 @@ import Data.List
 public export
 record BaryonState where
   constructor MkBaryonState
-  baryonPos    : BoxInt
-  baryonNeg    : BoxInt
-  photonTokens : BoxInt
+  baryonPos    : Core.BoxInt.BoxInt
+  baryonNeg    : Core.BoxInt.BoxInt
+  photonTokens : Core.BoxInt.BoxInt
 
 public export
 Eq BaryonState where
@@ -32,12 +32,12 @@ Eq BaryonState where
 public export
 Show BaryonState where
   show (MkBaryonState p n g) =
-    "BaryonState(B+=" ++ show (unwrapBox p) ++ ", B-=" ++ show (unwrapBox n) ++ 
-    ", N_gamma=" ++ show (unwrapBox g) ++ ")"
+    "BaryonState(B+=" ++ show (Core.BoxInt.unwrapBox p) ++ ", B-=" ++ show (Core.BoxInt.unwrapBox n) ++ 
+    ", N_gamma=" ++ show (Core.BoxInt.unwrapBox g) ++ ")"
 
 ||| Evaluates net baryon number: B_net = B+ - B-.
 public export
-netBaryonNumber : BaryonState -> BoxInt
+netBaryonNumber : BaryonState -> Core.BoxInt.BoxInt
 netBaryonNumber (MkBaryonState p n _) = p - n
 
 ||| Evaluates exact rational baryon asymmetry ratio: eta_B = (B+ - B-) / N_gamma.
@@ -45,7 +45,7 @@ public export
 baryonAsymmetryRatio : BaryonState -> UnixelFraction
 baryonAsymmetryRatio state =
   let bNet = netBaryonNumber state
-      denom = case unwrapBox (photonTokens state) of
+      denom = case Core.BoxInt.unwrapBox (photonTokens state) of
                 v => if v <= 0 then 1 else integerToNat v
   in MkUnixelFraction bNet (MkUnixel denom)
 
@@ -55,19 +55,19 @@ baryonAsymmetryRatio state =
 
 ||| Evaluates Sakharov Condition 1 (Baryon Violation): Delta B != 0.
 public export
-satisfiesBaryonViolation : (bInitial : BoxInt) -> (bFinal : BoxInt) -> Bool
+satisfiesBaryonViolation : (bInitial : Core.BoxInt.BoxInt) -> (bFinal : Core.BoxInt.BoxInt) -> Bool
 satisfiesBaryonViolation b0 b1 = b1 /= b0
 
 ||| Evaluates Sakharov Condition 2 (C and CP Violation): Matter > Antimatter seed asymmetry.
 public export
 satisfiesCPViolation : BaryonState -> Bool
-satisfiesCPViolation (MkBaryonState p n _) = unwrapBox p > unwrapBox n
+satisfiesCPViolation (MkBaryonState p n _) = Core.BoxInt.unwrapBox p > Core.BoxInt.unwrapBox n
 
 ||| Evaluates Sakharov Condition 3 (Out of Thermal Equilibrium):
 ||| Guaranteed by Substrate causal arrow non-zero expansion step.
 public export
-satisfiesOutOfEquilibrium : (causalArrowG22 : BoxInt) -> Bool
-satisfiesOutOfEquilibrium g22 = unwrapBox g22 == 0
+satisfiesOutOfEquilibrium : (causalArrowG22 : Core.BoxInt.BoxInt) -> Bool
+satisfiesOutOfEquilibrium g22 = Core.BoxInt.unwrapBox g22 == 0
 
 ------------------------------------------------------------------------
 -- 3. CONSTRUCTIVE FORMAL AUDIT PROOFS
@@ -80,16 +80,16 @@ satisfiesOutOfEquilibrium g22 = unwrapBox g22 == 0
 public export
 auditBaryonNumberAsymmetryPositiveProof : Bool
 auditBaryonNumberAsymmetryPositiveProof =
-  let state = MkBaryonState (intToBoxInt 1000000001) (intToBoxInt 1000000000) (intToBoxInt 1000000000)
+  let state = MkBaryonState (Core.BoxInt.intToBoxInt 1000000001) (Core.BoxInt.intToBoxInt 1000000000) (Core.BoxInt.intToBoxInt 1000000000)
       bNet = netBaryonNumber state
-  in unwrapBox bNet == 1 && unwrapBox bNet > 0
+  in Core.BoxInt.unwrapBox bNet == 1 && Core.BoxInt.unwrapBox bNet > 0
 
 ||| Audits C and CP Seed Violation (B+ > B-):
 ||| Proves matter seed asymmetry is strictly positive.
 public export
 auditCPViolationSeedAsymmetryProof : Bool
 auditCPViolationSeedAsymmetryProof =
-  let state = MkBaryonState (intToBoxInt 1000000001) (intToBoxInt 1000000000) (intToBoxInt 1000000000)
+  let state = MkBaryonState (Core.BoxInt.intToBoxInt 1000000001) (Core.BoxInt.intToBoxInt 1000000000) (Core.BoxInt.intToBoxInt 1000000000)
   in satisfiesCPViolation state
 
 ||| Audits Substrate Thermal Departure (g22 == 0):
@@ -97,4 +97,4 @@ auditCPViolationSeedAsymmetryProof =
 public export
 auditSubstrateThermalDepartureProof : Bool
 auditSubstrateThermalDepartureProof =
-  satisfiesOutOfEquilibrium (intToBoxInt 0)
+  satisfiesOutOfEquilibrium (Core.BoxInt.intToBoxInt 0)

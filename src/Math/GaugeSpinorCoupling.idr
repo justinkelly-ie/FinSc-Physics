@@ -22,8 +22,8 @@ public export
 record GaugeCoupledSpinor where
   constructor MkGaugeCoupledSpinor
   spinor      : DiracSpinor4
-  gaugeCharge : BoxInt
-  connectionA : (BoxInt, BoxInt, BoxInt, BoxInt)
+  gaugeCharge : Core.BoxInt.BoxInt
+  connectionA : (Core.BoxInt.BoxInt, Core.BoxInt.BoxInt, Core.BoxInt.BoxInt, Core.BoxInt.BoxInt)
 
 public export
 Eq GaugeCoupledSpinor where
@@ -33,13 +33,13 @@ Eq GaugeCoupledSpinor where
 ||| Evaluates discrete gauge-covariant derivative step:
 ||| D_mu psi = nabla_mu psi - q * A_mu * psi
 public export
-gaugeCovariantStep : (derivative : BoxInt) -> (charge : BoxInt) -> (aMu : BoxInt) -> (psiComponent : BoxInt) -> BoxInt
+gaugeCovariantStep : (derivative : Core.BoxInt.BoxInt) -> (charge : Core.BoxInt.BoxInt) -> (aMu : Core.BoxInt.BoxInt) -> (psiComponent : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 gaugeCovariantStep d q a psi =
   d - (q * a * psi)
 
 ||| Computes the gauge-invariant probability density j^0 from the coupled spinor.
 public export
-coupledDiracDensity : GaugeCoupledSpinor -> BoxInt
+coupledDiracDensity : GaugeCoupledSpinor -> Core.BoxInt.BoxInt
 coupledDiracDensity (MkGaugeCoupledSpinor s _ _) = spinorProbabilityDensity s
 
 ------------------------------------------------------------------------
@@ -50,9 +50,9 @@ coupledDiracDensity (MkGaugeCoupledSpinor s _ _) = spinorProbabilityDensity s
 ||| and the TT metric shear perturbation h_ij:
 ||| E_int = h_plus * (j1^2 - j2^2) + 2 * h_cross * (j1 * j2).
 public export
-metricShearSpinorInteraction : (shear : MetricShearTT) -> (j1 : BoxInt) -> (j2 : BoxInt) -> BoxInt
+metricShearSpinorInteraction : (shear : MetricShearTT) -> (j1 : Core.BoxInt.BoxInt) -> (j2 : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 metricShearSpinorInteraction (MkMetricShearTT hPlus hCross) j1 j2 =
-  (hPlus * (j1 * j1 - j2 * j2)) + (intToBoxInt 2 * hCross * j1 * j2)
+  (hPlus * (j1 * j1 - j2 * j2)) + (Core.BoxInt.intToBoxInt 2 * hCross * j1 * j2)
 
 ------------------------------------------------------------------------
 -- 3. CONSTRUCTIVE FORMAL AUDIT PROOFS
@@ -65,7 +65,7 @@ metricShearSpinorInteraction (MkMetricShearTT hPlus hCross) j1 j2 =
 public export
 auditGaugeCovariantDerivativeProof : Bool
 auditGaugeCovariantDerivativeProof =
-  let res = gaugeCovariantStep (intToBoxInt 10) (intToBoxInt 1) (intToBoxInt 2) (intToBoxInt 3)
+  let res = gaugeCovariantStep (Core.BoxInt.intToBoxInt 10) (Core.BoxInt.intToBoxInt 1) (Core.BoxInt.intToBoxInt 2) (Core.BoxInt.intToBoxInt 3)
   in unwrapBox res == 4
 
 ||| Audits Gauge-Coupled Dirac Current Positivity (j^0 >= 0):
@@ -75,7 +75,7 @@ public export
 auditGaugeCoupledCurrentPositivityProof : Bool
 auditGaugeCoupledCurrentPositivityProof =
   let psi = MkDiracSpinor4 (MkPixel 1 0) (MkPixel 2 0) (MkPixel 2 0) (MkPixel 0 0)
-      coupled = MkGaugeCoupledSpinor psi (intToBoxInt 1) (intToBoxInt 0, intToBoxInt 1, intToBoxInt 0, intToBoxInt 0)
+      coupled = MkGaugeCoupledSpinor psi (Core.BoxInt.intToBoxInt 1) (Core.BoxInt.intToBoxInt 0, Core.BoxInt.intToBoxInt 1, Core.BoxInt.intToBoxInt 0, Core.BoxInt.intToBoxInt 0)
       j0 = coupledDiracDensity coupled
   in unwrapBox j0 == 9 && unwrapBox j0 >= 0
 
@@ -85,6 +85,6 @@ auditGaugeCoupledCurrentPositivityProof =
 public export
 auditMetricShearSpinorInteractionProof : Bool
 auditMetricShearSpinorInteractionProof =
-  let shear = MkMetricShearTT (intToBoxInt 0) (intToBoxInt 2)
-      eInt = metricShearSpinorInteraction shear (intToBoxInt 3) (intToBoxInt 2)
+  let shear = MkMetricShearTT (Core.BoxInt.intToBoxInt 0) (Core.BoxInt.intToBoxInt 2)
+      eInt = metricShearSpinorInteraction shear (Core.BoxInt.intToBoxInt 3) (Core.BoxInt.intToBoxInt 2)
   in unwrapBox eInt == 24

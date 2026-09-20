@@ -20,10 +20,10 @@ import Data.Nat
 public export
 record TransportMatrix2x2 where
   constructor MkTransportMatrix2x2
-  l11 : BoxInt
-  l12 : BoxInt
-  l21 : BoxInt
-  l22 : BoxInt
+  l11 : Core.BoxInt.BoxInt
+  l12 : Core.BoxInt.BoxInt
+  l21 : Core.BoxInt.BoxInt
+  l22 : Core.BoxInt.BoxInt
 
 public export
 Eq TransportMatrix2x2 where
@@ -39,7 +39,7 @@ isOnsagerReciprocal (MkTransportMatrix2x2 _ l12 l21 _) =
 ||| Computes discrete entropy production rate:
 ||| sigma = X_1 * (L_11 X_1 + L_12 X_2) + X_2 * (L_21 X_1 + L_22 X_2)
 public export
-entropyProductionRate : TransportMatrix2x2 -> (x1 : BoxInt) -> (x2 : BoxInt) -> BoxInt
+entropyProductionRate : TransportMatrix2x2 -> (x1 : Core.BoxInt.BoxInt) -> (x2 : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 entropyProductionRate (MkTransportMatrix2x2 l11 l12 l21 l22) x1 x2 =
   let v1 = unwrapBox x1
       v2 = unwrapBox x2
@@ -50,7 +50,7 @@ entropyProductionRate (MkTransportMatrix2x2 l11 l12 l21 l22) x1 x2 =
       j1 = k11 * v1 + k12 * v2
       j2 = k21 * v1 + k22 * v2
       prod = v1 * j1 + v2 * j2
-  in intToBoxInt prod
+  in Core.BoxInt.intToBoxInt prod
 
 ------------------------------------------------------------------------
 -- 2. CONSTRUCTIVE FORMAL AUDIT PROOFS
@@ -66,9 +66,9 @@ entropyProductionRate (MkTransportMatrix2x2 l11 l12 l21 l22) x1 x2 =
 public export
 auditReciprocalTransportProof : Bool
 auditReciprocalTransportProof =
-  let lMat = MkTransportMatrix2x2 (intToBoxInt 4) (intToBoxInt 2) (intToBoxInt 2) (intToBoxInt 3)
-      x1 = intToBoxInt 3
-      x2 = intToBoxInt 1
+  let lMat = MkTransportMatrix2x2 (Core.BoxInt.intToBoxInt 4) (Core.BoxInt.intToBoxInt 2) (Core.BoxInt.intToBoxInt 2) (Core.BoxInt.intToBoxInt 3)
+      x1 = Core.BoxInt.intToBoxInt 3
+      x2 = Core.BoxInt.intToBoxInt 1
       sigma = entropyProductionRate lMat x1 x2
   in isOnsagerReciprocal lMat &&
      unwrapBox sigma == 51 &&

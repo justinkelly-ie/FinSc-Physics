@@ -29,9 +29,9 @@ evaluateDiscreteInstantonCharge sumVal divVal =
 ||| Computes the discrete axial current divergence (Chiral Anomaly equation):
 ||| ∇ · j_5 = 2 * m * j_5 + 2 * Q_top.
 public export
-discreteAxialCurrentDivergence : (mass : BoxInt) -> (j5Density : BoxInt) -> (qTop : BoxInt) -> BoxInt
+discreteAxialCurrentDivergence : (mass : Core.BoxInt.BoxInt) -> (j5Density : Core.BoxInt.BoxInt) -> (qTop : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 discreteAxialCurrentDivergence m j5 q =
-  (intToBoxInt 2 * m * j5) + (intToBoxInt 2 * q)
+  (Core.BoxInt.intToBoxInt 2 * m * j5) + (Core.BoxInt.intToBoxInt 2 * q)
 
 ||| Validates the Atiyah-Singer Index Theorem on discrete lattices:
 ||| Index(D) ≡ Q_top.

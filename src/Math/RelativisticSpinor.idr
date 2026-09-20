@@ -36,14 +36,14 @@ Show DiracSpinor4 where
 ||| Evaluates the signed integer value of a Pixel component: (pos - neg).
 %inline
 public export
-evalSpinorComponent : Pixel -> BoxInt
-evalSpinorComponent (MkPixel p n) = intToBoxInt (cast p - cast n)
+evalSpinorComponent : Pixel -> Core.BoxInt.BoxInt
+evalSpinorComponent (MkPixel p n) = Core.BoxInt.intToBoxInt (cast p - cast n)
 
 ||| Computes the positive discrete probability / charge density:
 ||| j_0 = sum_{k=1}^4 (eval(comp_k))^2 >= 0.
 %inline
 public export
-spinorProbabilityDensity : DiracSpinor4 -> BoxInt
+spinorProbabilityDensity : DiracSpinor4 -> Core.BoxInt.BoxInt
 spinorProbabilityDensity (MkDiracSpinor4 c1 c2 c3 c4) =
   let v1 = evalSpinorComponent c1
       v2 = evalSpinorComponent c2
@@ -54,7 +54,7 @@ spinorProbabilityDensity (MkDiracSpinor4 c1 c2 c3 c4) =
 ||| Evaluates discrete 4-current divergence across a closed cell complex.
 %inline
 public export
-evaluateDirac4CurrentDivergence : DiracSpinor4 -> BoxInt
+evaluateDirac4CurrentDivergence : DiracSpinor4 -> Core.BoxInt.BoxInt
 evaluateDirac4CurrentDivergence (MkDiracSpinor4 c1 c2 c3 c4) =
   let v1 = evalSpinorComponent c1
       v2 = evalSpinorComponent c2
@@ -71,15 +71,15 @@ evaluateDirac4CurrentDivergence (MkDiracSpinor4 c1 c2 c3 c4) =
 public export
 record ChiralComponents where
   constructor MkChiralComponents
-  leftHanded  : BoxInt
-  rightHanded : BoxInt
+  leftHanded  : Core.BoxInt.BoxInt
+  rightHanded : Core.BoxInt.BoxInt
 
 %inline
 public export
-decomposeChiral : BoxInt -> BoxInt -> ChiralComponents
+decomposeChiral : Core.BoxInt.BoxInt -> Core.BoxInt.BoxInt -> ChiralComponents
 decomposeChiral v chiralWeight =
-  let left  = (v * (intToBoxInt 1 - chiralWeight)) `div` intToBoxInt 2
-      right = (v * (intToBoxInt 1 + chiralWeight)) `div` intToBoxInt 2
+  let left  = (v * (Core.BoxInt.intToBoxInt 1 - chiralWeight)) `div` Core.BoxInt.intToBoxInt 2
+      right = (v * (Core.BoxInt.intToBoxInt 1 + chiralWeight)) `div` Core.BoxInt.intToBoxInt 2
   in MkChiralComponents left right
 
 ------------------------------------------------------------------------
@@ -116,8 +116,8 @@ auditDiracCurrentConservationProof =
 public export
 auditChiralProjectorCompletenessProof : Bool
 auditChiralProjectorCompletenessProof =
-  let v = intToBoxInt 100
-      decomp = decomposeChiral v (intToBoxInt 1)
+  let v = Core.BoxInt.intToBoxInt 100
+      decomp = decomposeChiral v (Core.BoxInt.intToBoxInt 1)
   in unwrapBox (leftHanded decomp) == 0 &&
      unwrapBox (rightHanded decomp) == 100 &&
      (unwrapBox (leftHanded decomp) + unwrapBox (rightHanded decomp)) == 100

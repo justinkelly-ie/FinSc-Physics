@@ -18,21 +18,21 @@ import Data.Nat
 ||| Computes the exact discrete Bohmian Quantum Potential from amplitude R and its Laplacian Delta R:
 ||| Q = - (Delta R) / (2 * R) (in exact UnixelFraction units).
 public export
-discreteQuantumPotential : (laplacianR : BoxInt) -> (amplitudeR : Nat) -> UnixelFraction
+discreteQuantumPotential : (laplacianR : Core.BoxInt.BoxInt) -> (amplitudeR : Nat) -> UnixelFraction
 discreteQuantumPotential lapR r =
   let lapVal = unwrapBox lapR
       denom = if r == 0 then 1 else 2 * r
-  in MkUnixelFraction (intToBoxInt (- lapVal)) (MkUnixel denom)
+  in MkUnixelFraction (Core.BoxInt.intToBoxInt (- lapVal)) (MkUnixel denom)
 
 ||| Total Discrete Bohmian Particle Energy along a causal trajectory:
 ||| E_total = E_kin + V_classical + Q_quantum
 public export
-bohmianTotalEnergy : (kin : BoxInt) -> (vClassical : BoxInt) -> (qQuantum : BoxInt) -> BoxInt
+bohmianTotalEnergy : (kin : Core.BoxInt.BoxInt) -> (vClassical : Core.BoxInt.BoxInt) -> (qQuantum : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 bohmianTotalEnergy k v q =
   let kVal = unwrapBox k
       vVal = unwrapBox v
       qVal = unwrapBox q
-  in intToBoxInt (kVal + vVal + qVal)
+  in Core.BoxInt.intToBoxInt (kVal + vVal + qVal)
 
 ------------------------------------------------------------------------
 -- 2. CONSTRUCTIVE FORMAL AUDIT PROOFS
@@ -48,8 +48,7 @@ bohmianTotalEnergy k v q =
 public export
 auditQuantumPotentialProof : Bool
 auditQuantumPotentialProof =
-  case discreteQuantumPotential (intToBoxInt 4) 2 of
+  case discreteQuantumPotential (Core.BoxInt.intToBoxInt 4) 2 of
     MkUnixelFraction qNum (MkUnixel qDen) =>
-      let eTot = bohmianTotalEnergy (intToBoxInt 5) (intToBoxInt 6) (intToBoxInt (-1))
-      in (qNum == intToBoxInt (-4)) && natEq qDen 4 && (eTot == intToBoxInt 10)
-
+      let eTot = bohmianTotalEnergy (Core.BoxInt.intToBoxInt 5) (Core.BoxInt.intToBoxInt 6) (Core.BoxInt.intToBoxInt (-1))
+      in (qNum == Core.BoxInt.intToBoxInt (-4)) && natEq qDen 4 && (eTot == Core.BoxInt.intToBoxInt 10)

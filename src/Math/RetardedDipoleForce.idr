@@ -18,20 +18,20 @@ import Data.Nat
 ||| Computes the short-range non-retarded London dispersion potential:
 ||| V_London(Q) = - C6 / Q^3 (in exact UnixelFraction units)
 public export
-discreteLondonPotential : (c6 : BoxInt) -> (quadranceQ : Nat) -> UnixelFraction
+discreteLondonPotential : (c6 : Core.BoxInt.BoxInt) -> (quadranceQ : Nat) -> UnixelFraction
 discreteLondonPotential c6 q =
   let c6Val = unwrapBox c6
       denom = if q == 0 then 1 else q * q * q
-  in MkUnixelFraction (intToBoxInt (- c6Val)) (MkUnixel denom)
+  in MkUnixelFraction (Core.BoxInt.intToBoxInt (- c6Val)) (MkUnixel denom)
 
 ||| Computes the long-range retarded Casimir-Polder potential:
 ||| V_CP(Q) = - C7 / Q^4 (in exact UnixelFraction units)
 public export
-discreteCasimirPolderPotential : (c7 : BoxInt) -> (quadranceQ : Nat) -> UnixelFraction
+discreteCasimirPolderPotential : (c7 : Core.BoxInt.BoxInt) -> (quadranceQ : Nat) -> UnixelFraction
 discreteCasimirPolderPotential c7 q =
   let c7Val = unwrapBox c7
       denom = if q == 0 then 1 else q * q * q * q
-  in MkUnixelFraction (intToBoxInt (- c7Val)) (MkUnixel denom)
+  in MkUnixelFraction (Core.BoxInt.intToBoxInt (- c7Val)) (MkUnixel denom)
 
 ||| Validates that both London and Casimir-Polder forces are strictly attractive (negative potential):
 public export
@@ -52,9 +52,8 @@ isAttractiveDispersion (MkUnixelFraction n _) = boxNegative n
 public export
 auditRetardedDipoleForceProof : Bool
 auditRetardedDipoleForceProof =
-  case (discreteLondonPotential (intToBoxInt 8) 2, discreteCasimirPolderPotential (intToBoxInt 81) 3) of
+  case (discreteLondonPotential (Core.BoxInt.intToBoxInt 8) 2, discreteCasimirPolderPotential (Core.BoxInt.intToBoxInt 81) 3) of
     (MkUnixelFraction n1 (MkUnixel d1), MkUnixelFraction n2 (MkUnixel d2)) =>
-      (n1 == intToBoxInt (-8)) && natEq d1 8 &&
-      (n2 == intToBoxInt (-81)) && natEq d2 81 &&
+      (n1 == Core.BoxInt.intToBoxInt (-8)) && natEq d1 8 &&
+      (n2 == Core.BoxInt.intToBoxInt (-81)) && natEq d2 81 &&
       boxNegative n1 && boxNegative n2
-

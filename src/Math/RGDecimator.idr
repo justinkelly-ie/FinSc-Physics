@@ -31,10 +31,10 @@ interface RGDecimator micro macro | micro where
 public export
 record Plaquette2x2 where
   constructor MkPlaquette2x2
-  f00 : BoxInt
-  f01 : BoxInt
-  f10 : BoxInt
-  f11 : BoxInt
+  f00 : Core.BoxInt.BoxInt
+  f01 : Core.BoxInt.BoxInt
+  f10 : Core.BoxInt.BoxInt
+  f11 : Core.BoxInt.BoxInt
 
 public export
 Eq Plaquette2x2 where
@@ -46,7 +46,7 @@ Eq Plaquette2x2 where
 public export
 record MacroPlaquette where
   constructor MkMacroPlaquette
-  totalFlux : BoxInt
+  totalFlux : Core.BoxInt.BoxInt
 
 public export
 Eq MacroPlaquette where
@@ -66,8 +66,8 @@ RGDecimator Plaquette2x2 MacroPlaquette where
 ||| Evaluates discrete topological First Chern Number over a list of decimated macro-plaquettes:
 ||| C_1 = sum_i MacroPlaquette_i.
 public export
-decimatedChernNumber : List MacroPlaquette -> BoxInt
-decimatedChernNumber [] = intToBoxInt 0
+decimatedChernNumber : List MacroPlaquette -> Core.BoxInt.BoxInt
+decimatedChernNumber [] = Core.BoxInt.intToBoxInt 0
 decimatedChernNumber (MkMacroPlaquette f :: rest) = f + decimatedChernNumber rest
 
 ------------------------------------------------------------------------
@@ -81,7 +81,7 @@ decimatedChernNumber (MkMacroPlaquette f :: rest) = f + decimatedChernNumber res
 public export
 auditPlaquetteDecimationProof : Bool
 auditPlaquetteDecimationProof =
-  let micro = MkPlaquette2x2 (intToBoxInt 1) (intToBoxInt 3) (intToBoxInt (-1)) (intToBoxInt 2)
+  let micro = MkPlaquette2x2 (Core.BoxInt.intToBoxInt 1) (Core.BoxInt.intToBoxInt 3) (Core.BoxInt.intToBoxInt (-1)) (Core.BoxInt.intToBoxInt 2)
       macro = decimate micro
   in unwrapBox (totalFlux macro) == 5 && isScaleInvariant micro macro
 
@@ -91,8 +91,8 @@ auditPlaquetteDecimationProof =
 public export
 auditMultiBlockTopologicalFixedPointProof : Bool
 auditMultiBlockTopologicalFixedPointProof =
-  let b1 = MkPlaquette2x2 (intToBoxInt 1) (intToBoxInt 2) (intToBoxInt 0) (intToBoxInt 1)
-      b2 = MkPlaquette2x2 (intToBoxInt 2) (intToBoxInt (-1)) (intToBoxInt 1) (intToBoxInt 1)
+  let b1 = MkPlaquette2x2 (Core.BoxInt.intToBoxInt 1) (Core.BoxInt.intToBoxInt 2) (Core.BoxInt.intToBoxInt 0) (Core.BoxInt.intToBoxInt 1)
+      b2 = MkPlaquette2x2 (Core.BoxInt.intToBoxInt 2) (Core.BoxInt.intToBoxInt (-1)) (Core.BoxInt.intToBoxInt 1) (Core.BoxInt.intToBoxInt 1)
       m1 = decimate b1
       m2 = decimate b2
       cMacro = decimatedChernNumber [m1, m2]
@@ -158,4 +158,3 @@ public export
 auditRGMagicMaxelDecimationProof : Bool
 auditRGMagicMaxelDecimationProof =
   isMagicMaxel rgDecimationMagicMaxel 4
-

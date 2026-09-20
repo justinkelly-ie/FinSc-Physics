@@ -17,13 +17,13 @@ import Data.Nat
 ||| Computes the gauge-invariant topological photon mass:
 ||| m_gamma = level * couplingSquared (on exact integer BoxInt units).
 public export
-discreteChernSimonsMass : (level : BoxInt) -> (couplingSquared : BoxInt) -> BoxInt
+discreteChernSimonsMass : (level : Core.BoxInt.BoxInt) -> (couplingSquared : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 discreteChernSimonsMass k e2 = k * e2
 
 ||| Proves Parity & Time-Reversal Oddness of Chern-Simons mass:
 ||| Under P or T inversion: k -> -k => m_gamma -> -m_gamma.
 public export
-isChernSimonsParityOdd : (level : BoxInt) -> (couplingSquared : BoxInt) -> Bool
+isChernSimonsParityOdd : (level : Core.BoxInt.BoxInt) -> (couplingSquared : Core.BoxInt.BoxInt) -> Bool
 isChernSimonsParityOdd k e2 =
   let mOrig = discreteChernSimonsMass k e2
       kInv  = negate k
@@ -44,10 +44,10 @@ isChernSimonsParityOdd k e2 =
 public export
 auditTopologicalGaugeMassProof : Bool
 auditTopologicalGaugeMassProof =
-  let kLevel = intToBoxInt 3
-      e2Val  = intToBoxInt 4
+  let kLevel = Core.BoxInt.intToBoxInt 3
+      e2Val  = Core.BoxInt.intToBoxInt 4
       mPhot  = discreteChernSimonsMass kLevel e2Val
-      mZero  = discreteChernSimonsMass (intToBoxInt 0) e2Val
+      mZero  = discreteChernSimonsMass (Core.BoxInt.intToBoxInt 0) e2Val
   in unwrapBox mPhot == 12 &&
      unwrapBox mZero == 0 &&
      isChernSimonsParityOdd kLevel e2Val

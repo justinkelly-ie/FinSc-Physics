@@ -40,7 +40,7 @@ isBuettikerReciprocal (MkConductanceMatrix3x3 g12 g13 g21 g23 g31 g32) =
 ||| Computes Terminal Currents I_1, I_2, I_3 given Terminal Voltages V_1, V_2, V_3:
 ||| I_p = sum_{q != p} G_pq * (V_p - V_q)
 public export
-terminalCurrents : ConductanceMatrix3x3 -> (v1 : BoxInt) -> (v2 : BoxInt) -> (v3 : BoxInt) -> (BoxInt, BoxInt, BoxInt)
+terminalCurrents : ConductanceMatrix3x3 -> (v1 : Core.BoxInt.BoxInt) -> (v2 : Core.BoxInt.BoxInt) -> (v3 : Core.BoxInt.BoxInt) -> (Core.BoxInt.BoxInt, Core.BoxInt.BoxInt, Core.BoxInt.BoxInt)
 terminalCurrents (MkConductanceMatrix3x3 g12 g13 g21 g23 g31 g32) v1 v2 v3 =
   let u1 = unwrapBox v1
       u2 = unwrapBox v2
@@ -48,11 +48,11 @@ terminalCurrents (MkConductanceMatrix3x3 g12 g13 g21 g23 g31 g32) v1 v2 v3 =
       i1 = (cast g12) * (u1 - u2) + (cast g13) * (u1 - u3)
       i2 = (cast g21) * (u2 - u1) + (cast g23) * (u2 - u3)
       i3 = (cast g31) * (u3 - u1) + (cast g32) * (u3 - u2)
-  in (intToBoxInt i1, intToBoxInt i2, intToBoxInt i3)
+  in (Core.BoxInt.intToBoxInt i1, Core.BoxInt.intToBoxInt i2, Core.BoxInt.intToBoxInt i3)
 
 ||| Validates Kirchhoff Total Current Conservation: I_1 + I_2 + I_3 == 0.
 public export
-isKirchhoffConserved : (BoxInt, BoxInt, BoxInt) -> Bool
+isKirchhoffConserved : (Core.BoxInt.BoxInt, Core.BoxInt.BoxInt, Core.BoxInt.BoxInt) -> Bool
 isKirchhoffConserved (i1, i2, i3) =
   unwrapBox i1 + unwrapBox i2 + unwrapBox i3 == 0
 
@@ -72,9 +72,9 @@ public export
 auditMultiTerminalConductionProof : Bool
 auditMultiTerminalConductionProof =
   let gMat = MkConductanceMatrix3x3 2 1 2 3 1 3
-      v1 = intToBoxInt 10
-      v2 = intToBoxInt 5
-      v3 = intToBoxInt 2
+      v1 = Core.BoxInt.intToBoxInt 10
+      v2 = Core.BoxInt.intToBoxInt 5
+      v3 = Core.BoxInt.intToBoxInt 2
       currs = terminalCurrents gMat v1 v2 v3
       (i1, i2, i3) = currs
   in isBuettikerReciprocal gMat &&

@@ -18,8 +18,8 @@ import Data.List
 public export
 record GalacticProfile where
   constructor MkGalacticProfile
-  coreBaryonMass : BoxInt
-  diskMassSlope  : BoxInt
+  coreBaryonMass : Core.BoxInt.BoxInt
+  diskMassSlope  : Core.BoxInt.BoxInt
 
 public export
 Eq GalacticProfile where
@@ -28,15 +28,15 @@ Eq GalacticProfile where
 
 ||| Evaluates enclosed baryonic mass at radius r: M(r) = M_core + k * r.
 public export
-enclosedMass : GalacticProfile -> (radius : BoxInt) -> BoxInt
+enclosedMass : GalacticProfile -> (radius : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 enclosedMass (MkGalacticProfile m0 k) r = m0 + (k * r)
 
 ||| Computes standard Newtonian circular velocity squared: v_N^2(r) = (G * M(r)) / r.
 public export
-newtonianVelocitySquared : (gConst : BoxInt) -> GalacticProfile -> (radius : BoxInt) -> BoxInt
+newtonianVelocitySquared : (gConst : Core.BoxInt.BoxInt) -> GalacticProfile -> (radius : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 newtonianVelocitySquared g gal r =
   let m = enclosedMass gal r
-      rVal = if unwrapBox r == 0 then intToBoxInt 1 else r
+      rVal = if unwrapBox r == 0 then Core.BoxInt.intToBoxInt 1 else r
   in (g * m) `div` rVal
 
 ||| Computes emergent rotation velocity squared under Dark Matter Cyclotomic Drag:
@@ -44,12 +44,12 @@ newtonianVelocitySquared g gal r =
 ||| For localized core baryonic mass M_core, v^2(r) = G * M_core * dragSlope + (G * M_core / r),
 ||| which approaches an asymptotically FLAT velocity plateau (G * M_core * dragSlope) as r -> infinity!
 public export
-emergentRotationVelocitySquared : (gConst : BoxInt) -> (dragSlope : BoxInt) ->
-                                  GalacticProfile -> (radius : BoxInt) -> BoxInt
+emergentRotationVelocitySquared : (gConst : Core.BoxInt.BoxInt) -> (dragSlope : Core.BoxInt.BoxInt) ->
+                                  GalacticProfile -> (radius : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 emergentRotationVelocitySquared g slope gal r =
   let m = enclosedMass gal r
-      rVal = if unwrapBox r == 0 then intToBoxInt 1 else r
-      dragFactor = intToBoxInt 1 + (slope * rVal)
+      rVal = if unwrapBox r == 0 then Core.BoxInt.intToBoxInt 1 else r
+      dragFactor = Core.BoxInt.intToBoxInt 1 + (slope * rVal)
   in (g * m * dragFactor) `div` rVal
 
 ------------------------------------------------------------------------
@@ -58,18 +58,18 @@ emergentRotationVelocitySquared g slope gal r =
 
 ||| Simulates galactic rotation velocity profile across radii r = 1..10 at a single timestep.
 public export
-simulateGalacticRadiusProfile : (gConst : BoxInt) -> (dragSlope : BoxInt) ->
-                                GalacticProfile -> List BoxInt
+simulateGalacticRadiusProfile : (gConst : Core.BoxInt.BoxInt) -> (dragSlope : Core.BoxInt.BoxInt) ->
+                                GalacticProfile -> List Core.BoxInt.BoxInt
 simulateGalacticRadiusProfile g slope gal =
-  map (\r => emergentRotationVelocitySquared g slope gal (intToBoxInt (cast r))) [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  map (\r => emergentRotationVelocitySquared g slope gal (Core.BoxInt.intToBoxInt (cast r))) [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 ||| Simulates a 1,000-step time-series galactic rotation curve evolution.
 public export
-simulateGalacticRotationTimeSeries : (steps : Nat) -> (gConst : BoxInt) -> (dragSlope : BoxInt) ->
-                                     GalacticProfile -> List BoxInt
+simulateGalacticRotationTimeSeries : (steps : Nat) -> (gConst : Core.BoxInt.BoxInt) -> (dragSlope : Core.BoxInt.BoxInt) ->
+                                     GalacticProfile -> List Core.BoxInt.BoxInt
 simulateGalacticRotationTimeSeries Z g slope gal = simulateGalacticRadiusProfile g slope gal
 simulateGalacticRotationTimeSeries (S k) g slope (MkGalacticProfile core s) =
-  let updatedGal = MkGalacticProfile (core + intToBoxInt 1) s
+  let updatedGal = MkGalacticProfile (core + Core.BoxInt.intToBoxInt 1) s
   in simulateGalacticRotationTimeSeries k g slope updatedGal
 
 ------------------------------------------------------------------------
@@ -86,11 +86,11 @@ simulateGalacticRotationTimeSeries (S k) g slope (MkGalacticProfile core s) =
 public export
 auditGalacticRotationFlatnessProof : Bool
 auditGalacticRotationFlatnessProof =
-  let gal = MkGalacticProfile (intToBoxInt 100) (intToBoxInt 0)
-      g = intToBoxInt 100
-      dragSlope = intToBoxInt 1
-      v10 = emergentRotationVelocitySquared g dragSlope gal (intToBoxInt 10)
-      v20 = emergentRotationVelocitySquared g dragSlope gal (intToBoxInt 20)
+  let gal = MkGalacticProfile (Core.BoxInt.intToBoxInt 100) (Core.BoxInt.intToBoxInt 0)
+      g = Core.BoxInt.intToBoxInt 100
+      dragSlope = Core.BoxInt.intToBoxInt 1
+      v10 = emergentRotationVelocitySquared g dragSlope gal (Core.BoxInt.intToBoxInt 10)
+      v20 = emergentRotationVelocitySquared g dragSlope gal (Core.BoxInt.intToBoxInt 20)
   in unwrapBox v10 == 11000 && unwrapBox v20 == 10500 &&
      abs (unwrapBox v10 - unwrapBox v20) <= 600
 
@@ -100,12 +100,12 @@ auditGalacticRotationFlatnessProof =
 public export
 auditTullyFisherRelationProof : Bool
 auditTullyFisherRelationProof =
-  let gal1 = MkGalacticProfile (intToBoxInt 100) (intToBoxInt 0)
-      gal2 = MkGalacticProfile (intToBoxInt 200) (intToBoxInt 0) -- 2x Baryon Mass
-      g = intToBoxInt 100
-      dragSlope = intToBoxInt 1
-      v1 = emergentRotationVelocitySquared g dragSlope gal1 (intToBoxInt 10)
-      v2 = emergentRotationVelocitySquared g dragSlope gal2 (intToBoxInt 10)
+  let gal1 = MkGalacticProfile (Core.BoxInt.intToBoxInt 100) (Core.BoxInt.intToBoxInt 0)
+      gal2 = MkGalacticProfile (Core.BoxInt.intToBoxInt 200) (Core.BoxInt.intToBoxInt 0) -- 2x Baryon Mass
+      g = Core.BoxInt.intToBoxInt 100
+      dragSlope = Core.BoxInt.intToBoxInt 1
+      v1 = emergentRotationVelocitySquared g dragSlope gal1 (Core.BoxInt.intToBoxInt 10)
+      v2 = emergentRotationVelocitySquared g dragSlope gal2 (Core.BoxInt.intToBoxInt 10)
   in unwrapBox v2 > unwrapBox v1 && unwrapBox v2 == (unwrapBox v1 * 2)
 
 ||| Audits 1,000-Step Time-Series Galactic Rotation Curve Simulation:

@@ -20,8 +20,8 @@ public export
 record BitMemoryState where
   constructor MkBitMemoryState
   activeBits   : Nat
-  activeEnergy : BoxInt
-  sinkEnergy   : BoxInt
+  activeEnergy : Core.BoxInt.BoxInt
+  sinkEnergy   : Core.BoxInt.BoxInt
 
 public export
 Eq BitMemoryState where
@@ -31,11 +31,11 @@ Eq BitMemoryState where
 public export
 Show BitMemoryState where
   show (MkBitMemoryState b e s) =
-    "BitMemory(bits=" ++ show b ++ ", E_active=" ++ show (unwrapBox e) ++ ", E_sink=" ++ show (unwrapBox s) ++ ")"
+    "BitMemory(bits=" ++ show b ++ ", E_active=" ++ show (Core.BoxInt.unwrapBox e) ++ ", E_sink=" ++ show (Core.BoxInt.unwrapBox s) ++ ")"
 
 ||| Evaluates the total energy across the active computational register and the parabolic sink.
 public export
-totalMemoryEnergy : BitMemoryState -> BoxInt
+totalMemoryEnergy : BitMemoryState -> Core.BoxInt.BoxInt
 totalMemoryEnergy (MkBitMemoryState _ e s) = e + s
 
 ------------------------------------------------------------------------
@@ -49,7 +49,7 @@ eraseBitAndDissipate : (b : Nat) -> (tScale : Nat) -> BitMemoryState -> BitMemor
 eraseBitAndDissipate b tScale (MkBitMemoryState curBits curE curSink) =
   let erasedBits = if b > curBits then curBits else b
       remainingBits = minus curBits erasedBits
-      dissipated = intToBoxInt (cast (erasedBits * tScale))
+      dissipated = Core.BoxInt.intToBoxInt (cast (erasedBits * tScale))
       newE = curE - dissipated
       newSink = curSink + dissipated
   in MkBitMemoryState remainingBits newE newSink
@@ -65,12 +65,12 @@ eraseBitAndDissipate b tScale (MkBitMemoryState curBits curE curSink) =
 public export
 auditLandauerDissipationBoundProof : Bool
 auditLandauerDissipationBoundProof =
-  let init = MkBitMemoryState 8 (intToBoxInt 100) (intToBoxInt 20)
+  let init = MkBitMemoryState 8 (Core.BoxInt.intToBoxInt 100) (Core.BoxInt.intToBoxInt 20)
       after = eraseBitAndDissipate 4 2 init
       deltaSink = sinkEnergy after - sinkEnergy init
       deltaE = activeEnergy init - activeEnergy after
-  in unwrapBox deltaSink == 8 &&
-     unwrapBox deltaE == 8 &&
+  in Core.BoxInt.unwrapBox deltaSink == 8 &&
+     Core.BoxInt.unwrapBox deltaE == 8 &&
      activeBits after == 4
 
 ||| Audits Exact QTT Total Energy Conservation during bit erasure:
@@ -78,7 +78,7 @@ auditLandauerDissipationBoundProof =
 public export
 auditLandauerTotalConservationProof : Bool
 auditLandauerTotalConservationProof =
-  let init = MkBitMemoryState 10 (intToBoxInt 200) (intToBoxInt 55)
+  let init = MkBitMemoryState 10 (Core.BoxInt.intToBoxInt 200) (Core.BoxInt.intToBoxInt 55)
       after = eraseBitAndDissipate 7 3 init
   in totalMemoryEnergy init == totalMemoryEnergy after
 
@@ -88,7 +88,7 @@ auditLandauerTotalConservationProof =
 public export
 auditParabolicSinkMonotonicityProof : Bool
 auditParabolicSinkMonotonicityProof =
-  let init = MkBitMemoryState 5 (intToBoxInt 50) (intToBoxInt 10)
+  let init = MkBitMemoryState 5 (Core.BoxInt.intToBoxInt 50) (Core.BoxInt.intToBoxInt 10)
       after = eraseBitAndDissipate 3 1 init
-      deltaSink = unwrapBox (sinkEnergy after - sinkEnergy init)
+      deltaSink = Core.BoxInt.unwrapBox (sinkEnergy after - sinkEnergy init)
   in deltaSink >= 0 && deltaSink == 3

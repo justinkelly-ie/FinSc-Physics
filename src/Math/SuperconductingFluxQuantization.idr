@@ -19,9 +19,9 @@ import Data.List
 public export
 record SuperconductingLoop where
   constructor MkSuperconductingLoop
-  cooperPairCharge : BoxInt
-  fluxQuantumPhi0  : BoxInt
-  windingNumber    : BoxInt
+  cooperPairCharge : Core.BoxInt.BoxInt
+  fluxQuantumPhi0  : Core.BoxInt.BoxInt
+  windingNumber    : Core.BoxInt.BoxInt
 
 public export
 Eq SuperconductingLoop where
@@ -36,7 +36,7 @@ Show SuperconductingLoop where
 
 ||| Evaluates total trapped magnetic flux: Phi = n * Phi_0.
 public export
-trappedMagneticFlux : SuperconductingLoop -> BoxInt
+trappedMagneticFlux : SuperconductingLoop -> Core.BoxInt.BoxInt
 trappedMagneticFlux (MkSuperconductingLoop _ f0 n) = n * f0
 
 ------------------------------------------------------------------------
@@ -47,9 +47,9 @@ trappedMagneticFlux (MkSuperconductingLoop _ f0 n) = n * f0
 ||| delta_phi = (2e * V) / hbar = 2 * V.
 ||| phi(t+1) = (phi(t) + 2 * V) mod (2 * pi).
 public export
-stepJosephsonPhase : (phi : BoxInt) -> (voltage : BoxInt) -> (period : BoxInt) -> BoxInt
+stepJosephsonPhase : (phi : Core.BoxInt.BoxInt) -> (voltage : Core.BoxInt.BoxInt) -> (period : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
 stepJosephsonPhase phi v period =
-  let nextPhase = phi + (intToBoxInt 2 * v)
+  let nextPhase = phi + (Core.BoxInt.intToBoxInt 2 * v)
   in nextPhase `mod` period
 
 ------------------------------------------------------------------------
@@ -63,7 +63,7 @@ stepJosephsonPhase phi v period =
 public export
 auditCooperPairFluxQuantumProof : Bool
 auditCooperPairFluxQuantumProof =
-  let loop = MkSuperconductingLoop (intToBoxInt 2) (intToBoxInt 1) (intToBoxInt 0)
+  let loop = MkSuperconductingLoop (Core.BoxInt.intToBoxInt 2) (Core.BoxInt.intToBoxInt 1) (Core.BoxInt.intToBoxInt 0)
   in unwrapBox (cooperPairCharge loop) == 2
 
 ||| Audits Exact Integer Magnetic Flux Quantization (Phi = n * Phi_0):
@@ -72,7 +72,7 @@ auditCooperPairFluxQuantumProof =
 public export
 auditFluxQuantizationIntegerStepsProof : Bool
 auditFluxQuantizationIntegerStepsProof =
-  let loop = MkSuperconductingLoop (intToBoxInt 2) (intToBoxInt 10) (intToBoxInt 5)
+  let loop = MkSuperconductingLoop (Core.BoxInt.intToBoxInt 2) (Core.BoxInt.intToBoxInt 10) (Core.BoxInt.intToBoxInt 5)
       flux = trappedMagneticFlux loop
   in unwrapBox flux == 50
 
@@ -82,8 +82,8 @@ auditFluxQuantizationIntegerStepsProof =
 public export
 auditJosephsonPhaseSlipPeriodicityProof : Bool
 auditJosephsonPhaseSlipPeriodicityProof =
-  let phi0 = intToBoxInt 1
-      v    = intToBoxInt 3
-      period = intToBoxInt 6
+  let phi0 = Core.BoxInt.intToBoxInt 1
+      v    = Core.BoxInt.intToBoxInt 3
+      period = Core.BoxInt.intToBoxInt 6
       phi1 = stepJosephsonPhase phi0 v period
   in unwrapBox phi1 == 1 && phi1 == phi0

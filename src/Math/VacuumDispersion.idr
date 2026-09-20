@@ -34,13 +34,13 @@ cavityModeEnergySum (S k) = (S k) + cavityModeEnergySum k
 ||| Computes the discrete Casimir vacuum pressure / force between parallel plates:
 ||| F(d) = E(d-1) - E(d) = -d < 0 (Strictly attractive).
 public export
-discreteCasimirForce : Nat -> BoxInt
-discreteCasimirForce Z = intToBoxInt 0
+discreteCasimirForce : Nat -> Core.BoxInt.BoxInt
+discreteCasimirForce Z = Core.BoxInt.intToBoxInt 0
 discreteCasimirForce (S k) =
   let ePrev = cavityModeEnergySum k
       eCurr = cavityModeEnergySum (S k)
       diff = cast ePrev - cast eCurr
-  in intToBoxInt diff
+  in Core.BoxInt.intToBoxInt diff
 
 ------------------------------------------------------------------------
 -- 2. CONSTRUCTIVE FORMAL AUDIT PROOFS
