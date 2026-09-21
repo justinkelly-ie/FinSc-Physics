@@ -1,11 +1,11 @@
-# Idris2-Physics
+# FinSc-Physics
 
 [![Idris 2 Verification](https://img.shields.io/badge/Idris_2-0.8.0-blue.svg)](https://www.idris-lang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Layer 3b/6 Constructive Physical Laws, Applicative Homomorphisms & Empirical Constant Verification for Idris 2**
 
-`Idris2-Physics` forms **Layer 3b/6** of the 10-layer constructive non-linear multiset science framework. It formalizes constructive physical conservation laws, applicative law homomorphisms ($h(f \text{ <*> } x) = h(f) \text{ <*> } h(x)$), interaction monads (`PhysicsMonad`), 44 mathematical physics law modules, and type-level empirical dataset auditing against CODATA 2022 constants.
+`FinSc-Physics` forms **Layer 3b/6** of the 10-layer constructive non-linear multiset science framework. It formalizes constructive physical conservation laws, applicative law homomorphisms ($h(f \text{ <*> } x) = h(f) \text{ <*> } h(x)$), interaction monads (`PhysicsMonad`), 44 mathematical physics law modules, and type-level empirical dataset auditing against CODATA 2022 constants.
 
 ---
 
@@ -32,8 +32,8 @@
 ## 🚀 Building & Installing
 
 ```bash
-idris2 --build Idris2-Physics.ipkg
-idris2 --install Idris2-Physics.ipkg
+idris2 --build FinSc-Physics.ipkg
+idris2 --install FinSc-Physics.ipkg
 ```
 
 ---

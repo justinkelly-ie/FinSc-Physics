@@ -1,9 +1,9 @@
-package Idris2-Physics
+package FinSc-Physics
 version = 0.3.0
 authors = "Justin Kelly"
 brief   = "Layer 3b Fundamental Constructive Physical Laws & Conservation Theorems."
 
-depends = Idris2-Geometry, Idris2-Multiset-Core, Idris2-Multiset-Transform, base, linear
+depends = FinSc-Geometry, FinSc-Multiset-Core, FinSc-Multiset-Transform, base, linear
 sourcedir = "src"
 
 modules = Physics,
