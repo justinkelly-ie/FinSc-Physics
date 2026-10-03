@@ -2,6 +2,7 @@ module Stage0.LawFunctor
 
 import Stage0.Multiset
 import Stage1.ScaleTransform
+import Stage1.MultisetDuality
 import Transform
 import Stage0.ActionPrinciple
 
@@ -39,7 +40,7 @@ interface (Functor stateCarrier, ScaleTransform (stateCarrier a) (stateCarrier b
 public export
 interface AdjointLawFunctor (lawIndex : Nat) (0 l : Type -> Type) (0 r : Type -> Type) where
   ||| Adjunction definition grounding the physical law in Hom-Tensor Natural Isomorphism
-  lawAdjunction : Stage1.Category.Adjunction.MultisetAdjunction l r
+  lawAdjunction : Stage1.MultisetDuality.MultisetAdjunction l r
 
   ||| Computes discrete entropy change ΔS along left adjoint forward pushforward
   pushforwardEntropyDelta : l a -> Stage0.BoxInt.BoxInt

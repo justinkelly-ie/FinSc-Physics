@@ -113,7 +113,7 @@ multisetHelmholtzFreeEnergy t m =
 public export
 standardCosmic210Partition : CosmicBudgetPartition
 standardCosmic210Partition =
-  MkCosmicBudgetPartition (natToBoxInt Stage1.FourGeometriesActions.ellipticLatticeCapacity) (natToBoxInt Stage1.FourGeometriesActions.hyperbolicRomCapacity) (natToBoxInt Stage1.FourGeometriesActions.darkMatterTriangularResidue)
+  MkCosmicBudgetPartition (natToBoxInt Stage1.FourGeometries.ellipticLatticeCapacity) (natToBoxInt Stage1.FourGeometries.hyperbolicRomCapacity) (natToBoxInt Stage1.FourGeometries.darkMatterTriangularResidue)
 
 ||| QTT 0 Erased Proof: Discrete Helmholtz Free Energy Minimization at Equilibrium (T = 2).
 public export

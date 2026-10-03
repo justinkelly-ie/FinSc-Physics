@@ -20,25 +20,25 @@ import Data.Fuel
 
 ||| A 2D spatial coordinate on the discrete lattice.
 public export
-record Coord2D where
+record LatticeCoord2D where
   constructor MkCoord2D
   posX : Stage0.BoxInt.BoxInt
   posY : Stage0.BoxInt.BoxInt
 
 public export
-Eq Coord2D where
+Eq LatticeCoord2D where
   (MkCoord2D x1 y1) == (MkCoord2D x2 y2) = x1 == x2 && y1 == y2
 
 ||| Difference vector between two lattice coordinates: Δx = x_{k+1} - x_k.
 %inline
 public export
-coordDiff : Coord2D -> Coord2D -> Coord2D
+coordDiff : LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D
 coordDiff (MkCoord2D x2 y2) (MkCoord2D x1 y1) = MkCoord2D (x2 - x1) (y2 - y1)
 
 ||| Computes metric kinetic quadrance: T_g(Δx) = Δx^T · g · Δx.
 %inline
 public export
-metricKineticQuadrance : Stage1.VexelMaxel.Maxel -> Coord2D -> Stage0.BoxInt.BoxInt
+metricKineticQuadrance : Stage1.VexelMaxel.Maxel -> LatticeCoord2D -> Stage0.BoxInt.BoxInt
 metricKineticQuadrance m (MkCoord2D dx dy) =
   let g11Val = g11 m
       g12Val = g12 m
@@ -50,7 +50,7 @@ metricKineticQuadrance m (MkCoord2D dx dy) =
 ||| Discrete Lagrangian: L(x_k, x_{k+1}) = T_g(Δx) + SubstrateCoupling(x_k, x_{k+1}) - V(x_k).
 %inline
 public export
-discreteLagrangian : Stage1.FourGeometries.FundamentalGeometry -> Coord2D -> Coord2D -> (Coord2D -> Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
+discreteLagrangian : Stage1.FourGeometries.FundamentalGeometry -> LatticeCoord2D -> LatticeCoord2D -> (LatticeCoord2D -> Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 discreteLagrangian SubstrateGeom (MkCoord2D x1 y1) (MkCoord2D x2 y2) vPot =
   let metric = geometryMetric SubstrateGeom
       diff = MkCoord2D (x2 - x1) (y2 - y1)
@@ -68,7 +68,7 @@ discreteLagrangian geom (MkCoord2D x1 y1) (MkCoord2D x2 y2) vPot =
 ||| Computes the Discrete Action S[γ] along an ordered sequence of coordinates.
 %inline
 public export
-discreteAction : Stage1.FourGeometries.FundamentalGeometry -> List Coord2D -> (Coord2D -> Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
+discreteAction : Stage1.FourGeometries.FundamentalGeometry -> List LatticeCoord2D -> (LatticeCoord2D -> Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 discreteAction _ [] _ = Stage0.BoxInt.intToBoxInt 0
 discreteAction _ [x] _ = Stage0.BoxInt.intToBoxInt 0
 discreteAction geom (x0 :: x1 :: xs) vPot =
@@ -82,7 +82,7 @@ discreteAction geom (x0 :: x1 :: xs) vPot =
 ||| Discrete second-order difference / acceleration: Δ²x = x_{k+1} - 2x_k + x_{k-1}.
 %inline
 public export
-discreteAcceleration : Coord2D -> Coord2D -> Coord2D -> Coord2D
+discreteAcceleration : LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D
 discreteAcceleration (MkCoord2D xPrev yPrev) (MkCoord2D xCurr yCurr) (MkCoord2D xNext yNext) =
   MkCoord2D ( xNext - (Stage0.BoxInt.intToBoxInt 2 * xCurr) + xPrev )
             ( yNext - (Stage0.BoxInt.intToBoxInt 2 * yCurr) + yPrev )
@@ -91,7 +91,7 @@ discreteAcceleration (MkCoord2D xPrev yPrev) (MkCoord2D xCurr yCurr) (MkCoord2D 
 ||| For extremal physical trajectories, this residual evaluates strictly to (0, 0).
 %inline
 public export
-discreteEulerLagrangeResidual : Stage1.VexelMaxel.Maxel -> Coord2D -> Coord2D -> Coord2D -> Coord2D -> Coord2D
+discreteEulerLagrangeResidual : Stage1.VexelMaxel.Maxel -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D
 discreteEulerLagrangeResidual m prev curr next (MkCoord2D gradVx gradVy) =
   let accel  = discreteAcceleration prev curr next
       ax     = posX accel
@@ -107,13 +107,13 @@ discreteEulerLagrangeResidual m prev curr next (MkCoord2D gradVx gradVy) =
 ||| Zero potential function for free particle trajectories.
 %inline
 public export
-zeroPotential : Coord2D -> Stage0.BoxInt.BoxInt
+zeroPotential : LatticeCoord2D -> Stage0.BoxInt.BoxInt
 zeroPotential _ = Stage0.BoxInt.intToBoxInt 0
 
 ||| Linear potential gradient: V(x, y) = x -> ∇V = (1, 0).
 %inline
 public export
-linearPotentialGrad : Coord2D
+linearPotentialGrad : LatticeCoord2D
 linearPotentialGrad = MkCoord2D (Stage0.BoxInt.intToBoxInt 1) (Stage0.BoxInt.intToBoxInt 0)
 
 ||| QTT 0 Erased Proof: Discrete Euler-Lagrange Equivalence on Geodesics.
@@ -129,7 +129,7 @@ prfSubstrateActionAsymmetry _ = Refl
 ||| Computes discrete canonical momentum token: p_k = g · (x_{k+1} - x_k).
 %inline
 public export
-discreteCanonicalMomentum : Stage1.VexelMaxel.Maxel -> Coord2D -> Coord2D -> Coord2D
+discreteCanonicalMomentum : Stage1.VexelMaxel.Maxel -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D
 discreteCanonicalMomentum m (MkCoord2D x1 y1) (MkCoord2D x2 y2) =
   let dx = x2 - x1
       dy = y2 - y1
@@ -165,7 +165,7 @@ prfSectorSpecificActionSignatures _ = Refl
 ||| evaluated into an inner synthetic homotopy action manifold (HomotopyLevel).
 %inline
 public export
-discreteAction2LTT : Stage1.FourGeometries.FundamentalGeometry -> Stage1.TypeTheory.TwoLevel.StrictLevel (List Coord2D) -> (Coord2D -> Stage0.BoxInt.BoxInt) -> Stage1.TypeTheory.TwoLevel.HomotopyLevel Stage0.BoxInt.BoxInt
+discreteAction2LTT : Stage1.FourGeometries.FundamentalGeometry -> Stage1.TypeTheory.TwoLevel.StrictLevel (List LatticeCoord2D) -> (LatticeCoord2D -> Stage0.BoxInt.BoxInt) -> Stage1.TypeTheory.TwoLevel.HomotopyLevel Stage0.BoxInt.BoxInt
 discreteAction2LTT geom (Stage1.TypeTheory.TwoLevel.MkStrict coords) vPot =
   Stage1.TypeTheory.TwoLevel.MkHomotopy (discreteAction geom coords vPot)
 
@@ -174,7 +174,7 @@ discreteAction2LTT geom (Stage1.TypeTheory.TwoLevel.MkStrict coords) vPot =
 public export
 0 verifyGeodesicEulerLagrangeStationarity :
     (0 m : Stage1.VexelMaxel.Maxel) ->
-    (0 p0, p1, p2 : Coord2D) ->
+    (0 p0, p1, p2 : LatticeCoord2D) ->
     (0 prf : discreteEulerLagrangeResidual m p0 p1 p2 (MkCoord2D (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 0)) = MkCoord2D (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 0)) ->
     True = True
 verifyGeodesicEulerLagrangeStationarity _ _ _ _ _ = Refl
@@ -194,14 +194,14 @@ verifyDiscreteActionPathEquivalence _ = Refl
 
 ||| Computes discrete action S[γ] over a deforested coordinate stream using fusedHylomorphism.
 public export covering
-fusedDiscreteAction : Fuel -> Stage1.FourGeometries.FundamentalGeometry -> List Coord2D -> (Coord2D -> Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
+fusedDiscreteAction : Fuel -> Stage1.FourGeometries.FundamentalGeometry -> List LatticeCoord2D -> (LatticeCoord2D -> Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 fusedDiscreteAction f geom coords vPot =
   Stage0.OnSeq.FusedStream.fusedHylomorphism f
     (\st => case st of
               [] => Done
               [_] => Done
               (x0 :: x1 :: xs) => Yield (x0, x1) (x1 :: xs))
-    (\(x0, x1), acc => discreteLagrangian geom x0 x1 vPot + acc)
+    (\pair, acc => let (x0, x1) = pair in discreteLagrangian geom x0 x1 vPot + acc)
     (Stage0.BoxInt.intToBoxInt 0)
     coords
 
@@ -223,7 +223,7 @@ auditFusedDiscreteActionProof =
 ||| Evaluates discrete momentum conservation along consecutive trajectory steps:
 ||| p_0 == p_1 where p_0 = g · (x_1 - x_0) and p_1 = g · (x_2 - x_1).
 public export
-isMomentumConserved : Stage1.VexelMaxel.Maxel -> Coord2D -> Coord2D -> Coord2D -> Bool
+isMomentumConserved : Stage1.VexelMaxel.Maxel -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> Bool
 isMomentumConserved m p0 p1 p2 =
   let m0 = discreteCanonicalMomentum m p0 p1
       m1 = discreteCanonicalMomentum m p1 p2
@@ -231,7 +231,7 @@ isMomentumConserved m p0 p1 p2 =
 
 ||| Erased compile-time proof witness verifying Noether momentum conservation along a trajectory step.
 public export
-0 ActionConservationWitness : Stage1.VexelMaxel.Maxel -> Coord2D -> Coord2D -> Coord2D -> Type
+0 ActionConservationWitness : Stage1.VexelMaxel.Maxel -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> Type
 ActionConservationWitness m p0 p1 p2 = isMomentumConserved m p0 p1 p2 = True
 
 ||| Static compile-time witness for free particle motion along straight geodesic [(0,0), (1,1), (2,2)].
@@ -241,11 +241,11 @@ prfGeodesicNoetherConservation _ = Refl
 
 ||| Verified physical trajectory step carrying compile-time erased Noether momentum conservation witness.
 public export
-record VerifiedPhysicalTrajectory (m : Stage1.VexelMaxel.Maxel) (p0 : Coord2D) (p1 : Coord2D) (p2 : Coord2D) where
+record VerifiedPhysicalTrajectory (m : Stage1.VexelMaxel.Maxel) (p0 : LatticeCoord2D) (p1 : LatticeCoord2D) (p2 : LatticeCoord2D) where
   constructor MkVerifiedTrajectory
-  startCoord : Coord2D
-  midCoord   : Coord2D
-  endCoord   : Coord2D
+  startCoord : LatticeCoord2D
+  midCoord   : LatticeCoord2D
+  endCoord   : LatticeCoord2D
   0 noetherPrf : ActionConservationWitness m p0 p1 p2
 
 ------------------------------------------------------------------------
@@ -257,7 +257,7 @@ public export
 record TrajectoryStep where
   constructor MkTrajectoryStep
   stepId   : Int
-  diff     : Coord2D
+  diff     : LatticeCoord2D
   lagrange : Stage0.BoxInt.BoxInt
 
 public export
@@ -267,7 +267,7 @@ Eq TrajectoryStep where
 
 ||| O(1) allocation deforested trajectory stream transducer folding discrete Lagrangian sum across steps.
 public export covering
-fusedActionTrajectoryStream : Fuel -> Stage1.FourGeometries.FundamentalGeometry -> List Coord2D -> (Coord2D -> Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
+fusedActionTrajectoryStream : Fuel -> Stage1.FourGeometries.FundamentalGeometry -> List LatticeCoord2D -> (LatticeCoord2D -> Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 fusedActionTrajectoryStream f geom coords vPot =
   Stage0.OnSeq.FusedStream.fusedHylomorphism f
     (\(idx, st) => case st of
@@ -282,7 +282,7 @@ fusedActionTrajectoryStream f geom coords vPot =
 
 ||| O(1) allocation deforested stream transducer evaluating total trajectory kinetic quadrance sum.
 public export covering
-fusedComputeTotalKineticQuadrance : Fuel -> Stage1.VexelMaxel.Maxel -> List Coord2D -> Stage0.BoxInt.BoxInt
+fusedComputeTotalKineticQuadrance : Fuel -> Stage1.VexelMaxel.Maxel -> List LatticeCoord2D -> Stage0.BoxInt.BoxInt
 fusedComputeTotalKineticQuadrance f m coords =
   Stage0.OnSeq.FusedStream.fusedHylomorphism f
     (\(idx, st) => case st of

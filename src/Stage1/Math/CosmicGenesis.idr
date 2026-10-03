@@ -14,7 +14,7 @@ import Stage1.Math.HelmholtzFreeEnergy
 import Stage1.Math.QuadStreamPhysicalLaws
 import Stage1.Category.Adjunction
 import Stage1.MultisetTensor
-import Stage1.FourGeometriesActions
+import Stage1.FourGeometries
 import Data.List
 import Data.Nat
 
@@ -45,16 +45,16 @@ Eq GenesisState where
 
 public export
 genesisVacuum : GenesisState
-genesisVacuum = MkGenesisState (Stage0.BoxInt.intToBoxInt 0) Stage1.FourGeometriesActions.hyperbolicRomCapacity Stage1.FourGeometriesActions.darkMatterTriangularResidue Stage1.FourGeometriesActions.primorial210Budget
+genesisVacuum = MkGenesisState (Stage0.BoxInt.intToBoxInt 0) Stage1.FourGeometries.hyperbolicRomCapacity Stage1.FourGeometries.darkMatterTriangularResidue Stage1.FourGeometries.primorial210Budget
 
 ||| QuadStream Primordial Genesis State initialized to canonical Primorial 210 budget bounds.
 public export
 genesisQuadStream : QuadStreamMultiset BoxInt
 genesisQuadStream =
-  let e = AddM (intToBoxInt 0) (natToBoxInt Stage1.FourGeometriesActions.ellipticLatticeCapacity) ZeroM
-      h = AddM (intToBoxInt 0) (natToBoxInt Stage1.FourGeometriesActions.hyperbolicRomCapacity) ZeroM
+  let e = AddM (intToBoxInt 0) (natToBoxInt Stage1.FourGeometries.ellipticLatticeCapacity) ZeroM
+      h = AddM (intToBoxInt 0) (natToBoxInt Stage1.FourGeometries.hyperbolicRomCapacity) ZeroM
       p = AddM (intToBoxInt 0) (intToBoxInt 0) ZeroM
-      s = AddM (intToBoxInt 0) (natToBoxInt Stage1.FourGeometriesActions.darkMatterTriangularResidue) ZeroM
+      s = AddM (intToBoxInt 0) (natToBoxInt Stage1.FourGeometries.darkMatterTriangularResidue) ZeroM
   in MkQuadStream e h p s
 
 ||| Audits the Primordial Genesis Budget Partition: 0 + 128 + 55 == 183 <= 210,
@@ -63,17 +63,17 @@ public export
 isValidGenesisPartition : GenesisState -> Bool
 isValidGenesisPartition (MkGenesisState vm de dm tot) =
   Stage0.BoxInt.unwrapBox vm == 0 &&
-  de == Stage1.FourGeometriesActions.hyperbolicRomCapacity &&
-  dm == Stage1.FourGeometriesActions.darkMatterTriangularResidue &&
-  (Stage1.FourGeometriesActions.ellipticLatticeCapacity + de + dm == tot) &&
-  tot == Stage1.FourGeometriesActions.primorial210Budget
+  de == Stage1.FourGeometries.hyperbolicRomCapacity &&
+  dm == Stage1.FourGeometries.darkMatterTriangularResidue &&
+  (Stage1.FourGeometries.ellipticLatticeCapacity + de + dm == tot) &&
+  tot == Stage1.FourGeometries.primorial210Budget
 
 ||| Audits QuadStream Primordial Genesis Budget Partition: 27 + 128 + 55 == 210.
 public export
 isValidQuadStreamGenesisPartition : QuadStreamMultiset BoxInt -> Bool
 isValidQuadStreamGenesisPartition qs =
   let part = quadStreamToCosmicPartition qs
-  in (vmTokens part + deTokens part + dmTokens part) == natToBoxInt Stage1.FourGeometriesActions.primorial210Budget
+  in (vmTokens part + deTokens part + dmTokens part) == natToBoxInt Stage1.FourGeometries.primorial210Budget
 
 ------------------------------------------------------------------------
 -- 2. ANTIMATTER PAIR ANNIHILATION & RELIC ASYMMETRY FREEZE-OUT

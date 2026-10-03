@@ -174,7 +174,7 @@ orbitalMinorQuadrance (MkRationalOrbit qa qc _) = qa - qc
 ||| between r1 = (x1, y1) and r2 = (x2, y2):
 ||| Quadrea = 4 * (x1 * y2 - x2 * y1)^2 = 4 * L_z^2.
 public export
-sweptQuadrea : (r1 : Coord2D) -> (r2 : Coord2D) -> Stage0.BoxInt.BoxInt
+sweptQuadrea : (r1 : LatticeCoord2D) -> (r2 : LatticeCoord2D) -> Stage0.BoxInt.BoxInt
 sweptQuadrea (MkCoord2D x1 y1) (MkCoord2D x2 y2) =
   let crossLz = (x1 * y2) - (x2 * y1)
   in Stage0.BoxInt.intToBoxInt 4 * (crossLz * crossLz)

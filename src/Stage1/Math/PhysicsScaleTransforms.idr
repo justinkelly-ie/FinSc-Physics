@@ -7,7 +7,7 @@ import Stage0.WitnessLedger
 import Stage0.Multiset
 import Stage1.MultisetTensor
 import Stage1.ScaleTransform
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.TypeTheory.Staging
 import Stage1.TypeTheory.TwoLevel
 import Stage1.QuadStream
@@ -51,7 +51,7 @@ Show PhysicsMacroDomain where
 
 ||| Heterogeneous MultisetScaleAdjunction instance (f_* ⊣ f^*) between ConcretePhysicsState and PhysicsMacroDomain
 public export
-Stage1.Category.Adjunction.MultisetScaleAdjunction ConcretePhysicsState PhysicsMacroDomain where
+Stage1.MultisetDuality.MultisetScaleAdjunction ConcretePhysicsState PhysicsMacroDomain where
   f_pushforward (MkConcretePhysics q) = MkPhysicsMacro q
   f_pullback (MkPhysicsMacro q)       = MkConcretePhysics q
   verifyUnit _   = Refl
@@ -121,7 +121,7 @@ proofPhysicsHomInv (AddM (val, MkAbstractPhysicsFunctor (MkPhysicsMacro q) b) w 
 
 ||| Category-Theoretic MultisetAdjunction instance L_Physics ⊣ R_Physics for physical scale space
 public export
-Stage1.Category.Adjunction.MultisetAdjunction ConcretePhysicsFunctor AbstractPhysicsFunctor where
+Stage1.MultisetDuality.MultisetAdjunction ConcretePhysicsFunctor AbstractPhysicsFunctor where
   leftAdjoint x = MkConcretePhysicsFunctor (MkConcretePhysics (Stage0.BoxInt.intToBoxInt 0)) x
   rightAdjoint (MkConcretePhysicsFunctor _ x) = x
   homTensorIso = physicsHomTensorIso
@@ -137,7 +137,7 @@ StrictReflectionFunctor ConcretePhysicsFunctor AbstractPhysicsFunctor where
 
 ||| ScaleTransform instance: Maps a 2D physical coordinate (Coord2D) to its spatial quadrance (BoxInt)
 public export
-ScaleTransform Coord2D Stage0.BoxInt.BoxInt where
+ScaleTransform LatticeCoord2D Stage0.BoxInt.BoxInt where
   scaleTransform (MkCoord2D x y) = (x * x) + (y * y)
 
 ||| QTT 0 Erased Proof: Physical Spatial Coordinate ScaleTransform Quadrance Invariant
@@ -147,13 +147,13 @@ prfCoordToQuadranceScaleTransform = prfRefl
 
 ||| Evaluates physical pushforward along an AdjointScaleChain scale jump
 public export
-evalPhysicsChainPush : Stage1.Category.Adjunction.AdjointScaleChain a b -> a -> b
-evalPhysicsChainPush = Stage1.Category.Adjunction.evalChainPush
+evalPhysicsChainPush : Stage1.MultisetDuality.AdjointScaleChain a b -> a -> b
+evalPhysicsChainPush = Stage1.MultisetDuality.evalChainPush
 
 ||| Evaluates physical pullback along an AdjointScaleChain scale jump
 public export
-evalPhysicsChainPull : Stage1.Category.Adjunction.AdjointScaleChain a b -> b -> a
-evalPhysicsChainPull = Stage1.Category.Adjunction.evalChainPull
+evalPhysicsChainPull : Stage1.MultisetDuality.AdjointScaleChain a b -> b -> a
+evalPhysicsChainPull = Stage1.MultisetDuality.evalChainPull
 
 ||| QTT 0 Erased Proof Witness: Physics ScaleTransform Plugin
 public export
