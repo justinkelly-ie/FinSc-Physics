@@ -12,9 +12,9 @@ import Stage1.Goh
 import Stage1.VexelMaxel
 import Stage1.Math.Transform.MultisetFilter
 import Stage1.Math.Transform.ChromogeometryMetric
-import Stage1.Math.Transform.QuadStreamAdjunction
+import Stage1.Math.Transform.QuadStreamDuality
 import Stage1.Math.HelmholtzFreeEnergy
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.Vect
 
@@ -119,15 +119,16 @@ pipelineQuadStreamTransducer qs =
 -- 5. COMPILE-TIME PROOF WITNESSES
 --------------------------------------------------------------------------------
 
-||| Static compile-time proof witness verifying physical QuadStream mass conservation.
+||| Static compile-time proof witness verifying physical QuadStream zero-mass vacuum state.
 public export
-0 verifyPhysicalQuadStreamConservation : (n : BoxInt) -> n = n
-verifyPhysicalQuadStreamConservation _ = Refl
+0 verifyPhysicalQuadStreamConservation :
+  quadStreamTotalMass (MkQuadStream ZeroM ZeroM ZeroM ZeroM) = intToBoxInt 0
+verifyPhysicalQuadStreamConservation = Refl
 
 ||| Static compile-time witness verifying composite law identity preservation.
 public export
-0 verifyCompositeLawIdentity : (n : BoxInt) -> n = n
-verifyCompositeLawIdentity _ = Refl
+0 verifyCompositeLawIdentity : (qs : QuadStreamMultiset BoxInt) -> composeQuadLaws Prelude.id Prelude.id qs = qs
+verifyCompositeLawIdentity qs = Refl
 
 --------------------------------------------------------------------------------
 -- 6. CATEGORY-THEORETIC MULTISET ADJUNCTION

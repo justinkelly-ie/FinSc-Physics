@@ -1,7 +1,7 @@
 module Stage0.AdjointChain
 
 import Stage0.Multiset
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 
 %default total
 

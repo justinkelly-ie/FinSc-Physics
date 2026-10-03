@@ -6,7 +6,7 @@ import Stage1.VexelMaxel
 import Stage0.Multiset
 import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.List
 import Data.Fin

@@ -6,7 +6,7 @@ import Stage1.UnixelFraction
 import Stage0.Multiset
 import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.List
 import Data.Fin
@@ -83,10 +83,10 @@ simulateBZEpochs (S k) state = simulateBZEpochs k (stepBZReaction state)
 -- 3. FORMAL INVARIANT AUDIT
 ------------------------------------------------------------------------
 
-||| QTT 0 Erased Proof: Discrete Belousov-Zhabotinsky Chemical Oscillations.
+||| QTT 0 Erased Proof: Discrete Belousov-Zhabotinsky Chemical Oscillations simulation identity.
 public export
-0 prfOscillatingReactions : (n : BoxInt) -> n = n
-prfOscillatingReactions = prfRefl
+0 prfOscillatingReactions : (s : BZState) -> simulateBZEpochs Z s = s
+prfOscillatingReactions s = Refl
 
 ------------------------------------------------------------------------
 -- 4. CATEGORY-THEORETIC MULTISET ADJUNCTION

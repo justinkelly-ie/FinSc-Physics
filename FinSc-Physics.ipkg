@@ -1,9 +1,9 @@
 package FinSc-Physics
 version = 0.3.0
 authors = "Justin Kelly"
-brief   = "Layer 3b Fundamental Constructive Physical Laws & Conservation Theorems."
+brief   = "Layer 4c Fundamental Constructive Physical Laws & Conservation Theorems."
 
-depends = FinSc-Geometry, FinSc-Multiset-Core, FinSc-Multiset-Transform, base, linear
+depends = FinSc-Geometry, FinSc-Multiset, FinSc-Metric-Substrate, FinSc-Multiset-Transform, base, linear
 sourcedir = "src"
 
 modules = Physics,

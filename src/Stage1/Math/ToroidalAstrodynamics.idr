@@ -8,7 +8,7 @@ import Stage0.Multiset
 import Stage0.ActionPrinciple
 import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.List
 import Stage0.OnSeq.FusedStream

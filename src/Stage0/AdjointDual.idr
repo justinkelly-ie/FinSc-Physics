@@ -3,7 +3,7 @@ module Stage0.AdjointDual
 import public Stage0.BoxInt
 import public Stage0.Multiset
 import public Stage1.QuadStream
-import public Stage1.Category.Adjunction
+import public Stage1.MultisetDuality
 import public Stage1.TypeTheory.Staging
 import public Stage1.TypeTheory.TwoLevel
 

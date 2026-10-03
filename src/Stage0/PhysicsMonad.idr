@@ -117,13 +117,28 @@ bindPhysicsMonad extractRL (MkPhysicsMonad rla) k =
   let aVal = extractRL rla
   in k aVal
 
-||| QTT 0 Erased Proof: Monad Left Identity Law for PhysicsMonad.
+||| QTT 0 Erased Proof: Monad Left Identity Law for PhysicsMonad:
+||| (return x >>= f) ≡ f x when extraction inverts injection.
 public export
-0 prfMonadLeftIdentity : (n : BoxInt) -> n = n
-prfMonadLeftIdentity _ = Refl
+0 prfMonadLeftIdentity : {0 l, r : Type -> Type} ->
+                         (injectRL : a -> r (l a)) ->
+                         (extractRL : r (l a) -> a) ->
+                         (0 invPrf : (x : a) -> extractRL (injectRL x) = x) ->
+                         (x : a) ->
+                         (k : a -> PhysicsMonad l r b) ->
+                         bindPhysicsMonad extractRL (purePhysicsMonad injectRL x) k = k x
+prfMonadLeftIdentity injectRL extractRL invPrf x k =
+  rewrite invPrf x in Refl
 
-||| QTT 0 Erased Proof: Monad Right Identity Law for PhysicsMonad.
+||| QTT 0 Erased Proof: Monad Right Identity Law for PhysicsMonad:
+||| (m >>= return) ≡ m when extraction inverts injection.
 public export
-0 prfMonadRightIdentity : (n : BoxInt) -> n = n
-prfMonadRightIdentity _ = Refl
+0 prfMonadRightIdentity : {0 l, r : Type -> Type} ->
+                          (injectRL : a -> r (l a)) ->
+                          (extractRL : r (l a) -> a) ->
+                          (0 invPrf : (x : r (l a)) -> injectRL (extractRL x) = x) ->
+                          (m : PhysicsMonad l r a) ->
+                          bindPhysicsMonad extractRL m (purePhysicsMonad injectRL) = m
+prfMonadRightIdentity injectRL extractRL invPrf (MkPhysicsMonad rla) =
+  rewrite invPrf rla in Refl
 

@@ -7,7 +7,7 @@ import Stage1.VexelMaxel
 import Stage1.UnixelFraction
 import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.List
 import Data.Vect
@@ -21,11 +21,6 @@ import Data.Vect
 public export
 fastNatPower2 : Nat -> Nat
 fastNatPower2 k = power 2 k
-
-||| @deprecated Linear Peano natPower2 is superseded by O(log k) binary fastNatPower2 from Stage0.BoxInt.
-public export
-natPower2 : Nat -> Nat
-natPower2 = fastNatPower2
 
 ||| Evaluates scaled Kraft-McMillan sum for a list of codeword lengths with maximum length maxL:
 ||| Sum_{i=1}^k 2^(maxL - l_i) <= 2^maxL.

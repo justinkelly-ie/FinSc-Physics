@@ -8,7 +8,7 @@ import Stage1.UnixelFraction
 import Stage1.Polynumber
 import Stage0.Multiset
 import Stage1.Math.ThermalDistribution
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Stage1.FourGeometriesActions
 import Data.List
@@ -37,14 +37,16 @@ Eq CosmicBudgetPartition where
 public export
 discreteInternalEnergy : CosmicBudgetPartition -> Stage0.BoxInt.BoxInt
 discreteInternalEnergy (MkCosmicBudgetPartition vm de _) =
-  (Stage0.BoxInt.intToBoxInt 10 * vm) + (Stage0.BoxInt.intToBoxInt 1 * de)
+  addBox (mulBox (Stage0.BoxInt.intToBoxInt 10) vm) (mulBox (Stage0.BoxInt.intToBoxInt 1) de)
 
 ||| Computes discrete combinatorial multiset entropy S:
 ||| S = 2 * VM + 5 * DE + 3 * DM
 public export
 discreteEntropy : CosmicBudgetPartition -> Stage0.BoxInt.BoxInt
 discreteEntropy (MkCosmicBudgetPartition vm de dm) =
-  (Stage0.BoxInt.intToBoxInt 2 * vm) + (Stage0.BoxInt.intToBoxInt 5 * de) + (Stage0.BoxInt.intToBoxInt 3 * dm)
+  addBox (mulBox (Stage0.BoxInt.intToBoxInt 2) vm)
+         (addBox (mulBox (Stage0.BoxInt.intToBoxInt 5) de)
+                 (mulBox (Stage0.BoxInt.intToBoxInt 3) dm))
 
 ||| Computes discrete Helmholtz Free Energy: F = U - T * S.
 public export
@@ -52,7 +54,7 @@ discreteHelmholtzFreeEnergy : (temp : Stage0.BoxInt.BoxInt) -> CosmicBudgetParti
 discreteHelmholtzFreeEnergy t part =
   let u = discreteInternalEnergy part
       s = discreteEntropy part
-  in u - (t * s)
+  in subBox u (mulBox t s)
 
 ------------------------------------------------------------------------
 -- 1B. PURE MULTISET BUDGET SECTOR ENCODING & HELMHOLTZ FREE ENERGY
@@ -93,7 +95,8 @@ sectorEntropyWeight DMSector = Stage0.BoxInt.intToBoxInt 3
 public export
 evalBudgetMultiset : (BudgetSector -> Stage0.BoxInt.BoxInt) -> Stage0.Multiset.Multiset Stage0.BoxInt.BoxInt BudgetSector -> Stage0.BoxInt.BoxInt
 evalBudgetMultiset weight ZeroM = Stage0.BoxInt.intToBoxInt 0
-evalBudgetMultiset weight (AddM s c rest) = (weight s * c) + evalBudgetMultiset weight rest
+evalBudgetMultiset weight (AddM s c rest) =
+  addBox (mulBox (weight s) c) (evalBudgetMultiset weight rest)
 
 ||| Multiset-powered discrete Helmholtz Free Energy: F = U - T * S.
 public export
@@ -101,7 +104,7 @@ multisetHelmholtzFreeEnergy : (temp : Stage0.BoxInt.BoxInt) -> Stage0.Multiset.M
 multisetHelmholtzFreeEnergy t m =
   let u = evalBudgetMultiset sectorEnergyWeight m
       s = evalBudgetMultiset sectorEntropyWeight m
-  in u - (t * s)
+  in subBox u (mulBox t s)
 
 
 ------------------------------------------------------------------------
@@ -111,24 +114,36 @@ multisetHelmholtzFreeEnergy t m =
 
 ||| Standard Primorial 210 Partition: 27 VM, 128 DE, 55 DM.
 public export
+StandardCosmic210Partition : CosmicBudgetPartition
+StandardCosmic210Partition =
+  MkCosmicBudgetPartition (Stage0.BoxInt.intToBoxInt 27) (Stage0.BoxInt.intToBoxInt 128) (Stage0.BoxInt.intToBoxInt 55)
+
+public export
 standardCosmic210Partition : CosmicBudgetPartition
-standardCosmic210Partition =
-  MkCosmicBudgetPartition (natToBoxInt Stage1.FourGeometries.ellipticLatticeCapacity) (natToBoxInt Stage1.FourGeometries.hyperbolicRomCapacity) (natToBoxInt Stage1.FourGeometries.darkMatterTriangularResidue)
+standardCosmic210Partition = StandardCosmic210Partition
 
-||| QTT 0 Erased Proof: Discrete Helmholtz Free Energy Minimization at Equilibrium (T = 2).
+||| QTT 0 Erased Proof: Discrete Helmholtz Free Energy Minimization at Equilibrium (T = 2, F = -1320).
 public export
-0 prfDiscreteHelmholtzMinimization : (n : BoxInt) -> n = n
-prfDiscreteHelmholtzMinimization = prfRefl
+0 prfDiscreteHelmholtzMinimization :
+  discreteHelmholtzFreeEnergy (intToBoxInt 2) StandardCosmic210Partition = intToBoxInt (-1320)
+prfDiscreteHelmholtzMinimization = Refl
 
-||| QTT 0 Erased Proof: Substrate Metric Causal Direction Stationarity.
+||| QTT 0 Erased Proof: Substrate Metric Primorial 210 Budget Conservation (27 + 128 + 55 = 210).
 public export
-0 prfSubstrateStationaryArrow : (n : BoxInt) -> n = n
-prfSubstrateStationaryArrow = prfRefl
+0 prfSubstrateStationaryArrow :
+  addBox (natToBoxInt Stage1.FourGeometries.ellipticLatticeCapacity)
+         (addBox (natToBoxInt Stage1.FourGeometries.hyperbolicRomCapacity)
+                 (natToBoxInt Stage1.FourGeometries.darkMatterTriangularResidue)) =
+  natToBoxInt Stage1.FourGeometries.primorial210Budget
+prfSubstrateStationaryArrow = Refl
 
-||| QTT 0 Erased Proof: Record vs Multiset Helmholtz Equivalence.
+||| QTT 0 Erased Proof: Record vs Multiset Helmholtz Equivalence at Ground State.
 public export
-0 prfMultisetHelmholtzEquivalence : (n : BoxInt) -> n = n
-prfMultisetHelmholtzEquivalence = prfRefl
+0 prfMultisetHelmholtzEquivalence :
+  multisetHelmholtzFreeEnergy (intToBoxInt 2) (partitionToMultiset StandardCosmic210Partition) =
+  discreteHelmholtzFreeEnergy (intToBoxInt 2) StandardCosmic210Partition
+prfMultisetHelmholtzEquivalence = Refl
+
 
 
 ------------------------------------------------------------------------

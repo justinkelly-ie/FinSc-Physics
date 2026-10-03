@@ -9,7 +9,7 @@ import Stage0.Multiset
 import Stage1.QuadStream
 import Stage1.Math.FractionalQuantumHall
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.List
 import Data.Nat
@@ -122,8 +122,9 @@ MultisetAdjunction HallViscosityFunctor AbstractHallViscosityFunctor where
 --    (Law 20: Discrete Hall Viscosity)
 ------------------------------------------------------------------------
 
-||| QTT 0 Erased Proof: Discrete Hall Viscosity & Topological Transport.
+||| QTT 0 Erased Proof: Discrete Hall Viscosity & Topological Transport Adjunction Hom-Tensor Invariant.
 public export
-0 prfHallViscosity : (n : BoxInt) -> n = n
-prfHallViscosity = prfRefl
+0 prfHallViscosity : (t : MultisetTensor (HallViscosityFunctor a) b) ->
+                     hallViscosityHomTensorInv (hallViscosityHomTensorIso t) = t
+prfHallViscosity = proofHallViscosityHomIso
 

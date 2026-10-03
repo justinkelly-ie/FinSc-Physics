@@ -3,7 +3,7 @@ module Stage0.ChromoLawFunctor
 import public Stage0.BoxInt
 import public Stage1.VexelMaxel
 import public Stage1.ChromoCategory
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 
 %default total
 

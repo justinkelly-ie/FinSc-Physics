@@ -7,7 +7,7 @@ import Stage0.Multiset
 import Stage1.QuadStream
 import Stage1.Math.RelativisticSpinor
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 
 %default total
@@ -169,8 +169,9 @@ MultisetAdjunction ChiralAnomalyFunctor AbstractChiralAnomalyFunctor where
 
 ||| QTT 0 Erased Proof: Chiral Anomaly Adjunction Hom-Tensor Duality Invariant
 public export
-0 prfChiralAnomalyAdjunctionDuality : (n : BoxInt) -> n = n
-prfChiralAnomalyAdjunctionDuality = prfMultisetDuality
+0 prfChiralAnomalyAdjunctionDuality : (t : MultisetTensor (ChiralAnomalyFunctor Nat) Nat) ->
+                                     chiralAnomalyHomTensorInv (chiralAnomalyHomTensorIso t) = t
+prfChiralAnomalyAdjunctionDuality = proofChiralAnomalyHomIso
 
 
 

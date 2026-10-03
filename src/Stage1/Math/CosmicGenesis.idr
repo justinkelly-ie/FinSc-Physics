@@ -12,7 +12,7 @@ import Stage1.Math.ConstructiveBaryogenesis
 import Stage1.Math.InformationErasureCost
 import Stage1.Math.HelmholtzFreeEnergy
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Stage1.FourGeometries
 import Data.List
@@ -203,8 +203,9 @@ MultisetAdjunction CosmicGenesisFunctor AbstractCosmicGenesisFunctor where
 
 ||| QTT 0 Erased Proof: Discrete Cosmic Genesis Adjunction Hom-Tensor Duality Invariant
 public export
-0 prfCosmicGenesisAdjunctionDuality : (n : BoxInt) -> n = n
-prfCosmicGenesisAdjunctionDuality = prfMultisetDuality
+0 prfCosmicGenesisAdjunctionDuality : (t : MultisetTensor (CosmicGenesisFunctor a) b) ->
+                                     cosmicGenesisHomTensorInv (cosmicGenesisHomTensorIso t) = t
+prfCosmicGenesisAdjunctionDuality = proofCosmicGenesisHomIso
 
 
 

@@ -9,7 +9,7 @@ import Stage1.Math.HolographicBound
 import Stage1.Math.HorizonRadiation
 import Stage1.Math.QuadStreamPhysicalLaws
 import Stage0.Applicative
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.List
 import Data.Fin
@@ -179,8 +179,9 @@ MultisetAdjunction BlackHoleFunctor AbstractBlackHoleFunctor where
 
 ||| QTT 0 Erased Proof: Black Hole Phase Transition Adjunction Hom-Tensor Duality Invariant
 public export
-0 prfBlackHolePhaseTransitionAdjunctionDuality : (n : BoxInt) -> n = n
-prfBlackHolePhaseTransitionAdjunctionDuality = prfMultisetDuality
+0 prfBlackHolePhaseTransitionAdjunctionDuality : (t : MultisetTensor (BlackHoleFunctor a) b) ->
+                                                blackHoleHomTensorInv (blackHoleHomTensorIso t) = t
+prfBlackHolePhaseTransitionAdjunctionDuality = proofBlackHoleHomIso
 
 
 

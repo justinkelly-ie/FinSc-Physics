@@ -9,7 +9,7 @@ import Stage1.QuadStream
 import Stage0.Applicative
 import Stage1.MotivicProof
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.List
 
@@ -214,8 +214,9 @@ MultisetAdjunction PoyntingVectorFunctor AbstractPoyntingFunctor where
 
 ||| QTT 0 Erased Proof: Poynting Energy Flow Adjunction Hom-Tensor Duality Invariant
 public export
-0 prfPoyntingVectorAdjunctionDuality : (n : BoxInt) -> n = n
-prfPoyntingVectorAdjunctionDuality = prfMultisetDuality
+0 prfPoyntingVectorAdjunctionDuality : (t : MultisetTensor (PoyntingVectorFunctor a) b) ->
+                                      poyntingHomTensorInv (poyntingHomTensorIso t) = t
+prfPoyntingVectorAdjunctionDuality = proofPoyntingHomIso
 
 
 

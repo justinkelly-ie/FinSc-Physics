@@ -7,7 +7,7 @@ import Stage0.Multiset
 import Stage1.ExclusionPrinciple
 import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.List
 import Data.Fin
@@ -171,8 +171,9 @@ MultisetAdjunction BCSGapFunctor AbstractBCSGapFunctor where
 
 ||| QTT 0 Erased Proof: Superconducting Energy Gap Adjunction Hom-Tensor Duality Invariant
 public export
-0 prfBCSGapAdjunctionDuality : (n : BoxInt) -> n = n
-prfBCSGapAdjunctionDuality = prfMultisetDuality
+0 prfBCSGapAdjunctionDuality : (t : MultisetTensor (BCSGapFunctor Nat) Nat) ->
+                               bcsGapHomTensorInv (bcsGapHomTensorIso t) = t
+prfBCSGapAdjunctionDuality = proofBCSGapHomIso
 
 
 

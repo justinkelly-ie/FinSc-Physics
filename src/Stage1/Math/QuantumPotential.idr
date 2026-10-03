@@ -8,7 +8,7 @@ import Stage1.UnixelFraction
 import Stage0.ActionPrinciple
 import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.List
 import Data.Nat
@@ -122,8 +122,9 @@ MultisetAdjunction BohmianPotentialFunctor AbstractBohmianPotentialFunctor where
 --    (Law 27: Discrete Bohmian Potential)
 ------------------------------------------------------------------------
 
-||| QTT 0 Erased Proof: Discrete Bohmian Quantum Potential & Causal Trajectories.
+||| QTT 0 Erased Proof: Discrete Bohmian Quantum Potential Adjunction Hom-Tensor Invariant.
 public export
-0 prfQuantumPotential : (n : BoxInt) -> n = n
-prfQuantumPotential = prfRefl
+0 prfQuantumPotential : (t : MultisetTensor (BohmianPotentialFunctor a) b) ->
+                        bohmianPotentialHomTensorInv (bohmianPotentialHomTensorIso t) = t
+prfQuantumPotential = proofBohmianPotentialHomIso
 

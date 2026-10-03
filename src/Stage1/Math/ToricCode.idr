@@ -7,7 +7,7 @@ import Stage0.Multiset
 import Stage1.QuadStream
 import Stage1.WilsonPolyhedra
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.List
 import Data.Fin
@@ -176,8 +176,9 @@ MultisetAdjunction ToricCodeFunctor AbstractToricCodeFunctor where
 
 ||| QTT 0 Erased Proof: Toric Code Adjunction Hom-Tensor Duality Invariant
 public export
-0 prfToricCodeAdjunctionDuality : (n : BoxInt) -> n = n
-prfToricCodeAdjunctionDuality = prfMultisetDuality
+0 prfToricCodeAdjunctionDuality : (t : MultisetTensor (ToricCodeFunctor Nat) Nat) ->
+                                  toricCodeHomTensorInv (toricCodeHomTensorIso t) = t
+prfToricCodeAdjunctionDuality = proofToricCodeHomIso
 
 
 

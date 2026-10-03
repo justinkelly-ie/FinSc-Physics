@@ -15,7 +15,7 @@ import Data.Fuel
 import Stage0.OnSeq.FusedStream
 import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 
 %default total
@@ -158,9 +158,10 @@ MultisetAdjunction PageCurveFunctor AbstractPageCurveFunctor where
 --    (Law 21: Discrete Page Curve)
 ------------------------------------------------------------------------
 
-||| QTT 0 Erased Proof: Discrete Page Curve & Unitary Black Hole Evaporation.
+||| QTT 0 Erased Proof: Discrete Page Curve & Unitary Black Hole Evaporation Adjunction Hom-Tensor Invariant.
 public export
-0 prfEvaporationEntropyCurve : (n : BoxInt) -> n = n
-prfEvaporationEntropyCurve = prfRefl
+0 prfEvaporationEntropyCurve : (t : MultisetTensor (PageCurveFunctor a) b) ->
+                               pageCurveHomTensorInv (pageCurveHomTensorIso t) = t
+prfEvaporationEntropyCurve = proofPageCurveHomIso
 
 

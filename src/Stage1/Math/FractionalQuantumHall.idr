@@ -7,7 +7,7 @@ import Stage1.UnixelFraction
 import Stage0.Multiset
 import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 
 %default total
@@ -132,19 +132,22 @@ MultisetAdjunction LaughlinFunctor AbstractLaughlinFunctor where
 --    (Law 14: Fractional Quantum Hall & Anyonic Statistics)
 ------------------------------------------------------------------------
 
-||| QTT 0 Erased Proof: Quasiparticle Fractional Charge Quantization.
+||| QTT 0 Erased Proof: Quasiparticle Fractional Charge Quantization (e* = 1/3 e).
 public export
-0 prfFractionalChargeQuantization : (n : BoxInt) -> n = n
-prfFractionalChargeQuantization = prfRefl
+0 prfFractionalChargeQuantization :
+  fractionalQuasiparticleCharge (MkLaughlinState 1 3) =
+  Stage1.UnixelFraction.MkUnixelFraction (intToBoxInt 1) (Stage1.VexelMaxel.MkUnixel 3)
+prfFractionalChargeQuantization = Refl
 
-||| QTT 0 Erased Proof: Anyonic Topological Braiding Phase.
+||| QTT 0 Erased Proof: Anyonic Topological Braiding Phase Period (2 * 3 = 6).
 public export
-0 prfAnyonicBraidingPhase : (n : BoxInt) -> n = n
-prfAnyonicBraidingPhase = prfRefl
+0 prfAnyonicBraidingPhase : anyonicExchangePeriod (MkLaughlinState 1 3) = 6
+prfAnyonicBraidingPhase = Refl
 
-||| QTT 0 Erased Proof: Fractional Hall Conductance.
+||| QTT 0 Erased Proof: Fractional Hall Hom-Tensor Adjunction Duality.
 public export
-0 prfFractionalHallConductance : (n : BoxInt) -> n = n
-prfFractionalHallConductance = prfRefl
+0 prfFractionalHallConductance : (t : MultisetTensor (LaughlinFunctor Nat) Nat) ->
+                                laughlinHomTensorInv (laughlinHomTensorIso t) = t
+prfFractionalHallConductance = proofLaughlinHomIso
 
 

@@ -10,7 +10,7 @@ import Stage1.MultisetTensor
 import Stage1.QuadStream
 import Stage1.Math.GravitationalWaveDynamics
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Data.List
 
 %default total
@@ -139,8 +139,9 @@ MultisetAdjunction GaugeSpinorFunctor AbstractGaugeSpinorFunctor where
 
 ||| Zero-erased proof witness certifying GaugeSpinor Multiset Adjunction Duality.
 public export
-0 prfGaugeSpinorAdjunctionDuality : (n : BoxInt) -> n = n
-prfGaugeSpinorAdjunctionDuality = prfMultisetDuality
+0 prfGaugeSpinorAdjunctionDuality : (t : MultisetTensor (GaugeSpinorFunctor a) b) ->
+                                    gaugeSpinorHomInv (gaugeSpinorHomIso t) = t
+prfGaugeSpinorAdjunctionDuality = proofGaugeSpinorHomIso
 
 
 ------------------------------------------------------------------------

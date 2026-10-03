@@ -7,7 +7,7 @@ import Stage1.QuadStream
 import Stage1.LinAlgebra.MetricTensor
 import Stage1.Math.HelmholtzFreeEnergy
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 
 %default total

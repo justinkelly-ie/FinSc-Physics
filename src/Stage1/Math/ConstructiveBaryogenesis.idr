@@ -7,7 +7,7 @@ import Stage1.UnixelFraction
 import Stage0.Multiset
 import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
-import Stage1.Category.Adjunction
+import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.Nat
 import Data.List
@@ -177,8 +177,9 @@ MultisetAdjunction BaryogenesisFunctor AbstractBaryogenesisFunctor where
 
 ||| QTT 0 Erased Proof: Constructive Baryogenesis Adjunction Hom-Tensor Duality Invariant
 public export
-0 prfBaryogenesisAdjunctionDuality : (n : BoxInt) -> n = n
-prfBaryogenesisAdjunctionDuality = prfMultisetDuality
+0 prfBaryogenesisAdjunctionDuality : (t : MultisetTensor (BaryogenesisFunctor a) b) ->
+                                    baryogenesisHomTensorInv (baryogenesisHomTensorIso t) = t
+prfBaryogenesisAdjunctionDuality = proofBaryogenesisHomIso
 
 
 
