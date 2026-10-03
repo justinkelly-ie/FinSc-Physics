@@ -1,12 +1,13 @@
-package FinSc-Physics
+package FinSc-Action-Dynamics
 version = 0.3.0
 authors = "Justin Kelly"
-brief   = "Layer 4c Fundamental Constructive Physical Laws & Conservation Theorems."
+brief   = "Layer 4c Discrete Action Dynamics, Variational Principle & Conservation Theorems."
 
 depends = FinSc-Geometry, FinSc-Multiset, FinSc-Metric-Substrate, FinSc-Multiset-Transform, base, linear
 sourcedir = "src"
 
-modules = Physics,
+modules = ActionDynamics,
+          Physics,
           Stage0.PhysicsMonad,
           Stage0.PhysicsComonad,
           Stage0.AdjointDual,
