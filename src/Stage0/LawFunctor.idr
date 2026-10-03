@@ -3,7 +3,7 @@ module Stage0.LawFunctor
 import Stage0.Multiset
 import Stage1.ScaleTransform
 import Stage1.MultisetDuality
-import Transform
+import PhaseUnfolding
 import Stage0.ActionPrinciple
 
 %default total
