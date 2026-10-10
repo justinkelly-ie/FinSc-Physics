@@ -9,6 +9,7 @@ import Stage1.Math.FluctuationTheorem
 import Stage1.Math.QuadStreamPhysicalLaws
 import Stage1.Math.RelativisticSpinor
 import Stage1.Math.DensityMatrix
+import Stage0.QTTDynamics
 import Language.Reflection
 
 %default total
@@ -125,6 +126,16 @@ public export
 auditBornRuleRationalNormalization : Elab (Reflect.ActionAuditor.auditBornRuleRationalNormalizationProofExport = True)
 auditBornRuleRationalNormalization = auditWitness Reflect.ActionAuditor.auditBornRuleRationalNormalizationProofExport
 
+||| Audit 9: Discrete Symplectic Leapfrog Linear State Transduction & Conservation.
+public export
+auditSymplecticFreeParticleProofExport : Bool
+auditSymplecticFreeParticleProofExport = Stage0.QTTDynamics.auditSymplecticFreeParticleProof
+
+public export
+%macro
+auditSymplecticFreeParticle : Elab (Reflect.ActionAuditor.auditSymplecticFreeParticleProofExport = True)
+auditSymplecticFreeParticle = auditWitness Reflect.ActionAuditor.auditSymplecticFreeParticleProofExport
+
 ||| Batch action dynamic auditor witnesses.
 public export
 actionAuditorWitnesses : List Bool
@@ -137,6 +148,7 @@ actionAuditorWitnesses =
   , auditComposableLawAssociativityProofExport
   , auditSpinorDensityPositivityProofExport
   , auditBornRuleRationalNormalizationProofExport
+  , auditSymplecticFreeParticleProofExport
   ]
 
 

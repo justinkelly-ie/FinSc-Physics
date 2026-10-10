@@ -6,6 +6,7 @@ import public Stage0.LawFunctor
 import public Stage0.ChromoLawFunctor
 import public Stage0.ApplicativeHomomorphism
 import public Stage0.ActionPrinciple
+import public Stage0.QTTDynamics
 import public Stage0.PhysicsLaw
 import public Stage0.Measurements
 
