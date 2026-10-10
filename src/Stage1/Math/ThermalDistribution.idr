@@ -8,6 +8,7 @@ import Stage0.Multiset
 import Stage1.QuadStream
 import Stage1.MultisetDuality
 import Stage1.MultisetTensor
+import Stage1.FourGeometries
 import Data.Vect
 import Data.List
 
@@ -34,11 +35,27 @@ Show EnergyLevel where
   show (MkEnergyLevel e w) =
     "Level(E=" ++ show e ++ ", w=" ++ show w ++ ")"
 
-||| Exact natural power b^e.
+||| Logarithmic fast binary natural power b^e via repeated squaring (Rule 04).
+||| Computes exact natural exponentiation in O(log e) steps using structural fuel.
+public export
+fastNatPower : Nat -> Nat -> Nat
+fastNatPower _ Z = 1
+fastNatPower b (S Z) = b
+fastNatPower b exp = loop exp b 1 (exp + 10)
+  where
+    loop : Nat -> Nat -> Nat -> Nat -> Nat
+    loop _ _ acc Z = acc
+    loop Z _ acc _ = acc
+    loop e base acc (S fuel) =
+      let acc' = if (e `mod` 2 == 1) then acc * base else acc
+          base' = base * base
+          e'   = e `div` 2
+      in loop e' base' acc' fuel
+
+||| Backward-compatible alias for fast logarithmic natural power.
 public export
 natPower : Nat -> Nat -> Nat
-natPower _ Z = 1
-natPower b (S k) = b * natPower b k
+natPower = fastNatPower
 
 ||| Computes scaled polynomial partition sum numerator:
 ||| ∑_{k=0}^m w_k · N^k · D^{m-k} where maxLevel = m.
@@ -46,8 +63,8 @@ public export
 scaledPartitionSum : List EnergyLevel -> (maxLevel : Nat) -> (numQ : Nat) -> (denQ : Nat) -> Nat
 scaledPartitionSum [] _ _ _ = 0
 scaledPartitionSum (MkEnergyLevel e w :: xs) maxLevel numQ denQ =
-  let pNum = natPower numQ e
-      pDen = natPower denQ (maxLevel `minus` e)
+  let pNum = fastNatPower numQ e
+      pDen = fastNatPower denQ (maxLevel `minus` e)
       term = w * (pNum * pDen)
   in term + scaledPartitionSum xs maxLevel numQ denQ
 
@@ -55,8 +72,8 @@ scaledPartitionSum (MkEnergyLevel e w :: xs) maxLevel numQ denQ =
 public export
 scaledLevelWeight : EnergyLevel -> (maxLevel : Nat) -> (numQ : Nat) -> (denQ : Nat) -> Nat
 scaledLevelWeight (MkEnergyLevel e w) maxLevel numQ denQ =
-  let pNum = natPower numQ e
-      pDen = natPower denQ (maxLevel `minus` e)
+  let pNum = fastNatPower numQ e
+      pDen = fastNatPower denQ (maxLevel `minus` e)
   in w * (pNum * pDen)
 
 ------------------------------------------------------------------------
@@ -112,10 +129,10 @@ parabolicLadder = [ MkEnergyLevel 0 1
 public export
 cosmicPartitionExponents : (Nat, Nat, Nat, Nat)
 cosmicPartitionExponents =
-  let ellExp = 27
-      hypExp = 128
-      parExp = 55
-      totalExp = ellExp + hypExp + parExp
+  let ellExp = Stage1.FourGeometries.ellipticLatticeCapacity
+      hypExp = Stage1.FourGeometries.hyperbolicRomCapacity
+      parExp = Stage1.FourGeometries.darkMatterTriangularResidue
+      totalExp = Stage1.FourGeometries.primorial210Budget
   in (ellExp, hypExp, parExp, totalExp)
 
 ||| The 4th Primorial Master Zeta Generator:

@@ -11,6 +11,7 @@ import Stage1.Math.QuadStreamPhysicalLaws
 import Stage0.Applicative
 import Stage1.MultisetDuality
 import Stage1.MultisetTensor
+import Stage1.FourGeometries
 import Data.List
 import Data.Fin
 import Data.Vect
@@ -92,10 +93,13 @@ auditBlackHolePhaseTransitionProof =
       lowT = evaluateHawkingPageTransition blankSpace (intToBoxInt 30)
       highT = evaluateHawkingPageTransition blankSpace (intToBoxInt 70)
       
-      e = AddM (intToBoxInt 0) (intToBoxInt 27) ZeroM
-      h = AddM (intToBoxInt 0) (intToBoxInt 128) ZeroM
+      eCap = natToBoxInt Stage1.FourGeometries.ellipticLatticeCapacity
+      hCap = natToBoxInt Stage1.FourGeometries.hyperbolicRomCapacity
+      dCap = natToBoxInt Stage1.FourGeometries.darkMatterTriangularResidue
+      e = AddM (intToBoxInt 0) eCap ZeroM
+      h = AddM (intToBoxInt 0) hCap ZeroM
       p = AddM (intToBoxInt 0) (intToBoxInt 0) ZeroM
-      s = AddM (intToBoxInt 0) (intToBoxInt 55) ZeroM
+      s = AddM (intToBoxInt 0) dCap ZeroM
       qs = MkQuadStream e h p s
       lowTQs = evaluateHawkingPageQuadStream qs (intToBoxInt 30)
       highTQs = evaluateHawkingPageQuadStream qs (intToBoxInt 70)

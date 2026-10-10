@@ -116,7 +116,9 @@ multisetHelmholtzFreeEnergy t m =
 public export
 StandardCosmic210Partition : CosmicBudgetPartition
 StandardCosmic210Partition =
-  MkCosmicBudgetPartition (Stage0.BoxInt.intToBoxInt 27) (Stage0.BoxInt.intToBoxInt 128) (Stage0.BoxInt.intToBoxInt 55)
+  MkCosmicBudgetPartition (natToBoxInt Stage1.FourGeometries.ellipticLatticeCapacity)
+                          (natToBoxInt Stage1.FourGeometries.hyperbolicRomCapacity)
+                          (natToBoxInt Stage1.FourGeometries.darkMatterTriangularResidue)
 
 public export
 standardCosmic210Partition : CosmicBudgetPartition

@@ -16,6 +16,7 @@ import Stage1.Math.Transform.QuadStreamDuality
 import Stage1.Math.HelmholtzFreeEnergy
 import Stage1.MultisetDuality
 import Stage1.MultisetTensor
+import Stage1.FourGeometries
 import Data.Vect
 
 %default total
@@ -93,16 +94,47 @@ record QuadStreamPipelineResult where
   spinorDensity : BoxInt
   chernNumber   : Integer
 
-||| Fuses density matrix norm, relativistic spinor probability density, and topological Chern number
-||| evaluations over a QuadStream payload into a single O(1) allocation deforested stream pass.
-public export covering
-pipelineQuadStreamTransducer : QuadStreamMultiset BoxInt -> QuadStreamPipelineResult
-pipelineQuadStreamTransducer qs =
-  let strm = quadStreamToStream qs
-      (totalNorm, (sumE, sumH, sumP, sumS), c1) = foldStream processElement (intToBoxInt 0, (intToBoxInt 0, intToBoxInt 0, intToBoxInt 0, intToBoxInt 0), 0) strm
+||| Comprehensive multi-law evaluation ledger for Quad-Stream physics.
+public export
+record PhysicalLawLedger where
+  constructor MkLawLedger
+  totalMass           : BoxInt
+  ellipticMass        : BoxInt
+  hyperbolicMass      : BoxInt
+  parabolicMass       : BoxInt
+  substrateMass       : BoxInt
+  spinorDensity       : BoxInt
+  chernNumber         : Integer
+  helmholtzFreeEnergy : BoxInt
+
+public export
+Eq PhysicalLawLedger where
+  (MkLawLedger m1 e1 h1 p1 s1 sp1 c1 f1) == (MkLawLedger m2 e2 h2 p2 s2 sp2 c2 f2) =
+    m1 == m2 && e1 == e2 && h1 == h2 && p1 == p2 && s1 == s2 &&
+    sp1 == sp2 && c1 == c2 && f1 == f2
+
+||| Single-pass fused stream pipeline ledger evaluation over a QuadStream payload.
+||| Evaluates 4 sector masses, spinor density, Chern invariant, and Helmholtz free energy concurrently.
+public export
+pipelineQuadStreamLedger : (temp : BoxInt) -> QuadStreamMultiset BoxInt -> PhysicalLawLedger
+pipelineQuadStreamLedger temp qs =
+  let countNodes = quadStreamNodeCount qs
+      fuel = (countNodes * 4) + 16
+      strm = quadStreamToStream qs
+      (totalNorm, (sumE, sumH, sumP, sumS), c1) =
+        foldStreamNat fuel processElement (intToBoxInt 0, (intToBoxInt 0, intToBoxInt 0, intToBoxInt 0, intToBoxInt 0), 0) strm
       spinorDensityVal = (sumE * sumE) + (sumH * sumH) + (sumP * sumP) + (sumS * sumS)
-  in MkQuadStreamPipelineResult totalNorm spinorDensityVal c1
+      fEnergy = discreteHelmholtzFreeEnergy temp (MkCosmicBudgetPartition sumE sumH sumS)
+  in MkLawLedger totalNorm sumE sumH sumP sumS spinorDensityVal c1 fEnergy
   where
+    quadStreamNodeCount : QuadStreamMultiset a -> Nat
+    quadStreamNodeCount (MkQuadStream e h p s) =
+      mCount e + mCount h + mCount p + mCount s
+      where
+        mCount : Multiset countC countElem -> Nat
+        mCount ZeroM = 0
+        mCount (AddM _ _ rest) = S (mCount rest)
+
     processElement : (BoxInt, (BoxInt, BoxInt, BoxInt, BoxInt), Integer)
                   -> (QuadStreamChannel, BoxInt, BoxInt)
                   -> (BoxInt, (BoxInt, BoxInt, BoxInt, BoxInt), Integer)
@@ -114,6 +146,102 @@ pipelineQuadStreamTransducer qs =
       (normAcc + w, (e, h, p + w, s), c1Acc)
     processElement (normAcc, (e, h, p, s), c1Acc) (SubstrateSector, _, w) =
       (normAcc + w, (e, h, p, s + w), c1Acc)
+
+||| Fuses density matrix norm, relativistic spinor probability density, and topological Chern number
+||| evaluations over a QuadStream payload into a single O(1) allocation deforested stream pass.
+public export
+pipelineQuadStreamTransducer : QuadStreamMultiset BoxInt -> QuadStreamPipelineResult
+pipelineQuadStreamTransducer qs =
+  let ledger = pipelineQuadStreamLedger (intToBoxInt 1) qs
+  in MkQuadStreamPipelineResult ledger.totalMass ledger.spinorDensity ledger.chernNumber
+
+||| A composable physical law transducer operating on deforested channel streams.
+public export
+record QuadStreamLawTransducer where
+  constructor MkLawTransducer
+  lawName   : String
+  transduce : FusedStream (QuadStreamChannel, BoxInt, BoxInt) ->
+              FusedStream (QuadStreamChannel, BoxInt, BoxInt)
+
+||| Identity law transducer (leaves stream unchanged).
+public export
+idLawTransducer : QuadStreamLawTransducer
+idLawTransducer = MkLawTransducer "IdentityLaw" id
+
+||| Associative composition of physical law stream transducers.
+public export
+composeLawTransducers : QuadStreamLawTransducer -> QuadStreamLawTransducer -> QuadStreamLawTransducer
+composeLawTransducers (MkLawTransducer n1 t1) (MkLawTransducer n2 t2) =
+  MkLawTransducer (n1 ++ " ; " ++ n2) (t2 . t1)
+
+||| Cyclotomic passband filter transducer for law degree d.
+public export
+cyclotomicFilterTransducer : (lawDegree : Nat) -> QuadStreamLawTransducer
+cyclotomicFilterTransducer lawDegree =
+  MkLawTransducer ("CyclotomicPassband(" ++ show lawDegree ++ ")")
+    (filterStream (\(_, v, _) =>
+      let dBox = intToBoxInt (cast lawDegree)
+          rem  = if dBox == intToBoxInt 0 then intToBoxInt 0 else modBox v dBox
+      in rem == intToBoxInt 0
+    ))
+
+||| Linear QTT state step applying cyclotomic passband filtering across all 4 channels (Rule 04).
+public export
+stepQuadStreamLinearPassband : (1 qs : QuadStreamMultiset BoxInt) -> (lawDegree : Nat) -> QuadStreamMultiset BoxInt
+stepQuadStreamLinearPassband (MkQuadStream e h p s) lawDegree =
+  MkQuadStream (filterM e) (filterM h) (filterM p) (filterM s)
+  where
+    filterM : (1 m : Multiset BoxInt BoxInt) -> Multiset BoxInt BoxInt
+    filterM ZeroM = ZeroM
+    filterM (AddM v w rest) =
+      let dBox = intToBoxInt (cast lawDegree)
+          rem  = if dBox == intToBoxInt 0 then intToBoxInt 0 else modBox v dBox
+      in if rem == intToBoxInt 0
+           then AddM v w (filterM rest)
+           else filterM rest
+
+||| Advances a QuadStreamMultiset using a stream law transducer.
+public export
+stepQuadStreamWithTransducer : QuadStreamMultiset BoxInt -> QuadStreamLawTransducer -> QuadStreamMultiset BoxInt
+stepQuadStreamWithTransducer qs tr =
+  let strm = quadStreamToStream qs
+      transduced = tr.transduce strm
+  in streamToQuadStreamNat Stage1.FourGeometries.primorial210Budget transduced
+
+||| Audit verifying comprehensive ledger evaluation on canonical Primorial 210 ground state.
+public export
+auditPipelineQuadStreamLedgerProof : Bool
+auditPipelineQuadStreamLedgerProof =
+  let eCap = natToBoxInt Stage1.FourGeometries.ellipticLatticeCapacity
+      hCap = natToBoxInt Stage1.FourGeometries.hyperbolicRomCapacity
+      dCap = natToBoxInt Stage1.FourGeometries.darkMatterTriangularResidue
+      bTot = natToBoxInt Stage1.FourGeometries.primorial210Budget
+      testQs = MkQuadStream (AddM (intToBoxInt 1) eCap ZeroM)
+                            (AddM (intToBoxInt 1) hCap ZeroM)
+                            ZeroM
+                            (AddM (intToBoxInt 1) dCap ZeroM)
+      ledger = pipelineQuadStreamLedger (intToBoxInt 2) testQs
+  in unwrapBox ledger.totalMass == unwrapBox bTot &&
+     unwrapBox ledger.ellipticMass == unwrapBox eCap &&
+     unwrapBox ledger.hyperbolicMass == unwrapBox hCap &&
+     unwrapBox ledger.substrateMass == unwrapBox dCap &&
+     unwrapBox ledger.helmholtzFreeEnergy == (-1320) &&
+     ledger.chernNumber == cast Stage1.FourGeometries.ellipticLatticeCapacity
+
+||| Audit verifying associativity of composable physical law transducers.
+public export
+auditComposableLawAssociativityProof : Bool
+auditComposableLawAssociativityProof =
+  let l1 = cyclotomicFilterTransducer 1
+      l2 = cyclotomicFilterTransducer 2
+      l3 = cyclotomicFilterTransducer 3
+      c1 = composeLawTransducers (composeLawTransducers l1 l2) l3
+      c2 = composeLawTransducers l1 (composeLawTransducers l2 l3)
+      testQs = MkQuadStream (AddM (intToBoxInt 6) (intToBoxInt 27) ZeroM) ZeroM ZeroM ZeroM
+      out1 = stepQuadStreamWithTransducer testQs c1
+      out2 = stepQuadStreamWithTransducer testQs c2
+  in quadStreamTotalMass out1 == quadStreamTotalMass out2
+
 
 --------------------------------------------------------------------------------
 -- 5. COMPILE-TIME PROOF WITNESSES

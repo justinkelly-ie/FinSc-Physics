@@ -2,9 +2,9 @@ module Stage1.Math.FluctuationTheorem
 
 import Stage0.BoxInt
 import Stage0.Multiset
+import Stage0.OnSeq.FusedStream
 import Stage1.VexelMaxel
 import Stage1.UnixelFraction
-import Stage0.Multiset
 import Stage1.QuadStream
 import Stage1.Math.WorkFreeEnergyEquality
 import Stage1.Math.QuadStreamPhysicalLaws
@@ -160,4 +160,49 @@ auditFluctuationTheoremProof =
      wDissRev == 0 &&
      wDissIrrev == 4 &&
      wDissIrrev > 0
+
+------------------------------------------------------------------------
+-- 4. COINDUCTIVE STREAMING CROOKS FLUCTUATION TRANSDUCER
+------------------------------------------------------------------------
+
+||| A stochastic trajectory stream step recording forward/backward work packets.
+public export
+record FluctuationStreamStep where
+  constructor MkFluctuationStreamStep
+  stepIndex      : Nat
+  trajectory     : TrajectoryWork
+  crooksRatio    : UnixelFraction
+  dissipatedHeat : BoxInt
+
+||| Coinductive stream transducer for non-equilibrium Crooks fluctuation work:
+public export
+streamCrooksFluctuations : (deltaF : BoxInt) -> (workSteps : List BoxInt) -> FusedStream FluctuationStreamStep
+streamCrooksFluctuations df wList =
+  unfoldStream (\(idx, remaining) =>
+    case remaining of
+      [] => Done
+      (wf :: rest) =>
+        let wb = - wf
+            traj = MkTrajectoryWork wf wb df
+            wDiss = microscopicDissipatedWork traj
+            ratioNum = if unwrapBox wDiss >= 0 then S (fromInteger (abs (unwrapBox wDiss))) else 1
+            ratio = mkUnixelFraction (intToBoxInt (cast ratioNum)) 1
+            step = MkFluctuationStreamStep idx traj ratio wDiss
+        in Yield step (idx + 1, rest)
+  ) (0, wList)
+
+||| Audits that the streaming Crooks fluctuation transducer validates non-equilibrium forward dissipation:
+public export
+auditStreamingCrooksProof : Bool
+auditStreamingCrooksProof =
+  let df = intToBoxInt 5
+      workList = [intToBoxInt 5, intToBoxInt 7, intToBoxInt 9]
+      strm = streamCrooksFluctuations df workList
+      (count, allSatisfied) =
+        foldStreamNat (length workList)
+          (\(cnt, ok), step => (cnt + 1, ok && isCrooksTheoremSatisfied (trajectory step)))
+          (0, True)
+          strm
+  in count == 3 && allSatisfied
+
 

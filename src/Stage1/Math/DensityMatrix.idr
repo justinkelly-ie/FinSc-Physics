@@ -35,26 +35,26 @@ fromPolynumber (MkPolynumber cs) =
   in MkDensityMatrix totalNorm strm
 
 ||| Evaluates total density matrix norm factor directly across a deforested FusedStream.
-public export covering
+public export
 evaluateQuadStreamDensityNormStream : FusedStream (QuadStreamChannel, BoxInt, BoxInt) -> BoxInt
 evaluateQuadStreamDensityNormStream strm =
-  foldStream (+) (intToBoxInt 0) (mapStream (\(_, _, w) => w) strm)
+  foldStreamFuel substrateFuel (+) (intToBoxInt 0) (mapStream (\(_, _, w) => w) strm)
 
 ||| Evaluates total density matrix norm factor across 4 QuadStream sectors.
-public export covering
+public export
 evaluateQuadStreamDensityNorm : QuadStreamMultiset BoxInt -> BoxInt
 evaluateQuadStreamDensityNorm qs = evaluateQuadStreamDensityNormStream (quadStreamToStream qs)
 
-public export covering
+public export
 streamIndex : Nat -> FusedStream a -> Maybe a
 streamIndex target strm =
-  snd $ foldStream (\(currIdx, res), x =>
+  snd $ foldStreamNat (S target) (\(currIdx, res), x =>
     if currIdx == target then (currIdx + 1, Just x) else (currIdx + 1, res)
   ) (Z, Nothing) strm
 
 ||| Deterministic Born Rule Quantum Measurement Projection:
 ||| Computes the transition probability P(k) = c_k / Z on exact UnixelFraction coordinates.
-public export covering
+public export
 bornRuleProjection : DensityMatrix poly -> Nat -> UnixelFraction
 bornRuleProjection (MkDensityMatrix norm cs) idx =
   case streamIndex idx cs of
@@ -66,10 +66,10 @@ bornRuleProjection (MkDensityMatrix norm cs) idx =
 
 ||| Computes exact discrete Von Neumann entropy S(rho) = - Tr(rho log rho) over quantum density matrix.
 ||| Enforces QTT linear single-use semantics (1 rho : DensityMatrix poly) to guarantee resource safety.
-public export covering
+public export
 computeVonNeumannEntropy : {poly : Polynumber} -> (1 rho : DensityMatrix poly) -> BoxInt
 computeVonNeumannEntropy (MkDensityMatrix norm cs) =
-  foldStream (+) (intToBoxInt 0) (mapStream id cs)
+  foldStreamFuel substrateFuel (+) (intToBoxInt 0) (mapStream id cs)
 
 ------------------------------------------------------------------------
 -- 2. CONSTRUCTIVE FORMAL AUDIT PROOFS FOR DENSITY MATRICES
@@ -78,7 +78,7 @@ computeVonNeumannEntropy (MkDensityMatrix norm cs) =
 ||| Audits Quantum Density Matrix & Born Rule Projection:
 ||| 1. Exact rational probability normalization \sum P(k) = 1.
 ||| 2. Zero floating-point loss over UnixelFraction coordinates.
-public export covering
+public export
 auditDensityMatrixBornRuleProof : Bool
 auditDensityMatrixBornRuleProof =
   let dm = fromPolynumber (MkPolynumber [intToBoxInt 1])

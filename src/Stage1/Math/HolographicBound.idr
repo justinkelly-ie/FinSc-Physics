@@ -10,6 +10,7 @@ import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
 import Stage1.MultisetDuality
 import Stage1.MultisetTensor
+import Stage1.FourGeometries
 import Data.List
 
 %default total
@@ -104,7 +105,7 @@ public export
 auditCosmicBudgetHolographicClosureProof : Bool
 auditCosmicBudgetHolographicClosureProof =
   let totalHoloCap = multiSectorHolographicCapacity 3
-      budget = 210
+      budget = Stage1.FourGeometries.primorial210Budget
   in totalHoloCap == 216 && totalHoloCap >= budget
 
 public export

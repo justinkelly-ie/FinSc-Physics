@@ -38,27 +38,34 @@ computeChernNumber (p :: ps) =
   (berryFluxNumerator p `div` berryFluxDenominator p) + computeChernNumber ps
 
 ||| Evaluates discrete Berry curvature flux extraction directly across a deforested stream of plaquettes.
-public export covering
+public export
 computeBerryCurvatureStream : FusedStream TorusPlaquette -> FusedStream Integer
 computeBerryCurvatureStream plaquettes =
   mapStream (\p => berryFluxNumerator p `div` (if berryFluxDenominator p == 0 then 1 else berryFluxDenominator p)) plaquettes
 
-||| Computes the discrete First Chern Number by streamifying Berry connection curvature sum extractions.
-public export covering
+||| Computes the discrete First Chern Number by streamifying Berry connection curvature sum extractions with parameterized fuel.
+public export
+computeChernNumberStreamFuel : Fuel -> FusedStream TorusPlaquette -> Integer
+computeChernNumberStreamFuel f plaquettes =
+  foldStreamFuel f (+) 0 (computeBerryCurvatureStream plaquettes)
+
+||| Computes the discrete First Chern Number bounded by canonical Primorial 210 capacity (Rule 03).
+public export
 computeChernNumberStream : FusedStream TorusPlaquette -> Integer
 computeChernNumberStream plaquettes =
-  foldStream (+) 0 (computeBerryCurvatureStream plaquettes)
+  computeChernNumberStreamFuel substrateFuel plaquettes
 
 ||| Computes the discrete First Chern Number over a List of plaquettes via zero-allocation streamification.
-public export covering
+public export
 computeChernNumberDeforested : List TorusPlaquette -> Integer
-computeChernNumberDeforested plaquettes = computeChernNumberStream (stream plaquettes)
+computeChernNumberDeforested plaquettes =
+  foldStreamNat (length plaquettes) (+) 0 (computeBerryCurvatureStream (stream plaquettes))
 
-||| Evaluates discrete First Chern Number from deforested FusedStream payload.
-public export covering
+||| Evaluates discrete First Chern Number from deforested FusedStream payload bounded by canonical Elliptic capacity (27 VM).
+public export
 evaluateQuadStreamChernNumberStream : FusedStream (QuadStreamChannel, Stage0.BoxInt.BoxInt, Stage0.BoxInt.BoxInt) -> Integer
 evaluateQuadStreamChernNumberStream strm =
-  let sumE = foldStream updateElliptic (intToBoxInt 0) strm
+  let sumE = foldStreamFuel ellipticFuel updateElliptic (intToBoxInt 0) strm
   in unwrapBox sumE
   where
     updateElliptic : Stage0.BoxInt.BoxInt -> (QuadStreamChannel, Stage0.BoxInt.BoxInt, Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
@@ -66,7 +73,7 @@ evaluateQuadStreamChernNumberStream strm =
     updateElliptic acc _                      = acc
 
 ||| Evaluates discrete First Chern Number from QuadStream payload.
-public export covering
+public export
 evaluateQuadStreamChernNumber : QuadStreamMultiset Stage0.BoxInt.BoxInt -> Integer
 evaluateQuadStreamChernNumber qs = evaluateQuadStreamChernNumberStream (quadStreamToStream qs)
 

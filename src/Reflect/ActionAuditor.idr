@@ -5,6 +5,10 @@
 module Reflect.ActionAuditor
 
 import Stage0.BoxInt
+import Stage1.Math.FluctuationTheorem
+import Stage1.Math.QuadStreamPhysicalLaws
+import Stage1.Math.RelativisticSpinor
+import Stage1.Math.DensityMatrix
 import Language.Reflection
 
 %default total
@@ -66,6 +70,61 @@ public export
 auditCausalActionAsymmetry : Elab (Reflect.ActionAuditor.auditCausalActionAsymmetryProof = True)
 auditCausalActionAsymmetry = pure Refl
 
+public export
+auditWitness : (target : Bool) -> Elab (target = True)
+auditWitness True = pure Refl
+auditWitness False = fail "Action auditor check failed: proof export returned False"
+
+||| Audit 4: Non-Equilibrium Streaming Crooks Fluctuation Theorem.
+public export
+auditStreamingCrooksProofExport : Bool
+auditStreamingCrooksProofExport = Stage1.Math.FluctuationTheorem.auditStreamingCrooksProof
+
+public export
+%macro
+auditStreamingCrooks : Elab (Reflect.ActionAuditor.auditStreamingCrooksProofExport = True)
+auditStreamingCrooks = auditWitness Reflect.ActionAuditor.auditStreamingCrooksProofExport
+
+||| Audit 5: Comprehensive Quad-Stream Multi-Law Ledger Evaluation.
+public export
+auditPipelineQuadStreamLedgerProofExport : Bool
+auditPipelineQuadStreamLedgerProofExport = Stage1.Math.QuadStreamPhysicalLaws.auditPipelineQuadStreamLedgerProof
+
+public export
+%macro
+auditPipelineQuadStreamLedger : Elab (Reflect.ActionAuditor.auditPipelineQuadStreamLedgerProofExport = True)
+auditPipelineQuadStreamLedger = auditWitness Reflect.ActionAuditor.auditPipelineQuadStreamLedgerProofExport
+
+||| Audit 6: Associativity of Composable Physical Law Stream Transducers.
+public export
+auditComposableLawAssociativityProofExport : Bool
+auditComposableLawAssociativityProofExport = Stage1.Math.QuadStreamPhysicalLaws.auditComposableLawAssociativityProof
+
+public export
+%macro
+auditComposableLawAssociativity : Elab (Reflect.ActionAuditor.auditComposableLawAssociativityProofExport = True)
+auditComposableLawAssociativity = auditWitness Reflect.ActionAuditor.auditComposableLawAssociativityProofExport
+
+||| Audit 7: Relativistic Dirac Spinor Probability Density Positivity & Stream Equivalence.
+public export
+auditSpinorDensityPositivityProofExport : Bool
+auditSpinorDensityPositivityProofExport = Stage1.Math.RelativisticSpinor.auditSpinorDensityPositivityProof
+
+public export
+%macro
+auditSpinorDensityPositivity : Elab (Reflect.ActionAuditor.auditSpinorDensityPositivityProofExport = True)
+auditSpinorDensityPositivity = auditWitness Reflect.ActionAuditor.auditSpinorDensityPositivityProofExport
+
+||| Audit 8: Quantum Density Matrix Born Rule Rational Normalization & Zero Precision Loss.
+public export
+auditBornRuleRationalNormalizationProofExport : Bool
+auditBornRuleRationalNormalizationProofExport = Stage1.Math.DensityMatrix.auditDensityMatrixBornRuleProof
+
+public export
+%macro
+auditBornRuleRationalNormalization : Elab (Reflect.ActionAuditor.auditBornRuleRationalNormalizationProofExport = True)
+auditBornRuleRationalNormalization = auditWitness Reflect.ActionAuditor.auditBornRuleRationalNormalizationProofExport
+
 ||| Batch action dynamic auditor witnesses.
 public export
 actionAuditorWitnesses : List Bool
@@ -73,4 +132,12 @@ actionAuditorWitnesses =
   [ auditGeodesicLeastActionProof
   , auditNoetherConservationProof
   , auditCausalActionAsymmetryProof
+  , auditStreamingCrooksProofExport
+  , auditPipelineQuadStreamLedgerProofExport
+  , auditComposableLawAssociativityProofExport
+  , auditSpinorDensityPositivityProofExport
+  , auditBornRuleRationalNormalizationProofExport
   ]
+
+
+

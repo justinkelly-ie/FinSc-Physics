@@ -9,6 +9,7 @@ import Language.Reflection
 import Stage1.Math.OnSeq.ConjugateDuality
 import Stage1.FourGeometriesActions
 import Stage1.TypeTheory.TwoLevel
+import Stage0.OnSeq.FusedStream
 import Data.Fuel
 
 %default total
@@ -73,6 +74,41 @@ discreteAction _ [] _ = Stage0.BoxInt.intToBoxInt 0
 discreteAction _ [x] _ = Stage0.BoxInt.intToBoxInt 0
 discreteAction geom (x0 :: x1 :: xs) vPot =
   discreteLagrangian geom x0 x1 vPot + discreteAction geom (x1 :: xs) vPot
+
+||| Deforested pairwise step transducer mapping a coordinate stream to adjacent pairs (x_k, x_{k+1}).
+public export
+streamAdjacentPairs : FusedStream LatticeCoord2D -> FusedStream (LatticeCoord2D, LatticeCoord2D)
+streamAdjacentPairs (MkStream {s} next seed) = MkStream nextPair (Nothing, seed)
+  where
+    nextPair : (Maybe LatticeCoord2D, s) -> Step (Maybe LatticeCoord2D, s) (LatticeCoord2D, LatticeCoord2D)
+    nextPair (Nothing, st) = case next st of
+      Done => Done
+      Skip st' => Skip (Nothing, st')
+      Yield x st' => Skip (Just x, st')
+    nextPair (Just prev, st) = case next st of
+      Done => Done
+      Skip st' => Skip (Just prev, st')
+      Yield curr st' => Yield (prev, curr) (Just curr, st')
+
+||| Evaluates discrete action integral S = \sum L(x_k, x_{k+1}) directly over a deforested stream of coordinate pairs.
+public export
+streamDiscreteAction : Fuel -> Stage1.FourGeometries.FundamentalGeometry ->
+                       (LatticeCoord2D -> Stage0.BoxInt.BoxInt) ->
+                       FusedStream (LatticeCoord2D, LatticeCoord2D) -> Stage0.BoxInt.BoxInt
+streamDiscreteAction f geom vPot pairStrm =
+  foldStreamFuel f
+    (\acc, (x0, x1) => acc + discreteLagrangian geom x0 x1 vPot)
+    (Stage0.BoxInt.intToBoxInt 0)
+    pairStrm
+
+||| Evaluates discrete action integral S = \sum L(x_k, x_{k+1}) from a raw coordinate stream in a single pass.
+public export
+streamTrajectoryAction : Fuel -> Stage1.FourGeometries.FundamentalGeometry ->
+                         (LatticeCoord2D -> Stage0.BoxInt.BoxInt) ->
+                         FusedStream LatticeCoord2D -> Stage0.BoxInt.BoxInt
+streamTrajectoryAction f geom vPot coordStrm =
+  streamDiscreteAction f geom vPot (streamAdjacentPairs coordStrm)
+
 
 ------------------------------------------------------------------------
 -- 2. DISCRETE EULER-LAGRANGE EQUATIONS (DEL)
@@ -163,7 +199,10 @@ prfParabolicNullMomentumZero = Refl
 ||| QTT 0 Erased Proof: Sector-Specific Action Signatures across the 4 Geometries (27 + 128 + 55 = 210).
 public export
 0 prfSectorSpecificActionSignatures :
-  addBox (intToBoxInt 27) (addBox (intToBoxInt 128) (intToBoxInt 55)) = intToBoxInt 210
+  addBox (natToBoxInt Stage1.FourGeometries.ellipticLatticeCapacity)
+         (addBox (natToBoxInt Stage1.FourGeometries.hyperbolicRomCapacity)
+                 (natToBoxInt Stage1.FourGeometries.darkMatterTriangularResidue)) =
+  natToBoxInt Stage1.FourGeometries.primorial210Budget
 prfSectorSpecificActionSignatures = Refl
 
 ------------------------------------------------------------------------
@@ -202,7 +241,7 @@ verifyDiscreteActionPathEquivalence _ = Refl
 ------------------------------------------------------------------------
 
 ||| Computes discrete action S[γ] over a deforested coordinate stream using fusedHylomorphism.
-public export covering
+public export
 fusedDiscreteAction : Fuel -> Stage1.FourGeometries.FundamentalGeometry -> List LatticeCoord2D -> (LatticeCoord2D -> Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 fusedDiscreteAction f geom coords vPot =
   Stage0.OnSeq.FusedStream.fusedHylomorphism f
@@ -215,14 +254,14 @@ fusedDiscreteAction f geom coords vPot =
     coords
 
 ||| Audit witness verifying equivalence of static discreteAction and fusedDiscreteAction.
-public export covering
+public export
 auditFusedDiscreteActionProof : Bool
 auditFusedDiscreteActionProof =
   let path = [MkCoord2D (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 0),
               MkCoord2D (Stage0.BoxInt.intToBoxInt 1) (Stage0.BoxInt.intToBoxInt 1),
               MkCoord2D (Stage0.BoxInt.intToBoxInt 2) (Stage0.BoxInt.intToBoxInt 2)]
       a1 = discreteAction EllipticGeom path zeroPotential
-      a2 = fusedDiscreteAction (limit 100) EllipticGeom path zeroPotential
+      a2 = fusedDiscreteAction (limit (length path)) EllipticGeom path zeroPotential
   in a1 == a2 && unwrapBox a2 == 4
 
 ------------------------------------------------------------------------
@@ -275,7 +314,7 @@ Eq TrajectoryStep where
     id1 == id2 && d1 == d2 && l1 == l2
 
 ||| O(1) allocation deforested trajectory stream transducer folding discrete Lagrangian sum across steps.
-public export covering
+public export
 fusedActionTrajectoryStream : Fuel -> Stage1.FourGeometries.FundamentalGeometry -> List LatticeCoord2D -> (LatticeCoord2D -> Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 fusedActionTrajectoryStream f geom coords vPot =
   Stage0.OnSeq.FusedStream.fusedHylomorphism f
@@ -290,7 +329,7 @@ fusedActionTrajectoryStream f geom coords vPot =
     (1, coords)
 
 ||| O(1) allocation deforested stream transducer evaluating total trajectory kinetic quadrance sum.
-public export covering
+public export
 fusedComputeTotalKineticQuadrance : Fuel -> Stage1.VexelMaxel.Maxel -> List LatticeCoord2D -> Stage0.BoxInt.BoxInt
 fusedComputeTotalKineticQuadrance f m coords =
   Stage0.OnSeq.FusedStream.fusedHylomorphism f
@@ -304,6 +343,18 @@ fusedComputeTotalKineticQuadrance f m coords =
     (\step, acc => lagrange step + acc)
     (Stage0.BoxInt.intToBoxInt 0)
     (1, coords)
+
+||| Audits that streamTrajectoryAction evaluates discrete action consistently with discreteAction.
+public export
+auditStreamDiscreteActionProof : Bool
+auditStreamDiscreteActionProof =
+  let coords = [MkCoord2D (intToBoxInt 0) (intToBoxInt 0),
+                MkCoord2D (intToBoxInt 1) (intToBoxInt 2),
+                MkCoord2D (intToBoxInt 3) (intToBoxInt 4)]
+      actionList = discreteAction EllipticGeom coords zeroPotential
+      actionStrm = streamTrajectoryAction (limit (length coords)) EllipticGeom zeroPotential (stream coords)
+  in actionList == actionStrm
+
 
 
 

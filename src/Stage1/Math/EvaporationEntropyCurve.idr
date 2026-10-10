@@ -58,21 +58,21 @@ isUnitaryPageEvaporation n =
 -- 2. DEFORESTED O(1) STREAM PROCESSING FOR PAGE ENTROPY TRAJECTORIES
 ------------------------------------------------------------------------
 
-||| Evaluates Page curve entropy trajectory in O(1) stack space using Fused Stream Hylomorphism.
-public export covering
+||| Evaluates Page curve entropy trajectory in O(1) stack space over Fuel.
+public export
 fusedPageEntropyTrajectory : Fuel -> (totalBudget : Nat) -> Nat
-fusedPageEntropyTrajectory fuel budget =
-  Stage0.OnSeq.FusedStream.fusedHylomorphism fuel pageProducer (\s, acc => s + acc) 0 0
+fusedPageEntropyTrajectory Dry _ = 0
+fusedPageEntropyTrajectory (More f) budget = loop f 0 0
   where
-    pageProducer : Nat -> Stage0.OnSeq.FusedStream.Step Nat Nat
-    pageProducer t =
-      if t <= budget then
-        Yield (discretePageEntropy t budget) (S t)
-      else
-        Done
+    loop : Fuel -> Nat -> Nat -> Nat
+    loop Dry _ acc = acc
+    loop (More f') t acc =
+      if t <= budget
+        then loop f' (S t) (acc + discretePageEntropy t budget)
+        else acc
 
 ||| Evaluates QuadStream discrete Page entropy trajectory summing initial mass budget across sectors.
-public export covering
+public export
 quadStreamPageEntropyTrajectory : Fuel -> QuadStreamMultiset Stage0.BoxInt.BoxInt -> Nat
 quadStreamPageEntropyTrajectory fuel (MkQuadStream e h p s) =
   let totalB = unwrapNat (multisetSum e + multisetSum h + multisetSum p + multisetSum s)

@@ -9,6 +9,7 @@ import Stage1.Math.HelmholtzFreeEnergy
 import Stage1.Math.QuadStreamPhysicalLaws
 import Stage1.MultisetDuality
 import Stage1.MultisetTensor
+import Stage1.FourGeometries
 
 %default total
 
@@ -63,10 +64,13 @@ auditDeWittSupermetricProof =
 public export
 auditZeroWheelerDeWittConstraintProof : Bool
 auditZeroWheelerDeWittConstraintProof =
-  let e = AddM (intToBoxInt 0) (intToBoxInt 27) ZeroM
-      h = AddM (intToBoxInt 0) (intToBoxInt 128) ZeroM
+  let eCap = natToBoxInt Stage1.FourGeometries.ellipticLatticeCapacity
+      hCap = natToBoxInt Stage1.FourGeometries.hyperbolicRomCapacity
+      dCap = natToBoxInt Stage1.FourGeometries.darkMatterTriangularResidue
+      e = AddM (intToBoxInt 0) eCap ZeroM
+      h = AddM (intToBoxInt 0) hCap ZeroM
       p = AddM (intToBoxInt 0) (intToBoxInt 0) ZeroM
-      s = AddM (intToBoxInt 0) (intToBoxInt 55) ZeroM
+      s = AddM (intToBoxInt 0) dCap ZeroM
       qs = MkQuadStream e h p s
       hTotal = discreteSuperHamiltonianQuadStream qs (Stage0.BoxInt.intToBoxInt 474)
   in Stage0.BoxInt.unwrapBox hTotal == 0
@@ -76,9 +80,9 @@ auditZeroWheelerDeWittConstraintProof =
 public export
 auditRelationalCosmicEnergyConservationProof : Bool
 auditRelationalCosmicEnergyConservationProof =
-  let eKin = 4 * 27
-      ePot = 2 * 128
-      eSink = 2 * 55
+  let eKin = 4 * Stage1.FourGeometries.ellipticLatticeCapacity
+      ePot = 2 * Stage1.FourGeometries.hyperbolicRomCapacity
+      eSink = 2 * Stage1.FourGeometries.darkMatterTriangularResidue
       eTotal = eKin + ePot + eSink
   in eKin == 108 && ePot == 256 && eSink == 110 && eTotal == 474
 

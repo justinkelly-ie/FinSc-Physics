@@ -197,7 +197,7 @@ prfRationalKeplerLaws = prfRefl
 ------------------------------------------------------------------------
 
 ||| Zero-allocation fused stream step function for symplectic N-body force accumulation on T^3.
-public export covering
+public export
 fusedSymplecticIntegrator : Fuel -> (g : Stage0.BoxInt.BoxInt) -> (drag : Stage0.BoxInt.BoxInt) -> (epsSq : Stage0.BoxInt.BoxInt) -> List MassToken -> List MassToken
 fusedSymplecticIntegrator f g drag epsSq tokens =
   Stage0.OnSeq.FusedStream.runFueledStream f $
