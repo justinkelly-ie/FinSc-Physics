@@ -11,6 +11,7 @@ import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
 import Stage1.MultisetDuality
 import Stage1.MultisetTensor
+import Stage1.RationalTrig
 import Data.List
 
 %default total
@@ -233,6 +234,38 @@ auditSpinorDensityPositivityProof =
       dStream = spinorProbabilityDensityStream sp
   in Stage0.BoxInt.unwrapBox dDirect == 4 &&
      Stage0.BoxInt.unwrapBox dStream == 4
+
+------------------------------------------------------------------------
+-- 6. DYNAMIC SPREAD COMPANION BOOST & COORDINATE PERSISTENCE
+------------------------------------------------------------------------
+
+||| A discrete 2-component polarization/relativistic spinor state vector.
+public export
+weylSpinorVexel : (u : BoxInt) -> (v : BoxInt) -> Vexel
+weylSpinorVexel u v = MkVexel [(MkUnixel 1, u), (MkUnixel 2, v)]
+
+||| Applies a dynamic Pythagorean spread boost/precession operator M(x, y) to a 2-spinor state:
+||| M(x, y) = [[2 * Q_Red, -Q_Blue], [Q_Blue, 0]].
+public export
+boostSpinorSpread : (x : BoxInt) -> (y : BoxInt) -> Vexel -> Vexel
+boostSpinorSpread x y s = canonicalizeVexel (actMaxelVexel (pythagoreanSpreadMaxel x y) s)
+
+||| Invariant audit verifying coordinate-preserving spinor boost:
+||| For a pure polarization eigenstate [1] with weight u (v = 0),
+||| coordinate 1 persists with exact weight (2 * Q_Red * u) without destruction,
+||| and transitions to coordinate 2 with weight (Q_Blue * u).
+public export
+auditSpinorSpreadBoostProof : (x : BoxInt) -> (y : BoxInt) -> (u : BoxInt) -> Bool
+auditSpinorSpreadBoostProof x y u =
+  let qBlue = (x * x) + (y * y)
+      qRed  = (x * x) - (y * y)
+      sIn   = weylSpinorVexel u (intToBoxInt 0)
+      sOut  = boostSpinorSpread x y sIn
+      persisted = lookupUnixel (MkUnixel 1) sOut
+      transition = lookupUnixel (MkUnixel 2) sOut
+      expectedPersist = (intToBoxInt 2 * qRed) * u
+      expectedTrans   = qBlue * u
+  in boxEq persisted expectedPersist && boxEq transition expectedTrans
 
 
 
