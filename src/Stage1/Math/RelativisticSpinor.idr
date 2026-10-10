@@ -138,20 +138,16 @@ decomposeChiral v chiralWeight =
 --    (Law 8: Discrete Dirac Spinor & Conserved Current)
 ------------------------------------------------------------------------
 
-||| QTT 0 Erased Proof: Dirac Probability Density Positivity.
+||| Audits Law 8 across discrete relativistic Dirac spinors:
 public export
-0 prfDiracCurrentPositivity : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfDiracCurrentPositivity = prfRefl
-
-||| QTT 0 Erased Proof: Exact 4-Current Divergence Conservation.
-public export
-0 prfDiracCurrentConservation : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfDiracCurrentConservation = prfRefl
-
-||| QTT 0 Erased Proof: Chiral Projector Completeness & Idempotency.
-public export
-0 prfChiralProjectorCompleteness : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfChiralProjectorCompleteness = prfRefl
+auditRelativisticSpinorProof : Bool
+auditRelativisticSpinorProof =
+  let sp = MkDiracSpinor4 (Stage1.VexelMaxel.MkPixel 3 0) (Stage1.VexelMaxel.MkPixel 4 0) (Stage1.VexelMaxel.MkPixel 0 0) (Stage1.VexelMaxel.MkPixel 0 0)
+      j0 = spinorProbabilityDensity sp
+      ch = decomposeChiral (Stage0.BoxInt.intToBoxInt 10) (Stage0.BoxInt.intToBoxInt 1)
+  in Stage0.BoxInt.unwrapBox j0 == 25 &&
+     Stage0.BoxInt.unwrapBox (leftHanded ch) == 0 &&
+     Stage0.BoxInt.unwrapBox (rightHanded ch) == 10
 
 ------------------------------------------------------------------------
 -- 4. CATEGORY-THEORETIC MULTISET ADJUNCTION

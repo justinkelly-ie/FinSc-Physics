@@ -187,10 +187,13 @@ keplerHarmonicRatio (MkRationalOrbit qa _ t) =
       qa3 = qa * qa * qa
   in t4 `div` qa3
 
-||| QTT 0 Erased Proof: Rational Kepler Laws.
+||| Audits toroidal astrodynamics harmonic ratio:
 public export
-0 prfRationalKeplerLaws : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfRationalKeplerLaws = prfRefl
+auditToroidalAstrodynamicsProof : Bool
+auditToroidalAstrodynamicsProof =
+  let orb = MkRationalOrbit (Stage0.BoxInt.intToBoxInt 4) (Stage0.BoxInt.intToBoxInt 16) (Stage0.BoxInt.intToBoxInt 8)
+      ratio = keplerHarmonicRatio orb
+  in Stage0.BoxInt.unwrapBox ratio == 64
 
 ------------------------------------------------------------------------
 -- 5. DEFORESTED SYMPLECTIC ASTRODYNAMICS STREAMS
@@ -216,11 +219,6 @@ fusedSymplecticIntegrator f g drag epsSq tokens =
                       newVel = (vx + fx, vy + fy, vz + fz)
                   in Stage0.OnSeq.FusedStream.Yield (MkMassToken (mass t) (pos t) newVel) rest)
       tokens
-
-||| QTT 0 Erased Proof: Symplectic Integrator Trajectory Preservation.
-public export
-0 prfFusedSymplecticIntegrator : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfFusedSymplecticIntegrator = prfRefl
 
 ------------------------------------------------------------------------
 -- 6. CATEGORY-THEORETIC MULTISET ADJUNCTION

@@ -125,9 +125,14 @@ MultisetAdjunction RefractionFunctor AbstractRefractionFunctor where
 -- 3. FORMAL INVARIANT AUDIT PROOFS
 ------------------------------------------------------------------------
 
-||| QTT 0 Erased Proof: Rational Snell's Law & Triple Spread Law.
+||| Audits Law 55 (Discrete Rational Snell's Refraction n1^2 * s1 = n2^2 * s2):
 public export
-0 prfLaw55RationalSnell : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfLaw55RationalSnell = prfRefl
+auditRationalSnellProof : Bool
+auditRationalSnellProof =
+  let n1 = Stage0.BoxInt.intToBoxInt 2
+      s1 = Stage0.BoxInt.intToBoxInt 9
+      n2 = Stage0.BoxInt.intToBoxInt 3
+      s2 = Stage0.BoxInt.intToBoxInt 4
+  in isSnellRefracted n1 s1 n2 s2
 
 

@@ -70,20 +70,17 @@ decimateBerryCurvature = foldl (+) (Stage0.BoxInt.intToBoxInt 0)
 --    (Multi-Scale Renormalization & Information Geometry)
 ------------------------------------------------------------------------
 
-||| QTT 0 Erased Proof: Discrete Beta Function Running.
+||| Audits Renormalization Group Information Flow & Topological Invariance:
 public export
-0 prfDiscreteBetaFlow : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfDiscreteBetaFlow = prfRefl
-
-||| QTT 0 Erased Proof: Discrete Fisher Information Metric Positivity.
-public export
-0 prfDiscreteFisherMetric : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfDiscreteFisherMetric = prfRefl
-
-||| QTT 0 Erased Proof: Scale-Invariance of Topological First Chern Number under RG Decimation.
-public export
-0 prfTopologicalRGFixedPoint : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfTopologicalRGFixedPoint = prfRefl
+auditRenormalizationInformationFlowProof : Bool
+auditRenormalizationInformationFlowProof =
+  let g0 = Stage1.UnixelFraction.mkUnixelFraction (Stage0.BoxInt.intToBoxInt 1) 1
+      (Stage1.UnixelFraction.MkUnixelFraction numDg _) = discreteBetaStep g0 1
+      (Stage1.UnixelFraction.MkUnixelFraction numFish _) = discreteFisherQuadrance 10 6
+      cCoarse = decimateBerryCurvature [Stage0.BoxInt.intToBoxInt 1, Stage0.BoxInt.intToBoxInt 0, Stage0.BoxInt.intToBoxInt 0, Stage0.BoxInt.intToBoxInt 0]
+  in Stage0.BoxInt.unwrapBox cCoarse == 1 &&
+     Stage0.BoxInt.unwrapBox numDg == (-1) &&
+     Stage0.BoxInt.unwrapBox numFish == 16
 
 ------------------------------------------------------------------------
 -- 5. CATEGORY-THEORETIC MULTISET ADJUNCTION

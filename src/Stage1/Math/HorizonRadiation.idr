@@ -58,12 +58,10 @@ discreteHawkingTemperature area =
   let denom = if area == 0 then 1 else 2 * area
   in Stage1.UnixelFraction.MkUnixelFraction (Stage0.BoxInt.intToBoxInt 1) (Stage1.VexelMaxel.MkUnixel denom)
 
-||| Executes one discrete Hawking evaporation quantum step
-||| parameterized by QTT 0 metric space parameter (0 space : VexelSpace d c):
-||| Relocates discrete quantum dM = 1 from black hole mass to emitted thermal bath.
+||| Discrete Hawking evaporation step without space witness.
 public export
-stepHawkingEvaporation : {d : Nat} -> {c : MetricColor} -> (0 space : VexelSpace d c) -> HorizonState -> HorizonState
-stepHawkingEvaporation space (MkHorizonState area m r) =
+stepHawkingEvaporationDiscrete : HorizonState -> HorizonState
+stepHawkingEvaporationDiscrete (MkHorizonState area m r) =
   let mVal = Stage0.BoxInt.unwrapBox m
       rVal = Stage0.BoxInt.unwrapBox r
       dM = if mVal > 0 then 1 else 0
@@ -71,6 +69,13 @@ stepHawkingEvaporation space (MkHorizonState area m r) =
       newR = rVal + dM
       newArea = if area > 0 && mVal > 0 then minus area 1 else area
   in MkHorizonState newArea (Stage0.BoxInt.intToBoxInt newM) (Stage0.BoxInt.intToBoxInt newR)
+
+||| Executes one discrete Hawking evaporation quantum step
+||| parameterized by QTT 0 metric space parameter (0 space : VexelSpace d c):
+||| Relocates discrete quantum dM = 1 from black hole mass to emitted thermal bath.
+public export
+stepHawkingEvaporation : {d : Nat} -> {c : MetricColor} -> (0 space : VexelSpace d c) -> HorizonState -> HorizonState
+stepHawkingEvaporation _ = stepHawkingEvaporationDiscrete
 
 ------------------------------------------------------------------------
 -- 2. CATEGORY-THEORETIC HOM-TENSOR MULTISET ADJUNCTION (L ⊣ R)
@@ -154,8 +159,14 @@ MultisetAdjunction HorizonRadiationFunctor AbstractHorizonRadiationFunctor where
 ||| 2. Total Token Energy Conservation: M + R = M_initial (zero leakage).
 ||| 3. Monotonic Horizon Evaporation: Mass strictly decreases until complete evaporation.
 public export
-0 prfHorizonRadiation : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfHorizonRadiation = prfRefl
+auditHorizonRadiationProof : Bool
+auditHorizonRadiationProof =
+  let st0 = MkHorizonState 54 (Stage0.BoxInt.intToBoxInt 10) (Stage0.BoxInt.intToBoxInt 0)
+      st1 = stepHawkingEvaporationDiscrete st0
+      (Stage1.UnixelFraction.MkUnixelFraction _ den) = discreteHawkingTemperature 54
+  in Stage0.BoxInt.unwrapBox (blackHoleMass st1) == 9 &&
+     Stage0.BoxInt.unwrapBox (emittedRadiation st1) == 1 &&
+     Stage1.VexelMaxel.unwrapUnixel den == 108
 
 
 

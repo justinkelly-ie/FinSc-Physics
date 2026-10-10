@@ -55,10 +55,13 @@ isAttractiveDispersion (Stage1.UnixelFraction.MkUnixelFraction n _) = Stage0.Box
 --    (Law 26: Discrete Casimir-Polder Force)
 ------------------------------------------------------------------------
 
-||| QTT 0 Erased Proof: Discrete Casimir-Polder & London Dispersion Forces.
+||| Audits Law 26 (Discrete Casimir-Polder Retarded Dipole Potential):
 public export
-0 prfRetardedDipoleForce : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfRetardedDipoleForce = prfRefl
+auditRetardedDipoleForceProof : Bool
+auditRetardedDipoleForceProof =
+  let c7 = Stage0.BoxInt.intToBoxInt 10
+      f = discreteCasimirPolderPotential c7 2
+  in isAttractiveDispersion f
 
 ------------------------------------------------------------------------
 -- 3. CATEGORY-THEORETIC MULTISET ADJUNCTION

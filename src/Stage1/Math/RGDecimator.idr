@@ -89,16 +89,6 @@ decimatedChernNumber (MkMacroPlaquette f :: rest) = f + decimatedChernNumber res
 --    (Categorical RG Decimator & Invariant Fixed Points)
 ------------------------------------------------------------------------
 
-||| QTT 0 Erased Proof: 2x2 Block Decimation Additive Invariance.
-public export
-0 prfPlaquetteDecimation : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfPlaquetteDecimation = prfRefl
-
-||| QTT 0 Erased Proof: Multi-Block Topological Fixed Point Conservation.
-public export
-0 prfMultiBlockTopologicalFixedPoint : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfMultiBlockTopologicalFixedPoint = prfRefl
-
 ------------------------------------------------------------------------
 -- 5. MULTI-SCALE CARET COMPOSITION OF RG TRANSFORMATIONS
 ------------------------------------------------------------------------
@@ -113,11 +103,6 @@ rgScaleOperator s = Stage1.Polynumber.monomialPolynumber (Stage0.BoxInt.intToBox
 public export
 composeRGScaleSteps : Stage1.Polynumber.Polynumber -> Stage1.Polynumber.Polynumber -> Stage1.Polynumber.Polynumber
 composeRGScaleSteps = Stage1.Polynumber.caretPolynumber
-
-||| QTT 0 Erased Proof: Multi-scale Caret Composition of RG Transformations.
-public export
-0 prfRGScaleCaretComposition : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfRGScaleCaretComposition = prfRefl
 
 ------------------------------------------------------------------------
 -- 6. DOUBLY STOCHASTIC RG DECIMATION KERNELS (CH. 27)
@@ -145,10 +130,17 @@ vectSum : {n : Nat} -> Vect n Nat -> Nat
 vectSum [] = 0
 vectSum (x :: xs) = x + vectSum xs
 
-||| QTT 0 Erased Proof: Doubly Stochastic RG Decimation Kernel properties.
+||| Audits 2x2 Block Decimation Additive Invariance & Doubly Stochastic Magic Maxel Decimation:
 public export
-0 prfRGMagicMaxelDecimation : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfRGMagicMaxelDecimation = prfRefl
+auditRGDecimatorProof : Bool
+auditRGDecimatorProof =
+  let p = MkPlaquette2x2 (Stage0.BoxInt.intToBoxInt 1) (Stage0.BoxInt.intToBoxInt 2) (Stage0.BoxInt.intToBoxInt 3) (Stage0.BoxInt.intToBoxInt 4)
+      macroP = decimate p
+      vIn : Vect 4 Nat = [1, 1, 1, 1]
+      vOut = applyRGMagicDecimation vIn
+  in isScaleInvariant p macroP &&
+     Stage0.BoxInt.unwrapBox (totalFlux macroP) == 10 &&
+     vectSum vOut == 16
 
 ------------------------------------------------------------------------
 -- 7. CATEGORY-THEORETIC MULTISET ADJUNCTION

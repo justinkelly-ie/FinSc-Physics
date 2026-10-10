@@ -140,10 +140,12 @@ public export
 ScaleTransform LatticeCoord2D Stage0.BoxInt.BoxInt where
   scaleTransform (MkCoord2D x y) = (x * x) + (y * y)
 
-||| QTT 0 Erased Proof: Physical Spatial Coordinate ScaleTransform Quadrance Invariant
+||| Audits physical coordinate scale transform quadrance invariance:
 public export
-0 prfCoordToQuadranceScaleTransform : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfCoordToQuadranceScaleTransform = prfRefl
+auditPhysicsScaleTransformProof : Bool
+auditPhysicsScaleTransformProof =
+  let q = scaleTransform (MkCoord2D (Stage0.BoxInt.intToBoxInt 4) (Stage0.BoxInt.intToBoxInt 3))
+  in Stage0.BoxInt.unwrapBox q == 25
 
 ||| Evaluates physical pushforward along an AdjointScaleChain scale jump
 public export
@@ -154,11 +156,6 @@ evalPhysicsChainPush = Stage1.MultisetDuality.evalChainPush
 public export
 evalPhysicsChainPull : Stage1.MultisetDuality.AdjointScaleChain a b -> b -> a
 evalPhysicsChainPull = Stage1.MultisetDuality.evalChainPull
-
-||| QTT 0 Erased Proof Witness: Physics ScaleTransform Plugin
-public export
-0 prfPhysicsScaleTransform : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfPhysicsScaleTransform = prfRefl
 
 --------------------------------------------------------------------------------
 -- 2LTT STAGED MULTISET ACTION INTEGRAL DEFORESTATION

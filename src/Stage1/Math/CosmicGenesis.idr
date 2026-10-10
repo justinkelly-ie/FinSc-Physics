@@ -124,10 +124,14 @@ aggregateMultisets [] = Stage0.Multiset.ZeroM
 aggregateMultisets (x :: xs) = Stage0.Multiset.addMultiset x (aggregateMultisets xs)
 
 
-||| QTT 0 Erased Proof: Discrete Cosmic Genesis & Primordial Relic Freeze-Out.
+||| Audits the Primordial Relic Freeze-Out & Landauer Dissipation Invariant:
 public export
-0 prfCosmicGenesisRelicFreezeOut : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfCosmicGenesisRelicFreezeOut = prfRefl
+auditCosmicGenesisRelicFreezeOutProof : Bool
+auditCosmicGenesisRelicFreezeOutProof =
+  let (diss, dm) = landauerFreezeOutStep 10 27 55
+      initB = MkBaryonState (Stage0.BoxInt.intToBoxInt 10) (Stage0.BoxInt.intToBoxInt 3) (Stage0.BoxInt.intToBoxInt 100)
+      finB = freezeOutAntimatterAnnihilation initB
+  in diss == 270 && dm == 325 && Stage0.BoxInt.unwrapBox (baryonPos finB) == 7
 
 --------------------------------------------------------------------------------
 -- 5. CATEGORY-THEORETIC HOM-TENSOR MULTISET ADJUNCTION (L ⊣ R)

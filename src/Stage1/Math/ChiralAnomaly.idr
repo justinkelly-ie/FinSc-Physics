@@ -19,16 +19,16 @@ import Stage1.MultisetTensor
 ||| Computes the analytical index of the discrete Dirac operator:
 ||| Index(D) = N_L - N_R (difference between left and right-handed zero modes).
 public export
-chiralDiracIndex : (leftModes : Nat) -> (rightModes : Nat) -> Integer
+chiralDiracIndex : (leftModes : Nat) -> (rightModes : Nat) -> BoxInt
 chiralDiracIndex nL nR =
-  natToInteger nL - natToInteger nR
+  subBox (natToBoxInt nL) (natToBoxInt nR)
 
 ||| Evaluates discrete topological instanton winding number Q_top (Second Chern Class C_2):
 ||| Q_top = (1 / 8π^2) ∑ Tr(F ∧ F) ∈ ℤ.
 public export
-evaluateDiscreteInstantonCharge : (plaquetteCrossSum : Integer) -> (divisor : Integer) -> Integer
+evaluateDiscreteInstantonCharge : (plaquetteCrossSum : BoxInt) -> (divisor : BoxInt) -> BoxInt
 evaluateDiscreteInstantonCharge sumVal divVal =
-  if divVal == 0 then 0 else sumVal `div` divVal
+  if unwrapBox divVal == 0 then intToBoxInt 0 else divBox sumVal divVal
 
 ||| Computes the discrete axial current divergence (Chiral Anomaly equation):
 ||| ∇ · j_5 = 2 * m * j_5 + 2 * Q_top.
@@ -48,7 +48,7 @@ evaluateQuadStreamAxialDivergence m (MkQuadStream e h p s) =
 ||| Validates the Atiyah-Singer Index Theorem on discrete lattices:
 ||| Index(D) ≡ Q_top.
 public export
-checkAtiyahSingerIndexEquivalence : (nL : Nat) -> (nR : Nat) -> (qTop : Integer) -> Bool
+checkAtiyahSingerIndexEquivalence : (nL : Nat) -> (nR : Nat) -> (qTop : BoxInt) -> Bool
 checkAtiyahSingerIndexEquivalence nL nR qTop =
   chiralDiracIndex nL nR == qTop
 
@@ -63,7 +63,7 @@ public export
 auditChiralZeroModeIndexProof : Bool
 auditChiralZeroModeIndexProof =
   let idx = chiralDiracIndex 3 1
-  in idx == 2
+  in unwrapBox idx == 2
 
 ||| Audits Discrete Second Chern Instanton Charge Quantization:
 ||| For discrete plaquette wedge product sum = 16 and normalization divisor = 8:
@@ -71,8 +71,8 @@ auditChiralZeroModeIndexProof =
 public export
 auditDiscreteSecondChernInstantonProof : Bool
 auditDiscreteSecondChernInstantonProof =
-  let qTop = evaluateDiscreteInstantonCharge 16 8
-  in qTop == 2
+  let qTop = evaluateDiscreteInstantonCharge (intToBoxInt 16) (intToBoxInt 8)
+  in unwrapBox qTop == 2
 
 ||| Audits Atiyah-Singer Index Theorem Equivalence:
 ||| Proves that the analytic chiral index Index(D) = 3 - 1 = 2 
@@ -80,7 +80,7 @@ auditDiscreteSecondChernInstantonProof =
 public export
 auditAtiyahSingerIndexTheoremProof : Bool
 auditAtiyahSingerIndexTheoremProof =
-  checkAtiyahSingerIndexEquivalence 3 1 2
+  checkAtiyahSingerIndexEquivalence 3 1 (intToBoxInt 2)
 
 --------------------------------------------------------------------------------
 -- 3. CATEGORY-THEORETIC HOM-TENSOR MULTISET ADJUNCTION (L ⊣ R)

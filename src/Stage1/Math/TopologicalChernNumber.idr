@@ -21,65 +21,64 @@ record TorusPlaquette where
   constructor MkTorusPlaquette
   gridX : Nat
   gridY : Nat
-  berryFluxNumerator : Integer
-  berryFluxDenominator : Integer
+  berryFluxNumerator : BoxInt
+  berryFluxDenominator : BoxInt
 
 public export
 Eq TorusPlaquette where
   (MkTorusPlaquette x1 y1 n1 d1) == (MkTorusPlaquette x2 y2 n2 d2) =
-    x1 == x2 && y1 == y2 && (n1 * d2 == n2 * d1)
+    x1 == x2 && y1 == y2 && (mulBox n1 d2 == mulBox n2 d1)
 
 ||| Computes the discrete First Chern Number by summing Berry flux over all plaquettes:
 ||| C_1 = (1 / 2π) ∑_{p} F_{xy}(p) ∈ ℤ.
 public export
-computeChernNumber : List TorusPlaquette -> Integer
-computeChernNumber [] = 0
+computeChernNumber : List TorusPlaquette -> BoxInt
+computeChernNumber [] = intToBoxInt 0
 computeChernNumber (p :: ps) =
-  (berryFluxNumerator p `div` berryFluxDenominator p) + computeChernNumber ps
+  addBox (divBox (berryFluxNumerator p) (berryFluxDenominator p)) (computeChernNumber ps)
 
 ||| Evaluates discrete Berry curvature flux extraction directly across a deforested stream of plaquettes.
 public export
-computeBerryCurvatureStream : FusedStream TorusPlaquette -> FusedStream Integer
+computeBerryCurvatureStream : FusedStream TorusPlaquette -> FusedStream BoxInt
 computeBerryCurvatureStream plaquettes =
-  mapStream (\p => berryFluxNumerator p `div` (if berryFluxDenominator p == 0 then 1 else berryFluxDenominator p)) plaquettes
+  mapStream (\p => divBox (berryFluxNumerator p) (if unwrapBox (berryFluxDenominator p) == 0 then intToBoxInt 1 else berryFluxDenominator p)) plaquettes
 
 ||| Computes the discrete First Chern Number by streamifying Berry connection curvature sum extractions with parameterized fuel.
 public export
-computeChernNumberStreamFuel : Fuel -> FusedStream TorusPlaquette -> Integer
+computeChernNumberStreamFuel : Fuel -> FusedStream TorusPlaquette -> BoxInt
 computeChernNumberStreamFuel f plaquettes =
-  foldStreamFuel f (+) 0 (computeBerryCurvatureStream plaquettes)
+  foldStreamFuel f addBox (intToBoxInt 0) (computeBerryCurvatureStream plaquettes)
 
 ||| Computes the discrete First Chern Number bounded by canonical Primorial 210 capacity (Rule 03).
 public export
-computeChernNumberStream : FusedStream TorusPlaquette -> Integer
+computeChernNumberStream : FusedStream TorusPlaquette -> BoxInt
 computeChernNumberStream plaquettes =
   computeChernNumberStreamFuel substrateFuel plaquettes
 
 ||| Computes the discrete First Chern Number over a List of plaquettes via zero-allocation streamification.
 public export
-computeChernNumberDeforested : List TorusPlaquette -> Integer
+computeChernNumberDeforested : List TorusPlaquette -> BoxInt
 computeChernNumberDeforested plaquettes =
-  foldStreamNat (length plaquettes) (+) 0 (computeBerryCurvatureStream (stream plaquettes))
+  foldStreamNat (length plaquettes) addBox (intToBoxInt 0) (computeBerryCurvatureStream (stream plaquettes))
 
 ||| Evaluates discrete First Chern Number from deforested FusedStream payload bounded by canonical Elliptic capacity (27 VM).
 public export
-evaluateQuadStreamChernNumberStream : FusedStream (QuadStreamChannel, Stage0.BoxInt.BoxInt, Stage0.BoxInt.BoxInt) -> Integer
+evaluateQuadStreamChernNumberStream : FusedStream (QuadStreamChannel, Stage0.BoxInt.BoxInt, Stage0.BoxInt.BoxInt) -> BoxInt
 evaluateQuadStreamChernNumberStream strm =
-  let sumE = foldStreamFuel ellipticFuel updateElliptic (intToBoxInt 0) strm
-  in unwrapBox sumE
+  foldStreamFuel ellipticFuel updateElliptic (intToBoxInt 0) strm
   where
     updateElliptic : Stage0.BoxInt.BoxInt -> (QuadStreamChannel, Stage0.BoxInt.BoxInt, Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
-    updateElliptic acc (EllipticSector, _, w) = acc + w
+    updateElliptic acc (EllipticSector, _, w) = addBox acc w
     updateElliptic acc _                      = acc
 
 ||| Evaluates discrete First Chern Number from QuadStream payload.
 public export
-evaluateQuadStreamChernNumber : QuadStreamMultiset Stage0.BoxInt.BoxInt -> Integer
+evaluateQuadStreamChernNumber : QuadStreamMultiset Stage0.BoxInt.BoxInt -> BoxInt
 evaluateQuadStreamChernNumber qs = evaluateQuadStreamChernNumberStream (quadStreamToStream qs)
 
 ||| Computes the Quantized Hall Conductance: σ_{xy} = C_1 * (e^2 / h).
 public export
-quantizedHallConductance : Integer -> Integer
+quantizedHallConductance : BoxInt -> BoxInt
 quantizedHallConductance c1 = c1
 
 ------------------------------------------------------------------------
@@ -90,20 +89,20 @@ quantizedHallConductance c1 = c1
 public export
 canonicalChernInsulatorTorus : List TorusPlaquette
 canonicalChernInsulatorTorus =
-  [ MkTorusPlaquette 0 0 1 4
-  , MkTorusPlaquette 1 0 1 4
-  , MkTorusPlaquette 0 1 1 4
-  , MkTorusPlaquette 1 1 1 4
+  [ MkTorusPlaquette 0 0 (intToBoxInt 1) (intToBoxInt 4)
+  , MkTorusPlaquette 1 0 (intToBoxInt 1) (intToBoxInt 4)
+  , MkTorusPlaquette 0 1 (intToBoxInt 1) (intToBoxInt 4)
+  , MkTorusPlaquette 1 1 (intToBoxInt 1) (intToBoxInt 4)
   ]
 
 ||| Canonical Trivial Band Insulator with Chern number C_1 = 0.
 public export
 canonicalTrivialInsulatorTorus : List TorusPlaquette
 canonicalTrivialInsulatorTorus =
-  [ MkTorusPlaquette 0 0 0 1
-  , MkTorusPlaquette 1 0 0 1
-  , MkTorusPlaquette 0 1 0 1
-  , MkTorusPlaquette 1 1 0 1
+  [ MkTorusPlaquette 0 0 (intToBoxInt 0) (intToBoxInt 1)
+  , MkTorusPlaquette 1 0 (intToBoxInt 0) (intToBoxInt 1)
+  , MkTorusPlaquette 0 1 (intToBoxInt 0) (intToBoxInt 1)
+  , MkTorusPlaquette 1 1 (intToBoxInt 0) (intToBoxInt 1)
   ]
 
 ------------------------------------------------------------------------
@@ -116,10 +115,10 @@ canonicalTrivialInsulatorTorus =
 public export
 auditChernNumberIntegerQuantizationProof : Bool
 auditChernNumberIntegerQuantizationProof =
-  let totalNum = sum (map berryFluxNumerator canonicalChernInsulatorTorus)
-      denom = 4
-      c1 = totalNum `div` denom
-  in totalNum == 4 && c1 == 1
+  let totalNum = foldl addBox (intToBoxInt 0) (map berryFluxNumerator canonicalChernInsulatorTorus)
+      denom = intToBoxInt 4
+      c1 = divBox totalNum denom
+  in unwrapBox totalNum == 4 && unwrapBox c1 == 1
 
 ||| Audits the Topological Hall Conductance Invariant:
 ||| Proves that σ_{xy} = 1 for the Chern insulator and σ_{xy} = 0 for the trivial insulator,
@@ -127,9 +126,9 @@ auditChernNumberIntegerQuantizationProof =
 public export
 auditTopologicalHallConductanceProof : Bool
 auditTopologicalHallConductanceProof =
-  let sigmaChern = quantizedHallConductance 1
-      sigmaTrivial = quantizedHallConductance 0
-  in sigmaChern == 1 && sigmaTrivial == 0
+  let sigmaChern = quantizedHallConductance (intToBoxInt 1)
+      sigmaTrivial = quantizedHallConductance (intToBoxInt 0)
+  in unwrapBox sigmaChern == 1 && unwrapBox sigmaTrivial == 0
 
 ------------------------------------------------------------------------
 -- 4. CATEGORY-THEORETIC MULTISET ADJUNCTION
@@ -138,7 +137,7 @@ auditTopologicalHallConductanceProof =
 public export
 record ChernState where
   constructor MkChernState
-  chernNumber : Integer
+  chernNumber : BoxInt
 
 public export
 Eq ChernState where

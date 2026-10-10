@@ -88,20 +88,16 @@ satisfiesOutOfEquilibrium g22 = Stage0.BoxInt.unwrapBox g22 == 0
 --    (Law 12: Constructive Baryogenesis & Sakharov Conditions)
 ------------------------------------------------------------------------
 
-||| QTT 0 Erased Proof: Positive Net Baryon Asymmetry (eta_B > 0).
+||| Audits the Three Sakharov Invariants for Constructive Baryogenesis:
+||| Verifies Baryon Violation, C/CP asymmetry, and Substrate out-of-equilibrium condition.
 public export
-0 prfBaryonNumberAsymmetryPositive : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfBaryonNumberAsymmetryPositive = prfRefl
-
-||| QTT 0 Erased Proof: C and CP Seed Violation (B+ > B-).
-public export
-0 prfCPViolationSeedAsymmetry : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfCPViolationSeedAsymmetry = prfRefl
-
-||| QTT 0 Erased Proof: Substrate Thermal Departure (g22 == 0).
-public export
-0 prfSubstrateThermalDeparture : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfSubstrateThermalDeparture = prfRefl
+auditSakharovBaryogenesisProof : Bool
+auditSakharovBaryogenesisProof =
+  let st = MkBaryonState (Stage0.BoxInt.intToBoxInt 10) (Stage0.BoxInt.intToBoxInt 3) (Stage0.BoxInt.intToBoxInt 100)
+      bViolation = satisfiesBaryonViolation (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 7)
+      cpViolation = satisfiesCPViolation st
+      outOfEq = satisfiesOutOfEquilibrium (Stage0.BoxInt.intToBoxInt 0)
+  in bViolation && cpViolation && outOfEq
 
 --------------------------------------------------------------------------------
 -- 4. CATEGORY-THEORETIC HOM-TENSOR MULTISET ADJUNCTION (L ⊣ R)

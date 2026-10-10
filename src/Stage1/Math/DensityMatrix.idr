@@ -59,10 +59,9 @@ bornRuleProjection : DensityMatrix poly -> Nat -> UnixelFraction
 bornRuleProjection (MkDensityMatrix norm cs) idx =
   case streamIndex idx cs of
     Nothing => mkUnixelFraction (intToBoxInt 0) 1
-    Just c  => mkUnixelFraction c (natFromInteger (unwrapBox norm))
-  where
-    natFromInteger : Integer -> Nat
-    natFromInteger n = if n <= 0 then 1 else cast n
+    Just c  =>
+      let nNat = boxToNat norm
+      in mkUnixelFraction c (if nNat == 0 then 1 else nNat)
 
 ||| Computes exact discrete Von Neumann entropy S(rho) = - Tr(rho log rho) over quantum density matrix.
 ||| Enforces QTT linear single-use semantics (1 rho : DensityMatrix poly) to guarantee resource safety.

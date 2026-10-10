@@ -92,7 +92,7 @@ record QuadStreamPipelineResult where
   constructor MkQuadStreamPipelineResult
   densityNorm   : BoxInt
   spinorDensity : BoxInt
-  chernNumber   : Integer
+  chernNumber   : BoxInt
 
 ||| Comprehensive multi-law evaluation ledger for Quad-Stream physics.
 public export
@@ -104,7 +104,7 @@ record PhysicalLawLedger where
   parabolicMass       : BoxInt
   substrateMass       : BoxInt
   spinorDensity       : BoxInt
-  chernNumber         : Integer
+  chernNumber         : BoxInt
   helmholtzFreeEnergy : BoxInt
 
 public export
@@ -122,7 +122,7 @@ pipelineQuadStreamLedger temp qs =
       fuel = (countNodes * 4) + 16
       strm = quadStreamToStream qs
       (totalNorm, (sumE, sumH, sumP, sumS), c1) =
-        foldStreamNat fuel processElement (intToBoxInt 0, (intToBoxInt 0, intToBoxInt 0, intToBoxInt 0, intToBoxInt 0), 0) strm
+        foldStreamNat fuel processElement (intToBoxInt 0, (intToBoxInt 0, intToBoxInt 0, intToBoxInt 0, intToBoxInt 0), intToBoxInt 0) strm
       spinorDensityVal = (sumE * sumE) + (sumH * sumH) + (sumP * sumP) + (sumS * sumS)
       fEnergy = discreteHelmholtzFreeEnergy temp (MkCosmicBudgetPartition sumE sumH sumS)
   in MkLawLedger totalNorm sumE sumH sumP sumS spinorDensityVal c1 fEnergy
@@ -135,11 +135,11 @@ pipelineQuadStreamLedger temp qs =
         mCount ZeroM = 0
         mCount (AddM _ _ rest) = S (mCount rest)
 
-    processElement : (BoxInt, (BoxInt, BoxInt, BoxInt, BoxInt), Integer)
+    processElement : (BoxInt, (BoxInt, BoxInt, BoxInt, BoxInt), BoxInt)
                   -> (QuadStreamChannel, BoxInt, BoxInt)
-                  -> (BoxInt, (BoxInt, BoxInt, BoxInt, BoxInt), Integer)
+                  -> (BoxInt, (BoxInt, BoxInt, BoxInt, BoxInt), BoxInt)
     processElement (normAcc, (e, h, p, s), c1Acc) (EllipticSector, _, w) =
-      (normAcc + w, (e + w, h, p, s), c1Acc + unwrapBox w)
+      (normAcc + w, (e + w, h, p, s), c1Acc + w)
     processElement (normAcc, (e, h, p, s), c1Acc) (HyperbolicSector, _, w) =
       (normAcc + w, (e, h + w, p, s), c1Acc)
     processElement (normAcc, (e, h, p, s), c1Acc) (ParabolicSector, _, w) =
@@ -226,7 +226,7 @@ auditPipelineQuadStreamLedgerProof =
      unwrapBox ledger.hyperbolicMass == unwrapBox hCap &&
      unwrapBox ledger.substrateMass == unwrapBox dCap &&
      unwrapBox ledger.helmholtzFreeEnergy == (-1320) &&
-     ledger.chernNumber == cast Stage1.FourGeometries.ellipticLatticeCapacity
+     unwrapBox ledger.chernNumber == cast Stage1.FourGeometries.ellipticLatticeCapacity
 
 ||| Audit verifying associativity of composable physical law transducers.
 public export

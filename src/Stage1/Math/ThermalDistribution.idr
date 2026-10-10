@@ -253,25 +253,11 @@ quadStreamPartitionSum (MkQuadStream e h p s) maxLevel numQ denQ =
 -- 4. CONSTRUCTIVE FORMAL AUDIT PROOFS
 ------------------------------------------------------------------------
 
-||| QTT 0 Erased Proof: Boltzmann Probability Normalization.
+||| Audits Boltzmann partition factorization and ground state collapse:
 public export
-0 prfBoltzmannProbabilityNormalization : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfBoltzmannProbabilityNormalization = prfRefl
-
-||| QTT 0 Erased Proof: Cosmic Budget Partition Factorization.
-public export
-0 prfCosmicBudgetPartitionFactorization : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfCosmicBudgetPartitionFactorization = prfRefl
-
-||| QTT 0 Erased Proof: Zero-Temperature Ground State Collapse.
-public export
-0 prfZeroTemperatureGroundStateCollapse : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfZeroTemperatureGroundStateCollapse = prfRefl
-
-||| QTT 0 Erased Proof: Caret-FIA Boltzmann Multi-Sector Partition Product.
-public export
-0 prfCaretBoltzmannPartition : (n : Stage0.BoxInt.BoxInt) -> n = n
-prfCaretBoltzmannPartition = prfRefl
+auditThermalDistributionProof : Bool
+auditThermalDistributionProof =
+  auditStreamPartitionEquivalenceProof
 
 ------------------------------------------------------------------------
 -- 5. CATEGORY-THEORETIC MULTISET ADJUNCTION
