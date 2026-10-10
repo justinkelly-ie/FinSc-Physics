@@ -133,6 +133,19 @@ auditCosmicGenesisRelicFreezeOutProof =
       finB = freezeOutAntimatterAnnihilation initB
   in diss == 270 && dm == 325 && Stage0.BoxInt.unwrapBox (baryonPos finB) == 7
 
+||| Multi-Epoch Cosmic Baryon Evolution: Traces Sakharov asymmetry generation through freeze-out.
+public export
+evaluateCompositeBaryonEvolution : Bool
+evaluateCompositeBaryonEvolution =
+  let bViol = satisfiesBaryonViolation (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 7)
+      outEq = satisfiesOutOfEquilibrium (Stage0.BoxInt.intToBoxInt 0)
+      initState = MkBaryonState (Stage0.BoxInt.intToBoxInt 10) (Stage0.BoxInt.intToBoxInt 3) (Stage0.BoxInt.intToBoxInt 100)
+      cpViol = satisfiesCPViolation initState
+      frozenState = freezeOutAntimatterAnnihilation initState
+      netSurviving = Stage0.BoxInt.unwrapBox (baryonPos frozenState) - Stage0.BoxInt.unwrapBox (baryonNeg frozenState)
+      photonsProduced = Stage0.BoxInt.unwrapBox (photonTokens frozenState)
+  in bViol && outEq && cpViol && (netSurviving == 7) && (photonsProduced == 106)
+
 --------------------------------------------------------------------------------
 -- 5. CATEGORY-THEORETIC HOM-TENSOR MULTISET ADJUNCTION (L ⊣ R)
 --------------------------------------------------------------------------------

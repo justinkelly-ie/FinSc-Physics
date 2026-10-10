@@ -155,6 +155,57 @@ pipelineQuadStreamTransducer qs =
   let ledger = pipelineQuadStreamLedger (intToBoxInt 1) qs
   in MkQuadStreamPipelineResult ledger.totalMass ledger.spinorDensity ledger.chernNumber
 
+||| Evaluates physical law ledger directly over a deforested stream without intermediate carrier allocations.
+public export
+fusedPipelineQuadStreamLedgerDirect : (fuel : Nat) -> (temp : BoxInt) -> FusedStream (QuadStreamChannel, BoxInt, BoxInt) -> PhysicalLawLedger
+fusedPipelineQuadStreamLedgerDirect fuel temp strm =
+  let (totalNorm, (sumE, sumH, sumP, sumS), c1) =
+        foldStreamNat fuel processElement (intToBoxInt 0, (intToBoxInt 0, intToBoxInt 0, intToBoxInt 0, intToBoxInt 0), intToBoxInt 0) strm
+      spinorDensityVal = (sumE * sumE) + (sumH * sumH) + (sumP * sumP) + (sumS * sumS)
+      fEnergy = discreteHelmholtzFreeEnergy temp (MkCosmicBudgetPartition sumE sumH sumS)
+  in MkLawLedger totalNorm sumE sumH sumP sumS spinorDensityVal c1 fEnergy
+  where
+    processElement : (BoxInt, (BoxInt, BoxInt, BoxInt, BoxInt), BoxInt)
+                  -> (QuadStreamChannel, BoxInt, BoxInt)
+                  -> (BoxInt, (BoxInt, BoxInt, BoxInt, BoxInt), BoxInt)
+    processElement (normAcc, (e, h, p, s), c1Acc) (EllipticSector, _, w) =
+      (normAcc + w, (e + w, h, p, s), c1Acc + w)
+    processElement (normAcc, (e, h, p, s), c1Acc) (HyperbolicSector, _, w) =
+      (normAcc + w, (e, h + w, p, s), c1Acc)
+    processElement (normAcc, (e, h, p, s), c1Acc) (ParabolicSector, _, w) =
+      (normAcc + w, (e, h, p + w, s), c1Acc)
+    processElement (normAcc, (e, h, p, s), c1Acc) (SubstrateSector, _, w) =
+      (normAcc + w, (e, h, p, s + w), c1Acc)
+
+||| Evaluates pipeline result directly over a deforested stream.
+public export
+fusedPipelineQuadStreamTransducerDirect : (fuel : Nat) -> FusedStream (QuadStreamChannel, BoxInt, BoxInt) -> QuadStreamPipelineResult
+fusedPipelineQuadStreamTransducerDirect fuel strm =
+  let ledger = fusedPipelineQuadStreamLedgerDirect fuel (intToBoxInt 1) strm
+  in MkQuadStreamPipelineResult ledger.totalMass ledger.spinorDensity ledger.chernNumber
+
+||| Evaluates physical ledger from a QuadStreamFusedBundle in a single deforested pass.
+public export
+evalFusedBundleLedger : (fuel : Nat) -> (temp : BoxInt) -> QuadStreamFusedBundle BoxInt -> PhysicalLawLedger
+evalFusedBundleLedger fuel temp bundle =
+  fusedPipelineQuadStreamLedgerDirect fuel temp (fusedBundleToTaggedStream bundle)
+
+||| Audit witness verifying zero-allocation deforested QuadStream pipeline ledger evaluation.
+public export
+auditDeforestedQuadStreamPipelineProof : Bool
+auditDeforestedQuadStreamPipelineProof =
+  let e = stream [ (intToBoxInt 0, natToBoxInt Stage1.FourGeometries.ellipticLatticeCapacity) ]
+      h = stream [ (intToBoxInt 0, natToBoxInt Stage1.FourGeometries.hyperbolicRomCapacity) ]
+      p = stream [ (intToBoxInt 0, intToBoxInt 0) ]
+      s = stream [ (intToBoxInt 0, natToBoxInt Stage1.FourGeometries.darkMatterTriangularResidue) ]
+      bundle = MkQuadStreamBundle e h p s
+      ledger = evalFusedBundleLedger 10 (intToBoxInt 1) bundle
+  in unwrapBox (totalMass ledger) == 210 &&
+     unwrapBox (ellipticMass ledger) == 27 &&
+     unwrapBox (hyperbolicMass ledger) == 128 &&
+     unwrapBox (substrateMass ledger) == 55
+
+
 ||| A composable physical law transducer operating on deforested channel streams.
 public export
 record QuadStreamLawTransducer where

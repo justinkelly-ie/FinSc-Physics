@@ -9,6 +9,7 @@ import Stage1.Math.FluctuationTheorem
 import Stage1.Math.QuadStreamPhysicalLaws
 import Stage1.Math.RelativisticSpinor
 import Stage1.Math.DensityMatrix
+import Stage1.Math.CosmicGenesis
 import Stage0.QTTDynamics
 import Language.Reflection
 
@@ -136,6 +137,26 @@ public export
 auditSymplecticFreeParticle : Elab (Reflect.ActionAuditor.auditSymplecticFreeParticleProofExport = True)
 auditSymplecticFreeParticle = auditWitness Reflect.ActionAuditor.auditSymplecticFreeParticleProofExport
 
+||| Audit 10: Deforested Quad-Stream Pipeline Primorial 210 Budget Closure (27 + 128 + 55 = 210).
+public export
+auditDeforestedQuadStreamPipelineProofExport : Bool
+auditDeforestedQuadStreamPipelineProofExport = Stage1.Math.QuadStreamPhysicalLaws.auditDeforestedQuadStreamPipelineProof
+
+public export
+%macro
+auditDeforestedQuadStreamPipeline : Elab (Reflect.ActionAuditor.auditDeforestedQuadStreamPipelineProofExport = True)
+auditDeforestedQuadStreamPipeline = auditWitness Reflect.ActionAuditor.auditDeforestedQuadStreamPipelineProofExport
+
+||| Audit 11: Multi-Epoch Cosmic Baryon Evolution (Sakharov Asymmetry to Freeze-Out).
+public export
+auditCompositeCosmicBaryonConservationProofExport : Bool
+auditCompositeCosmicBaryonConservationProofExport = Stage1.Math.CosmicGenesis.evaluateCompositeBaryonEvolution
+
+public export
+%macro
+auditCompositeCosmicBaryonConservation : Elab (Reflect.ActionAuditor.auditCompositeCosmicBaryonConservationProofExport = True)
+auditCompositeCosmicBaryonConservation = auditWitness Reflect.ActionAuditor.auditCompositeCosmicBaryonConservationProofExport
+
 ||| Batch action dynamic auditor witnesses.
 public export
 actionAuditorWitnesses : List Bool
@@ -149,7 +170,10 @@ actionAuditorWitnesses =
   , auditSpinorDensityPositivityProofExport
   , auditBornRuleRationalNormalizationProofExport
   , auditSymplecticFreeParticleProofExport
+  , auditDeforestedQuadStreamPipelineProofExport
+  , auditCompositeCosmicBaryonConservationProofExport
   ]
+
 
 
 
