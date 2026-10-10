@@ -2,6 +2,8 @@ module Stage1.Math.ThermalDistribution
 
 import Stage0.BoxInt
 import Stage0.WitnessLedger
+import Stage0.StreamPolynumber
+import Stage0.OnSeq.FusedStream as FS
 import Stage1.Polynumber
 import Stage1.UnixelFraction
 import Stage0.Multiset
@@ -9,6 +11,7 @@ import Stage1.QuadStream
 import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Stage1.FourGeometries
+import Data.Fuel
 import Data.Vect
 import Data.List
 
@@ -134,6 +137,61 @@ cosmicPartitionExponents =
       parExp = Stage1.FourGeometries.darkMatterTriangularResidue
       totalExp = Stage1.FourGeometries.primorial210Budget
   in (ellExp, hypExp, parExp, totalExp)
+
+||| Sector Partition Functions as deforested StreamPolynumbers:
+||| Z_Ell(q) = 1 + 3q + 6q^2
+public export
+ellipticStreamPoly : StreamPolynumber
+ellipticStreamPoly = streamPolyFromList [ (0, intToBoxInt 1)
+                                        , (1, intToBoxInt 3)
+                                        , (2, intToBoxInt 6)
+                                        ]
+
+||| Z_Hyp(q) = 1 + 8q + 27q^2
+public export
+hyperbolicStreamPoly : StreamPolynumber
+hyperbolicStreamPoly = streamPolyFromList [ (0, intToBoxInt 1)
+                                          , (1, intToBoxInt 8)
+                                          , (2, intToBoxInt 27)
+                                          ]
+
+||| Z_Par(q) = 1 + 2q + 4q^2
+public export
+parabolicStreamPoly : StreamPolynumber
+parabolicStreamPoly = streamPolyFromList [ (0, intToBoxInt 1)
+                                         , (1, intToBoxInt 2)
+                                         , (2, intToBoxInt 4)
+                                         ]
+
+||| Evaluates the cosmic sector partition polynomial sum at temperature parameter q.
+public export
+evalSectorPartitionPoly : Fuel -> BoxInt -> StreamPolynumber -> BoxInt
+evalSectorPartitionPoly fuel q poly = evalStreamPolyFuel fuel q poly
+
+||| Audits that deforested StreamPolynumber partition evaluation matches the scaled list sums:
+||| At q = 1: Z_Ell = 10, Z_Hyp = 36, Z_Par = 7.
+||| At q = 0: Z_Ell = 1, Z_Hyp = 1, Z_Par = 1 (ground state).
+public export
+auditStreamPartitionEquivalenceProof : Bool
+auditStreamPartitionEquivalenceProof =
+  let fuel = limit 10
+      one = intToBoxInt 1
+      zero = intToBoxInt 0
+      zEll1 = evalSectorPartitionPoly fuel one ellipticStreamPoly
+      zHyp1 = evalSectorPartitionPoly fuel one hyperbolicStreamPoly
+      zPar1 = evalSectorPartitionPoly fuel one parabolicStreamPoly
+      zEll0 = evalSectorPartitionPoly fuel zero ellipticStreamPoly
+      zHyp0 = evalSectorPartitionPoly fuel zero hyperbolicStreamPoly
+      zPar0 = evalSectorPartitionPoly fuel zero parabolicStreamPoly
+      sumEll = scaledPartitionSum ellipticLadder 2 1 1
+      sumHyp = scaledPartitionSum hyperbolicLadder 2 1 1
+      sumPar = scaledPartitionSum parabolicLadder 2 1 1
+  in (unwrapBox zEll1 == natToInteger sumEll) &&
+     (unwrapBox zHyp1 == natToInteger sumHyp) &&
+     (unwrapBox zPar1 == natToInteger sumPar) &&
+     (zEll0 == intToBoxInt 1) &&
+     (zHyp0 == intToBoxInt 1) &&
+     (zPar0 == intToBoxInt 1)
 
 ||| The 4th Primorial Master Zeta Generator:
 ||| Z_210(α) = B_2(1) ^ B_3(1) ^ B_5(1) ^ B_7(1).
