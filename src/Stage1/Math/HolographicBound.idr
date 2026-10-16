@@ -11,6 +11,7 @@ import Stage1.Math.QuadStreamPhysicalLaws
 import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Stage1.FourGeometries
+import Stage1.TypeTheory.Smoothness
 import Data.List
 
 %default total
@@ -81,14 +82,26 @@ saturateQuadStreamHolographic dimL (MkQuadStream e h p s) =
 --    (Law 13: Discrete Holographic Bound)
 ------------------------------------------------------------------------
 
+||| Certified holographic 2D boundary surface area dimension (Area = 54 Maxels).
+public export
+holographicAreaDimension : CosmicDimension
+holographicAreaDimension = dimHolographic54
+
+||| Certified multi-sector holographic boundary capacity dimension (4 * 54 = 216).
+public export
+multiSectorHolographicDimension : CosmicDimension
+multiSectorHolographicDimension = dimHolographic216
+
 ||| Audits 2D Boundary Surface Area Calculation:
 ||| For L = 3 (27-cell 3-torus volume), Area = 6 * 3^2 = 54 boundary Maxels.
 public export
 auditHolographicAreaLawProof : Bool
 auditHolographicAreaLawProof =
-  let area = boundarySurfaceArea 3
-      cap  = holographicCapacity 3
-  in area == 54 && cap == 54
+  let l = fst manifestSpatialDimension
+      expected = fst holographicAreaDimension
+      area = boundarySurfaceArea l
+      cap  = holographicCapacity l
+  in area == expected && cap == expected
 
 ||| Audits Bekenstein Holographic Saturation:
 ||| For L = 3 (cap = 54) and bulk injection of 70 tokens:
@@ -96,7 +109,8 @@ auditHolographicAreaLawProof =
 public export
 auditBekensteinSaturationProof : Bool
 auditBekensteinSaturationProof =
-  let (bounded, excess) = saturateHolographicTokens 3 70
+  let l = fst manifestSpatialDimension
+      (bounded, excess) = saturateHolographicTokens l 70
   in bounded == 54 && excess == 16
 
 ||| Audits Cosmic Budget 210 Holographic Closure:
@@ -104,9 +118,11 @@ auditBekensteinSaturationProof =
 public export
 auditCosmicBudgetHolographicClosureProof : Bool
 auditCosmicBudgetHolographicClosureProof =
-  let totalHoloCap = multiSectorHolographicCapacity 3
+  let l = fst manifestSpatialDimension
+      totalHoloCap = multiSectorHolographicCapacity l
+      expectedHolo = fst multiSectorHolographicDimension
       budget = Stage1.FourGeometries.primorial210Budget
-  in totalHoloCap == 216 && totalHoloCap >= budget
+  in totalHoloCap == expectedHolo && totalHoloCap >= budget
 
 public export
 contourWalk : BoxSpec -> List Bool
