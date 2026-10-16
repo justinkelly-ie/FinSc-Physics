@@ -61,6 +61,11 @@ applyPhysicalQuadStreamFilter lawDegree (MkQuadStream e h p s) =
                (filterStream p)
                (filterStream s)
 
+||| Applies physical cyclotomic passband filter Φ_p(x) certified by GohPrime p across all 4 sectors.
+public export
+applyPhysicalGohPrimeFilter : {p : Nat} -> GohPrime p -> QuadStreamMultiset BoxInt -> QuadStreamMultiset BoxInt
+applyPhysicalGohPrimeFilter prf qs = applyPhysicalQuadStreamFilter (gohDegree p) qs
+
 --------------------------------------------------------------------------------
 -- 3. WILDBERGER CHROMOGEOMETRIC TRIAD METRIC EVALUATION
 --------------------------------------------------------------------------------
@@ -251,6 +256,16 @@ stepQuadStreamLinearPassband (MkQuadStream e h p s) lawDegree =
            then AddM v w (filterM rest)
            else filterM rest
 
+||| Cyclotomic passband filter transducer certified by GohPrime p.
+public export
+gohPrimeFilterTransducer : {p : Nat} -> GohPrime p -> QuadStreamLawTransducer
+gohPrimeFilterTransducer prf = cyclotomicFilterTransducer (gohDegree p)
+
+||| Linear QTT state step applying cyclotomic passband filtering certified by GohPrime p (Rule 04).
+public export
+stepQuadStreamLinearGohPrimePassband : (1 qs : QuadStreamMultiset BoxInt) -> {p : Nat} -> GohPrime p -> QuadStreamMultiset BoxInt
+stepQuadStreamLinearGohPrimePassband qs prf = stepQuadStreamLinearPassband qs (gohDegree p)
+
 ||| Advances a QuadStreamMultiset using a stream law transducer.
 public export
 stepQuadStreamWithTransducer : QuadStreamMultiset BoxInt -> QuadStreamLawTransducer -> QuadStreamMultiset BoxInt
@@ -309,6 +324,12 @@ public export
 0 verifyCompositeLawIdentity : (qs : QuadStreamMultiset BoxInt) -> composeQuadLaws Prelude.id Prelude.id qs = qs
 verifyCompositeLawIdentity qs = Refl
 
+||| Static compile-time witness verifying that GohPrime passband filtering preserves the vacuum.
+public export
+0 verifyGohPrimeVacuumFiltering : {p : Nat} -> (prf : GohPrime p) ->
+  applyPhysicalGohPrimeFilter prf (MkQuadStream ZeroM ZeroM ZeroM ZeroM) = MkQuadStream ZeroM ZeroM ZeroM ZeroM
+verifyGohPrimeVacuumFiltering prf = Refl
+
 --------------------------------------------------------------------------------
 -- 6. CATEGORY-THEORETIC MULTISET ADJUNCTION
 --------------------------------------------------------------------------------
@@ -317,6 +338,10 @@ public export
 record QuadLawState where
   constructor MkQuadLawState
   lawDegree : Nat
+
+public export
+gohPrimeToQuadLawState : {p : Nat} -> GohPrime p -> QuadLawState
+gohPrimeToQuadLawState prf = MkQuadLawState (gohDegree p)
 
 public export
 Eq QuadLawState where
