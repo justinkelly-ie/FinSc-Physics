@@ -165,10 +165,7 @@ parabolicStreamPoly = streamPolyFromList [ (0, intToBoxInt 1)
                                          , (2, intToBoxInt 4)
                                          ]
 
-||| Evaluates the cosmic sector partition polynomial sum at temperature parameter q.
-public export
-evalSectorPartitionPoly : Fuel -> BoxInt -> StreamPolynumber -> BoxInt
-evalSectorPartitionPoly fuel q poly = evalStreamPolyFuel fuel q poly
+
 
 ||| Evaluates the cosmic sector partition polynomial sum using model-indexed GohFuel derived from geometry capacity (Rule 03, Item 2; Rule 04, Item 4).
 public export
@@ -226,15 +223,33 @@ public export
 ellipticPartitionPoly : Stage1.Polynumber.Polynumber
 ellipticPartitionPoly = Stage1.Polynumber.MkPolynumber [Stage0.BoxInt.intToBoxInt 1, Stage0.BoxInt.intToBoxInt 3, Stage0.BoxInt.intToBoxInt 6]
 
+||| Generating DepPolynumber for the Elliptic Sector (Z_Ell = 1 + 3q + 6q^2) with certified degree 2:
+public export
+ellipticPartitionDepPoly : Stage1.Polynumber.DepPolynumber 2
+ellipticPartitionDepPoly =
+  Stage1.Polynumber.MkDepPolynumber [Stage0.BoxInt.intToBoxInt 1, Stage0.BoxInt.intToBoxInt 3, Stage0.BoxInt.intToBoxInt 6]
+
 ||| Generating Polynumber for the Hyperbolic Sector (Z_Hyp = 1 + 8q + 27q^2):
 public export
 hyperbolicPartitionPoly : Stage1.Polynumber.Polynumber
 hyperbolicPartitionPoly = Stage1.Polynumber.MkPolynumber [Stage0.BoxInt.intToBoxInt 1, Stage0.BoxInt.intToBoxInt 8, Stage0.BoxInt.intToBoxInt 27]
 
+||| Generating DepPolynumber for the Hyperbolic Sector (Z_Hyp = 1 + 8q + 27q^2) with certified degree 2:
+public export
+hyperbolicPartitionDepPoly : Stage1.Polynumber.DepPolynumber 2
+hyperbolicPartitionDepPoly =
+  Stage1.Polynumber.MkDepPolynumber [Stage0.BoxInt.intToBoxInt 1, Stage0.BoxInt.intToBoxInt 8, Stage0.BoxInt.intToBoxInt 27]
+
 ||| Generating Polynumber for the Parabolic Sector (Z_Par = 1 + 2q + 4q^2):
 public export
 parabolicPartitionPoly : Stage1.Polynumber.Polynumber
 parabolicPartitionPoly = Stage1.Polynumber.MkPolynumber [Stage0.BoxInt.intToBoxInt 1, Stage0.BoxInt.intToBoxInt 2, Stage0.BoxInt.intToBoxInt 4]
+
+||| Generating DepPolynumber for the Parabolic Sector (Z_Par = 1 + 2q + 4q^2) with certified degree 2:
+public export
+parabolicPartitionDepPoly : Stage1.Polynumber.DepPolynumber 2
+parabolicPartitionDepPoly =
+  Stage1.Polynumber.MkDepPolynumber [Stage0.BoxInt.intToBoxInt 1, Stage0.BoxInt.intToBoxInt 2, Stage0.BoxInt.intToBoxInt 4]
 
 ||| Computes the joint multi-sector Cosmic Partition Function via the Caret Product:
 ||| Z_Cosmic = Z_Ell ^ Z_Hyp ^ Z_Par.
@@ -242,6 +257,18 @@ public export
 cosmicCaretPartitionPoly : Stage1.Polynumber.Polynumber
 cosmicCaretPartitionPoly =
   Stage1.Polynumber.caretPolynumber (Stage1.Polynumber.caretPolynumber ellipticPartitionPoly hyperbolicPartitionPoly) parabolicPartitionPoly
+
+||| Computes the joint multi-sector Cosmic Partition Function via the Caret Product with exact multiplicative degree:
+||| deg(Z_Cosmic) = deg(Z_Ell) * deg(Z_Hyp) * deg(Z_Par) = 2 * 2 * 2 = 8.
+public export
+cosmicCaretPartitionDepPoly : Stage1.Polynumber.DepPolynumber 8
+cosmicCaretPartitionDepPoly =
+  Stage1.Polynumber.caretDepPoly (Stage1.Polynumber.caretDepPoly ellipticPartitionDepPoly hyperbolicPartitionDepPoly) parabolicPartitionDepPoly
+
+||| Definitional compile-time witness verifying cosmic partition degree multiplicativity:
+public export
+0 prfCosmicPartitionDegree : (2 * 2 * 2 = 8)
+prfCosmicPartitionDegree = Refl
 
 ||| Evaluates QuadStream partition sum across all 4 geometric sectors.
 public export

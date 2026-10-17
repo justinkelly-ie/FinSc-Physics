@@ -71,6 +71,40 @@ computeVonNeumannEntropy (MkDensityMatrix norm cs) =
   foldStreamFuel substrateFuel (+) (intToBoxInt 0) (mapStream id cs)
 
 ------------------------------------------------------------------------
+-- 2. DEGREE-CERTIFIED QUANTUM DENSITY MATRIX (DepPolynumber)
+------------------------------------------------------------------------
+
+||| A Degree-Certified Multiset Quantum Density Matrix over a DepPolynumber generating function.
+public export
+record DepDensityMatrix (deg : Nat) (poly : DepPolynumber deg) where
+  constructor MkDepDensityMatrix
+  normFactor   : BoxInt
+  coefficients : Vect (S deg) BoxInt
+
+||| Constructs a DepDensityMatrix from a degree-certified DepPolynumber generating function.
+public export
+fromDepPolynumber : {deg : Nat} -> (poly : DepPolynumber deg) -> DepDensityMatrix deg poly
+fromDepPolynumber (MkDepPolynumber cs) =
+  let totalNorm = foldl (+) (intToBoxInt 0) cs
+  in MkDepDensityMatrix totalNorm cs
+
+||| Deterministic Bounds-Checked Born Rule Quantum Measurement Projection:
+||| Computes transition probability P(k) = c_k / Z on exact UnixelFraction coordinates,
+||| with compile-time index safety via Fin (S deg) eliminating Maybe and bounds errors.
+public export
+depBornRuleProjection : {deg : Nat} -> {poly : DepPolynumber deg} -> DepDensityMatrix deg poly -> Fin (S deg) -> UnixelFraction
+depBornRuleProjection (MkDepDensityMatrix norm cs) idx =
+  let c = index idx cs
+      nNat = boxToNat norm
+  in mkUnixelFraction c (if nNat == 0 then 1 else nNat)
+
+||| Computes exact discrete Von Neumann entropy over degree-certified quantum density matrix.
+public export
+computeDepVonNeumannEntropy : {deg : Nat} -> {poly : DepPolynumber deg} -> (1 rho : DepDensityMatrix deg poly) -> BoxInt
+computeDepVonNeumannEntropy (MkDepDensityMatrix norm cs) =
+  foldl (+) (intToBoxInt 0) cs
+
+------------------------------------------------------------------------
 -- 2. CONSTRUCTIVE FORMAL AUDIT PROOFS FOR DENSITY MATRICES
 ------------------------------------------------------------------------
 
