@@ -171,7 +171,7 @@ parabolicStreamPoly = streamPolyFromList [ (0, intToBoxInt 1)
 public export
 evalSectorPartitionPolyFuelModel : (geom : FundamentalGeometry) -> BoxInt -> StreamPolynumber -> BoxInt
 evalSectorPartitionPolyFuelModel geom q poly =
-  evalStreamPolyFuel (limit (gohSteps (geometryGohFuel geom))) q poly
+  evalStreamPolyNat (gohSteps (geometryGohFuel geom)) q poly
 
 ||| Audits that deforested StreamPolynumber partition evaluation matches the scaled list sums:
 ||| At q = 1: Z_Ell = 10, Z_Hyp = 36, Z_Par = 7.

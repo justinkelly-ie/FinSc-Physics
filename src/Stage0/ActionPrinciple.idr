@@ -274,6 +274,24 @@ fusedDiscreteAction f geom coords vPot =
     (Stage0.BoxInt.intToBoxInt 0)
     coords
 
+||| Computes discrete action S[γ] over a deforested coordinate stream using fusedHylomorphismNat.
+public export
+fusedDiscreteActionNat : (fuel : Nat) -> Stage1.FourGeometries.FundamentalGeometry -> List LatticeCoord2D -> (LatticeCoord2D -> Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
+fusedDiscreteActionNat fuel geom coords vPot =
+  Stage0.OnSeq.FusedStream.fusedHylomorphismNat fuel
+    (\st => case st of
+              [] => Done
+              [_] => Done
+              (x0 :: x1 :: xs) => Yield (x0, x1) (x1 :: xs))
+    (\pair, acc => let (x0, x1) = pair in discreteLagrangian geom x0 x1 vPot + acc)
+    (Stage0.BoxInt.intToBoxInt 0)
+    coords
+
+||| Computes discrete action S[γ] over a deforested coordinate stream using model-indexed GohFuel.
+public export
+fusedDiscreteActionFuelModel : GohFuel cap -> Stage1.FourGeometries.FundamentalGeometry -> List LatticeCoord2D -> (LatticeCoord2D -> Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
+fusedDiscreteActionFuelModel fuel = fusedDiscreteActionNat (gohSteps fuel)
+
 ||| Audit witness verifying equivalence of static discreteAction and fusedDiscreteAction.
 public export
 auditFusedDiscreteActionProof : Bool
@@ -282,7 +300,7 @@ auditFusedDiscreteActionProof =
               MkCoord2D (Stage0.BoxInt.intToBoxInt 1) (Stage0.BoxInt.intToBoxInt 1),
               MkCoord2D (Stage0.BoxInt.intToBoxInt 2) (Stage0.BoxInt.intToBoxInt 2)]
       a1 = discreteAction EllipticGeom path zeroPotential
-      a2 = fusedDiscreteAction (limit (length path)) EllipticGeom path zeroPotential
+      a2 = fusedDiscreteActionNat (length path) EllipticGeom path zeroPotential
   in a1 == a2 && unwrapBox a2 == 4
 
 ------------------------------------------------------------------------
@@ -373,7 +391,7 @@ auditStreamDiscreteActionProof =
                 MkCoord2D (intToBoxInt 1) (intToBoxInt 2),
                 MkCoord2D (intToBoxInt 3) (intToBoxInt 4)]
       actionList = discreteAction EllipticGeom coords zeroPotential
-      actionStrm = streamTrajectoryAction (limit (length coords)) EllipticGeom zeroPotential (stream coords)
+      actionStrm = streamTrajectoryActionFuelModel EllipticGeom zeroPotential (stream coords)
   in actionList == actionStrm
 
 
