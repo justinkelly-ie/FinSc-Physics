@@ -12,6 +12,7 @@ import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.List
 import Stage0.OnSeq.FusedStream
+import Stage0.StructuralFuel
 import Data.Fuel
 
 %default total
@@ -198,6 +199,33 @@ auditToroidalAstrodynamicsProof =
 ------------------------------------------------------------------------
 -- 5. DEFORESTED SYMPLECTIC ASTRODYNAMICS STREAMS
 ------------------------------------------------------------------------
+
+||| Zero-allocation fused stream step function for symplectic N-body force accumulation on T^3 using structural Nat fuel.
+public export
+fusedSymplecticIntegratorNat : (fuel : Nat) -> (g : Stage0.BoxInt.BoxInt) -> (drag : Stage0.BoxInt.BoxInt) -> (epsSq : Stage0.BoxInt.BoxInt) -> List MassToken -> List MassToken
+fusedSymplecticIntegratorNat fuel g drag epsSq tokens =
+  Stage0.OnSeq.FusedStream.runFueledStreamNat fuel $
+    Stage0.OnSeq.FusedStream.unfoldStream
+      (\st => case st of
+                [] => Stage0.OnSeq.FusedStream.Done
+                (t :: rest) =>
+                  let netForce = foldl (\(fxAcc, fyAcc, fzAcc), other =>
+                                          if t == other then (fxAcc, fyAcc, fzAcc)
+                                          else let (fx, fy, fz) = discreteGravitationalForce g drag epsSq t other
+                                               in (fxAcc + fx, fyAcc + fy, fzAcc + fz))
+                                        (Stage0.BoxInt.intToBoxInt 0, Stage0.BoxInt.intToBoxInt 0, Stage0.BoxInt.intToBoxInt 0)
+                                        tokens
+                      (vx, vy, vz) = vel t
+                      (fx, fy, fz) = netForce
+                      newVel = (vx + fx, vy + fy, vz + fz)
+                  in Stage0.OnSeq.FusedStream.Yield (MkMassToken (mass t) (pos t) newVel) rest)
+      tokens
+
+||| Zero-allocation fused stream step function for symplectic N-body force accumulation on T^3 using model-indexed GohFuel.
+public export
+fusedSymplecticIntegratorFuelModel : GohFuel cap -> (g : Stage0.BoxInt.BoxInt) -> (drag : Stage0.BoxInt.BoxInt) -> (epsSq : Stage0.BoxInt.BoxInt) -> List MassToken -> List MassToken
+fusedSymplecticIntegratorFuelModel fuel g drag epsSq tokens =
+  fusedSymplecticIntegratorNat (gohSteps fuel) g drag epsSq tokens
 
 ||| Zero-allocation fused stream step function for symplectic N-body force accumulation on T^3.
 public export
