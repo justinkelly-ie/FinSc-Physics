@@ -2,6 +2,7 @@ module Stage1.Math.PrefixCodeOptimality
 
 import Stage0.BoxInt
 import Stage0.Multiset
+import Stage0.StructuralFuel
 import Stage1.MultisetTree
 import Stage1.VexelMaxel
 import Stage1.UnixelFraction
@@ -17,10 +18,6 @@ import Data.Vect
 ------------------------------------------------------------------------
 -- 1. CONSTRUCTIVE MULTISET SHANNON-HUFFMAN PREFIX OPTIMALITY
 ------------------------------------------------------------------------
-
-public export
-fastNatPower2 : Nat -> Nat
-fastNatPower2 k = power 2 k
 
 ||| Evaluates scaled Kraft-McMillan sum for a list of codeword lengths with maximum length maxL:
 ||| Sum_{i=1}^k 2^(maxL - l_i) <= 2^maxL.
@@ -64,7 +61,7 @@ sternBrocotDepthFuel (S fuel) p q =
 public export
 sternBrocotDepth : (p : Nat) -> (q : Nat) -> Nat
 sternBrocotDepth p q =
-  sternBrocotDepthFuel (p + q + 10) p q
+  sternBrocotDepthFuel (gohSteps (gohFuelForCapacity (p + q))) p q
 
 ------------------------------------------------------------------------
 -- 2. CONSTRUCTIVE FORMAL AUDIT PROOFS
@@ -88,6 +85,10 @@ auditSternBrocotPrefixOptimalityProof : Bool
 auditSternBrocotPrefixOptimalityProof =
   let d = sternBrocotDepth 2 3
   in d == 2
+
+public export
+prfSternBrocotDepth2_3 : sternBrocotDepth 2 3 = 2
+prfSternBrocotDepth2_3 = Refl
 
 ||| Audits Cyclotomic Kolmogorov Program Minimality:
 ||| Proves that the cyclotomic polynomial generator Phi_137(x) of degree 136
