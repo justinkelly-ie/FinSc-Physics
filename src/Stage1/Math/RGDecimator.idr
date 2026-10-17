@@ -98,11 +98,32 @@ public export
 rgScaleOperator : Nat -> Stage1.Polynumber.Polynumber
 rgScaleOperator s = Stage1.Polynumber.monomialPolynumber (Stage0.BoxInt.intToBoxInt 1) s
 
+||| A scale transformation operator represented as a degree-certified scale monomial α^s (Rule 03, Item 7).
+public export
+rgScaleDepOperator : (s : Nat) -> Stage1.Polynumber.DepPolynumber s
+rgScaleDepOperator s = Stage1.Polynumber.monomialDepPoly (Stage0.BoxInt.intToBoxInt 1) s
+
 ||| Caret composition of successive RG scaling steps:
 ||| rgScaleOperator s1 ^ rgScaleOperator s2 = rgScaleOperator (s1 * s2)
 public export
 composeRGScaleSteps : Stage1.Polynumber.Polynumber -> Stage1.Polynumber.Polynumber -> Stage1.Polynumber.Polynumber
 composeRGScaleSteps = Stage1.Polynumber.caretPolynumber
+
+||| Caret composition of successive RG scaling steps with compile-time multiplicative degree guarantee (Rule 03, Item 7):
+||| rgScaleDepOperator s1 ^ rgScaleDepOperator s2 = rgScaleDepOperator (s1 * s2)
+public export
+composeRGScaleDepSteps : {s1, s2 : Nat} ->
+                         Stage1.Polynumber.DepPolynumber s1 ->
+                         Stage1.Polynumber.DepPolynumber s2 ->
+                         Stage1.Polynumber.DepPolynumber (s1 * s2)
+composeRGScaleDepSteps = Stage1.Polynumber.caretDepPoly
+
+||| Static compile-time proof verifying that RG decimation steps multiply degrees:
+||| R_2 ^ R_3 yields degree 2 * 3 = 6.
+public export
+0 auditRGDecimationDegreeProof :
+  (composeRGScaleDepSteps (rgScaleDepOperator 2) (rgScaleDepOperator 3)) = rgScaleDepOperator 6
+auditRGDecimationDegreeProof = Refl
 
 ------------------------------------------------------------------------
 -- 6. DOUBLY STOCHASTIC RG DECIMATION KERNELS (CH. 27)
