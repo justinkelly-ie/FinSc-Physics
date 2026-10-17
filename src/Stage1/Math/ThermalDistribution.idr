@@ -1,6 +1,7 @@
 module Stage1.Math.ThermalDistribution
 
 import Stage0.BoxInt
+import Stage0.StructuralFuel
 import Stage0.WitnessLedger
 import Stage0.StreamPolynumber
 import Stage0.OnSeq.FusedStream as FS
@@ -10,6 +11,7 @@ import Stage0.Multiset
 import Stage1.QuadStream
 import Stage1.MultisetDuality
 import Stage1.MultisetTensor
+import Stage1.TypeTheory.Smoothness
 import Stage1.FourGeometries
 import Data.Fuel
 import Data.Vect
@@ -168,30 +170,35 @@ public export
 evalSectorPartitionPoly : Fuel -> BoxInt -> StreamPolynumber -> BoxInt
 evalSectorPartitionPoly fuel q poly = evalStreamPolyFuel fuel q poly
 
+||| Evaluates the cosmic sector partition polynomial sum using model-indexed GohFuel derived from geometry capacity (Rule 03, Item 2; Rule 04, Item 4).
+public export
+evalSectorPartitionPolyFuelModel : (geom : FundamentalGeometry) -> BoxInt -> StreamPolynumber -> BoxInt
+evalSectorPartitionPolyFuelModel geom q poly =
+  evalStreamPolyFuel (limit (gohSteps (geometryGohFuel geom))) q poly
+
 ||| Audits that deforested StreamPolynumber partition evaluation matches the scaled list sums:
 ||| At q = 1: Z_Ell = 10, Z_Hyp = 36, Z_Par = 7.
 ||| At q = 0: Z_Ell = 1, Z_Hyp = 1, Z_Par = 1 (ground state).
 public export
 auditStreamPartitionEquivalenceProof : Bool
 auditStreamPartitionEquivalenceProof =
-  let fuel = limit 10
-      one = intToBoxInt 1
+  let one = intToBoxInt 1
       zero = intToBoxInt 0
-      zEll1 = evalSectorPartitionPoly fuel one ellipticStreamPoly
-      zHyp1 = evalSectorPartitionPoly fuel one hyperbolicStreamPoly
-      zPar1 = evalSectorPartitionPoly fuel one parabolicStreamPoly
-      zEll0 = evalSectorPartitionPoly fuel zero ellipticStreamPoly
-      zHyp0 = evalSectorPartitionPoly fuel zero hyperbolicStreamPoly
-      zPar0 = evalSectorPartitionPoly fuel zero parabolicStreamPoly
+      zEll1 = evalSectorPartitionPolyFuelModel EllipticGeom one ellipticStreamPoly
+      zHyp1 = evalSectorPartitionPolyFuelModel HyperbolicGeom one hyperbolicStreamPoly
+      zPar1 = evalSectorPartitionPolyFuelModel ParabolicGeom one parabolicStreamPoly
+      zEll0 = evalSectorPartitionPolyFuelModel EllipticGeom zero ellipticStreamPoly
+      zHyp0 = evalSectorPartitionPolyFuelModel HyperbolicGeom zero hyperbolicStreamPoly
+      zPar0 = evalSectorPartitionPolyFuelModel ParabolicGeom zero parabolicStreamPoly
       sumEll = scaledPartitionSum ellipticLadder 2 1 1
       sumHyp = scaledPartitionSum hyperbolicLadder 2 1 1
       sumPar = scaledPartitionSum parabolicLadder 2 1 1
-  in (unwrapBox zEll1 == natToInteger sumEll) &&
-     (unwrapBox zHyp1 == natToInteger sumHyp) &&
-     (unwrapBox zPar1 == natToInteger sumPar) &&
-     (zEll0 == intToBoxInt 1) &&
-     (zHyp0 == intToBoxInt 1) &&
-     (zPar0 == intToBoxInt 1)
+  in boxEq zEll1 (natToBoxInt sumEll) &&
+     boxEq zHyp1 (natToBoxInt sumHyp) &&
+     boxEq zPar1 (natToBoxInt sumPar) &&
+     boxEq zEll0 (intToBoxInt 1) &&
+     boxEq zHyp0 (intToBoxInt 1) &&
+     boxEq zPar0 (intToBoxInt 1)
 
 ||| The 4th Primorial Master Zeta Generator:
 ||| Z_210(α) = B_2(1) ^ B_3(1) ^ B_5(1) ^ B_7(1).

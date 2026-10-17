@@ -66,13 +66,13 @@ computeWilsonLoopHolonomy [] = PlusOne
 computeWilsonLoopHolonomy (u :: us) =
   mulGaussianLink u (computeWilsonLoopHolonomy us)
 
-||| Computes the real trace of a Gaussian link variable: Re(Tr(U)).
+||| Computes the real trace of a Gaussian link variable as a BoxInt: Re(Tr(U)).
 public export
-traceGaussianLink : GaussianLink -> Integer
-traceGaussianLink PlusOne  = 1
-traceGaussianLink PlusI    = 0
-traceGaussianLink MinusOne = -1
-traceGaussianLink MinusI   = 0
+traceGaussianLink : GaussianLink -> BoxInt
+traceGaussianLink PlusOne  = intToBoxInt 1
+traceGaussianLink PlusI    = intToBoxInt 0
+traceGaussianLink MinusOne = intToBoxInt (-1)
+traceGaussianLink MinusI   = intToBoxInt 0
 
 ||| Evaluates GaussianLink holonomy from QuadStream payload sector weights.
 public export
@@ -179,7 +179,7 @@ auditAharonovBohmPhaseShiftProof : Bool
 auditAharonovBohmPhaseShiftProof =
   let loopFluxPi = [PlusI, PlusI, PlusOne, PlusOne]
       holonomy = computeWilsonLoopHolonomy loopFluxPi
-  in holonomy == MinusOne && traceGaussianLink holonomy == (-1)
+  in holonomy == MinusOne && boxEq (traceGaussianLink holonomy) (intToBoxInt (-1))
 
 ||| Audits the Wilson Loop Gauge Closure Invariant:
 ||| Proves that a local gauge rotation V = +i preserves the trace of the closed 4-link loop:
@@ -204,5 +204,5 @@ auditWilsonLoopGaugeClosureProof =
       holonomyOrig = computeWilsonLoopHolonomy [e01, e12, e23, e30]
       holonomyGauge = computeWilsonLoopHolonomy [e01', e12', e23', e30']
   in holonomyOrig == holonomyGauge &&
-     traceGaussianLink holonomyGauge == (-1)
+     boxEq (traceGaussianLink holonomyGauge) (intToBoxInt (-1))
 

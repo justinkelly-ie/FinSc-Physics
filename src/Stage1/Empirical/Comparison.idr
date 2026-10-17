@@ -14,11 +14,7 @@ import public Stage0.Measurements
 public export
 auditRatioWithinConfidenceInterval : UnixelFraction -> EmpiricalRatio -> Bool
 auditRatioWithinConfidenceInterval modelVal emp =
-  let low  = lowerBound emp
-      high = upperBound emp
-      tLow  = rationalEquiv modelVal low || rationalEquiv (subUnixelFraction modelVal low) (mkUnixelFraction 0 1) || (let diff = subUnixelFraction modelVal low in not (unwrapBox (num diff) < 0))
-      tHigh = rationalEquiv modelVal high || (let diff = subUnixelFraction high modelVal in not (unwrapBox (num diff) < 0))
-  in tLow && tHigh
+  rationalLTE (lowerBound emp) modelVal && rationalLTE modelVal (upperBound emp)
 
 ||| Computes the exact Relative Rational Error E_rel = |modelVal - nominalRatio| / nominalRatio.
 public export
@@ -43,26 +39,18 @@ quadranceError modelVal emp =
 public export
 auditRatioMatchesWithinTolerance : UnixelFraction -> EmpiricalRatio -> UnixelFraction -> Bool
 auditRatioMatchesWithinTolerance modelVal emp eps =
-  let err = relativeRationalError modelVal emp
-      diff = subUnixelFraction eps err
-  in not (unwrapBox (num diff) < 0)
+  rationalLTE (relativeRationalError modelVal emp) eps
 
-||| Converts a Unixel denominator to an exact Integer.
+||| Converts a Unixel denominator to an exact BoxInt.
 public export
-unixelToInteger : Unixel -> Integer
-unixelToInteger (MkUnixel Z) = 0
-unixelToInteger (MkUnixel (S k)) = 1 + unixelToInteger (MkUnixel k)
+unixelToBoxInt : Unixel -> BoxInt
+unixelToBoxInt u = natToBoxInt (unwrapUnixel u)
 
 ||| Audits whether a model ratio matches empirical nominal within a given percentage error fraction (e.g. 1/10000 = 0.01%).
 public export
 auditRatioMatchesWithinPercentError : UnixelFraction -> EmpiricalRatio -> UnixelFraction -> Bool
 auditRatioMatchesWithinPercentError modelVal emp maxRelError =
-  let err = relativeRationalError modelVal emp
-      errDen = unixelToInteger (den err)
-      maxDen = unixelToInteger (den maxRelError)
-      lhs = unwrapBox (num err) * maxDen
-      rhs = unwrapBox (num maxRelError) * errDen
-  in lhs <= rhs
+  rationalLTE (relativeRationalError modelVal emp) maxRelError
 
 
 

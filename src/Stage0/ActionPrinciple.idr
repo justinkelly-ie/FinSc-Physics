@@ -1,6 +1,8 @@
 module Stage0.ActionPrinciple
 
 import Stage0.Multiset
+import Stage0.StructuralFuel
+import Stage1.FourGeometries
 import PhaseUnfolding
 import Geometry
 import Data.Vect
@@ -108,6 +110,25 @@ streamTrajectoryAction : Fuel -> Stage1.FourGeometries.FundamentalGeometry ->
                          FusedStream LatticeCoord2D -> Stage0.BoxInt.BoxInt
 streamTrajectoryAction f geom vPot coordStrm =
   streamDiscreteAction f geom vPot (streamAdjacentPairs coordStrm)
+
+||| Evaluates discrete action integral S = \sum L(x_k, x_{k+1}) over coordinate pairs using model-indexed GohFuel.
+public export
+streamDiscreteActionFuelModel : (geom : Stage1.FourGeometries.FundamentalGeometry) ->
+                                (LatticeCoord2D -> Stage0.BoxInt.BoxInt) ->
+                                FusedStream (LatticeCoord2D, LatticeCoord2D) -> Stage0.BoxInt.BoxInt
+streamDiscreteActionFuelModel geom vPot pairStrm =
+  foldStreamNat (gohSteps (Stage1.FourGeometries.geometryGohFuel geom))
+    (\acc, (x0, x1) => acc + discreteLagrangian geom x0 x1 vPot)
+    (Stage0.BoxInt.intToBoxInt 0)
+    pairStrm
+
+||| Evaluates discrete action integral S = \sum L(x_k, x_{k+1}) from raw coordinates using model-indexed GohFuel.
+public export
+streamTrajectoryActionFuelModel : (geom : Stage1.FourGeometries.FundamentalGeometry) ->
+                                  (LatticeCoord2D -> Stage0.BoxInt.BoxInt) ->
+                                  FusedStream LatticeCoord2D -> Stage0.BoxInt.BoxInt
+streamTrajectoryActionFuelModel geom vPot coordStrm =
+  streamDiscreteActionFuelModel geom vPot (streamAdjacentPairs coordStrm)
 
 
 ------------------------------------------------------------------------
