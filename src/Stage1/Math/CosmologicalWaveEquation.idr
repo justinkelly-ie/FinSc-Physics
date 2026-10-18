@@ -10,10 +10,8 @@ import Stage1.Math.QuadStreamPhysicalLaws
 import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Stage1.FourGeometries
-import Data.Vect
 import Stage0.OnSeq.FusedStream as FS
-import Stage1.VexelMaxel
-import Stage1.SpatialStencil
+import Stage1.MultisetTree
 import Stage1.TypeTheory.Staging
 
 %default total
@@ -169,64 +167,83 @@ MultisetAdjunction DeWittWaveFunctor AbstractDeWittWaveFunctor where
   verifyHomInv = proofDeWittWaveHomInv
 
 ------------------------------------------------------------------------
--- 4. DISCRETE WAVE OPERATOR & DEFORESTED LEAPFROG WAVE STREAM
+-- 4. DISCRETE WAVE OPERATOR & MULTISETTREE LEAPFROG WAVE STREAM
 ------------------------------------------------------------------------
 
-||| Discrete 1D wave operator leapfrog step:
-||| Computes psi(x, t+1) = psi(x-1, t) + psi(x+1, t) - psi(x, t-1) - m^2 * psi(x, t)
-||| directly preserving total symplectic action and energy without floating-point division.
+||| A discrete wave field represented by its active non-zero spatial support.
+||| Replaces dense fixed-dimension vectors with logarithmic AVL multiset trees.
 public export
-leapfrogWaveStep1D : {n : Nat} -> StagedBoundary -> (mSq : BoxInt) -> (prev : VexelN n) -> (curr : VexelN n) -> VexelN n
-leapfrogWaveStep1D bc mSq (MkVexelN pComps) (MkVexelN cComps) =
-  MkVexelN (updateCells 0 pComps cComps)
-  where
-    updateCells : Integer -> Vect k BoxInt -> Vect k BoxInt -> Vect k BoxInt
-    updateCells idx [] [] = []
-    updateCells idx (p :: ps) (c :: cs) =
-      let lVal = boundaryLookup1D bc cComps (idx - 1)
-          rVal = boundaryLookup1D bc cComps (idx + 1)
-          nextVal = (lVal + rVal) - p - (mSq * c)
-      in nextVal :: updateCells (idx + 1) ps cs
+0 WaveField : Type
+WaveField = BoxMultisetTree Integer
 
 ||| State bundle for discrete wave evolution: (psi(t-1), psi(t)).
 public export
-record DiscreteWaveState (n : Nat) where
+record DiscreteWaveState where
   constructor MkWaveState
-  prevGrid : VexelN n
-  currGrid : VexelN n
+  prevField : WaveField
+  currField : WaveField
 
 public export
-Eq (DiscreteWaveState n) where
+Eq DiscreteWaveState where
   (MkWaveState p1 c1) == (MkWaveState p2 c2) = p1 == p2 && c1 == c2
+
+||| Discrete 1D wave operator leapfrog step over active multiset support:
+||| For every active node x and its neighbors (x-1, x+1),
+||| psi(x, t+1) = psi(x-1, t) + psi(x+1, t) - psi(x, t-1) - m^2 * psi(x, t).
+||| Executes in O(K log K) time where K is the number of active excitations.
+public export
+leapfrogWaveStepTree : (mSq : BoxInt) -> (prev : WaveField) -> (curr : WaveField) -> WaveField
+leapfrogWaveStepTree mSq prev curr =
+  let prevCoords = foldBoxTreeR (\x, _, acc => the (List Integer) (x :: acc)) (the (List Integer) []) prev
+      activeCoords = foldBoxTreeR (\x, _, acc => the (List Integer) ((x - 1) :: x :: (x + 1) :: acc))
+                                  prevCoords
+                                  curr
+  in foldl updatePoint BoxLeaf activeCoords
+  where
+    updatePoint : WaveField -> Integer -> WaveField
+    updatePoint acc x =
+      let lVal = lookupBoxTree (x - 1) curr
+          rVal = lookupBoxTree (x + 1) curr
+          pVal = lookupBoxTree x prev
+          cVal = lookupBoxTree x curr
+          nextVal = (lVal + rVal) - pVal - (mSq * cVal)
+      in if unwrapBox nextVal == 0
+           then acc
+           else setBoxTree x nextVal acc
 
 ||| Single evolution step on DiscreteWaveState advancing one discrete time tick.
 public export
-stepWaveState : {n : Nat} -> StagedBoundary -> (mSq : BoxInt) -> DiscreteWaveState n -> DiscreteWaveState n
-stepWaveState bc mSq (MkWaveState prev curr) =
-  let next = leapfrogWaveStep1D bc mSq prev curr
+stepWaveStateTree : (mSq : BoxInt) -> DiscreteWaveState -> DiscreteWaveState
+stepWaveStateTree mSq (MkWaveState prev curr) =
+  let next = leapfrogWaveStepTree mSq prev curr
   in MkWaveState curr next
 
-||| Generates a deforested FusedStream of wave state configurations across discrete time ticks bounded by fuel.
+||| Generates a deforested FusedStream of wave states across discrete time ticks bounded by fuel.
 ||| Executes in O(1) auxiliary registers without intermediate heap allocation.
 public export
-streamWaveTrajectory : {n : Nat} -> (fuel : Nat) -> StagedBoundary -> (mSq : BoxInt) -> DiscreteWaveState n -> FS.FusedStream (DiscreteWaveState n)
-streamWaveTrajectory fuel bc mSq init =
-  FS.MkStream {s = (Nat, DiscreteWaveState n)} next (fuel, init)
+streamWaveTreeTrajectory : (fuel : Nat) -> (mSq : BoxInt) -> DiscreteWaveState -> FS.FusedStream DiscreteWaveState
+streamWaveTreeTrajectory fuel mSq init =
+  FS.MkStream {s = (Nat, DiscreteWaveState)} next (fuel, init)
   where
-    next : (Nat, DiscreteWaveState n) -> FS.Step (Nat, DiscreteWaveState n) (DiscreteWaveState n)
+    next : (Nat, DiscreteWaveState) -> FS.Step (Nat, DiscreteWaveState) DiscreteWaveState
     next (Z, _) = FS.Done
     next (S k, st) =
-      let nxt = stepWaveState bc mSq st
+      let nxt = stepWaveStateTree mSq st
       in FS.Yield st (k, nxt)
 
-||| Audit: Discrete wave equation reversibility and mass-shell conservation:
-||| Verifies that a wave step on a localized packet evolves deterministically.
+||| Audit: Discrete wave equation mass-shell conservation on BoxMultisetTree:
+||| Tests localized packet at x = 1 with amplitude 2 propagating symmetrically to x = 0 and x = 2.
 public export
 auditDiscreteWaveLeapfrogProof : Bool
 auditDiscreteWaveLeapfrogProof =
-  let p0 = MkVexelN [intToBoxInt 0, intToBoxInt 0, intToBoxInt 0]
-      c0 = MkVexelN [intToBoxInt 0, intToBoxInt 2, intToBoxInt 0]
+  let p0 : WaveField = BoxLeaf
+      c0 : WaveField = setBoxTree 1 (intToBoxInt 2) BoxLeaf
       w0 = MkWaveState p0 c0
-      w1 = stepWaveState PeriodicBoundary (intToBoxInt 0) w0
-      (MkVexelN res) = currGrid w1
-  in res == [intToBoxInt 2, intToBoxInt 0, intToBoxInt 2]
+      w1 = stepWaveStateTree (intToBoxInt 0) w0
+      nextF = currField w1
+      v0 = lookupBoxTree 0 nextF
+      v1 = lookupBoxTree 1 nextF
+      v2 = lookupBoxTree 2 nextF
+      v3 = lookupBoxTree 3 nextF
+  in v0 == intToBoxInt 2 && v1 == intToBoxInt 0 && v2 == intToBoxInt 2 && v3 == intToBoxInt 0
+
