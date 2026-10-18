@@ -42,7 +42,7 @@ public export
 newtonianVelocitySquared : (gConst : Stage0.BoxInt.BoxInt) -> GalacticProfile -> (radius : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 newtonianVelocitySquared g gal r =
   let m = enclosedMass gal r
-      rVal = if unwrapBox r == 0 then Stage0.BoxInt.intToBoxInt 1 else r
+      rVal = if boxIsZero r then Stage0.BoxInt.intToBoxInt 1 else r
   in (g * m) `div` rVal
 
 ||| Computes emergent rotation velocity squared under Dark Matter Cyclotomic Drag:
@@ -54,7 +54,7 @@ emergentRotationVelocitySquared : (gConst : Stage0.BoxInt.BoxInt) -> (dragSlope 
                                   GalacticProfile -> (radius : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 emergentRotationVelocitySquared g slope gal r =
   let m = enclosedMass gal r
-      rVal = if unwrapBox r == 0 then Stage0.BoxInt.intToBoxInt 1 else r
+      rVal = if boxIsZero r then Stage0.BoxInt.intToBoxInt 1 else r
       dragFactor = Stage0.BoxInt.intToBoxInt 1 + (slope * rVal)
   in (g * m * dragFactor) `div` rVal
 
@@ -81,7 +81,7 @@ projectMetricBulkToLeaf bulkDim leafDim (MkBoxSquareMaxel tree) =
       step : BoxMultisetTree Pixel -> (Nat, Nat) -> BoxMultisetTree Pixel
       step acc (r, c) =
         let w = lookupBoxTree (MkPixel r c) tree
-        in if unwrapBox w /= 0
+        in if boxIsNonZero w
               then setBoxTree (MkPixel r c) w acc
               else acc
       subTree = foldl step BoxLeaf pairs
@@ -229,8 +229,8 @@ auditGalacticRotationFlatnessProof =
       dragSlope = Stage0.BoxInt.intToBoxInt 1
       v10 = emergentRotationVelocitySquared g dragSlope gal (Stage0.BoxInt.intToBoxInt 10)
       v20 = emergentRotationVelocitySquared g dragSlope gal (Stage0.BoxInt.intToBoxInt 20)
-  in unwrapBox v10 == 11000 && unwrapBox v20 == 10500 &&
-     abs (unwrapBox v10 - unwrapBox v20) <= 600
+  in v10 == intToBoxInt 11000 && v20 == intToBoxInt 10500 &&
+     absBox (v10 - v20) <= intToBoxInt 600
 
 ||| Audits Baryonic Tully-Fisher Mass Scaling:
 ||| Proves that doubling total galactic core baryonic mass produces a proportional doubling in flat rotation velocity squared:
@@ -244,7 +244,7 @@ auditTullyFisherRelationProof =
       dragSlope = Stage0.BoxInt.intToBoxInt 1
       v1 = emergentRotationVelocitySquared g dragSlope gal1 (Stage0.BoxInt.intToBoxInt 10)
       v2 = emergentRotationVelocitySquared g dragSlope gal2 (Stage0.BoxInt.intToBoxInt 10)
-  in unwrapBox v2 > unwrapBox v1 && unwrapBox v2 == (unwrapBox v1 * 2)
+  in v2 > v1 && v2 == (v1 * intToBoxInt 2)
 
 ||| Audits 1,000-Step Time-Series Galactic Rotation Curve Simulation:
 ||| Verifies that velocity curves remain asymptotically flat after 1,000 evolution steps.
@@ -268,8 +268,8 @@ audit10DGalacticRotationFlatness =
   let gal = MkGalacticProfile (intToBoxInt 100) (intToBoxInt 0)
       v10 = rotationVelocity10D gal (intToBoxInt 10)
       v20 = rotationVelocity10D gal (intToBoxInt 20)
-  in unwrapBox v10 == 11000 && unwrapBox v20 == 10500 &&
-     abs (unwrapBox v10 - unwrapBox v20) <= 600
+  in v10 == intToBoxInt 11000 && v20 == intToBoxInt 10500 &&
+     absBox (v10 - v20) <= intToBoxInt 600
 
 ||| Combined audit proof export for Test 146 integration.
 public export
