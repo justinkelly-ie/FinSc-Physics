@@ -9,8 +9,6 @@ import Stage1.Math.QuadStreamPhysicalLaws
 import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Data.List
-import Data.Fin
-import Data.Vect
 
 %default total
 

@@ -1,6 +1,5 @@
 module Stage0.PhysicsMonad
 
-import Data.Vect
 import Stage0.BoxInt
 import Stage1.UnixelFraction
 import Stage1.Goh
