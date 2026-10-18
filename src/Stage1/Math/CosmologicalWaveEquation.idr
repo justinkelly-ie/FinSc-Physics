@@ -174,7 +174,7 @@ MultisetAdjunction DeWittWaveFunctor AbstractDeWittWaveFunctor where
 ||| Replaces dense fixed-dimension vectors with logarithmic AVL multiset trees.
 public export
 0 WaveField : Type
-WaveField = BoxMultisetTree Integer
+WaveField = BoxMultisetTree BoxInt
 
 ||| State bundle for discrete wave evolution: (psi(t-1), psi(t)).
 public export
@@ -194,13 +194,13 @@ Eq DiscreteWaveState where
 public export
 leapfrogWaveStepTree : (mSq : BoxInt) -> (prev : WaveField) -> (curr : WaveField) -> WaveField
 leapfrogWaveStepTree mSq prev curr =
-  let prevCoords = foldBoxTreeR (\x, _, acc => the (List Integer) (x :: acc)) (the (List Integer) []) prev
-      activeCoords = foldBoxTreeR (\x, _, acc => the (List Integer) ((x - 1) :: x :: (x + 1) :: acc))
+  let prevCoords = foldBoxTreeR (\x, _, acc => the (List BoxInt) (x :: acc)) (the (List BoxInt) []) prev
+      activeCoords = foldBoxTreeR (\x, _, acc => the (List BoxInt) ((x - 1) :: x :: (x + 1) :: acc))
                                   prevCoords
                                   curr
   in foldl updatePoint BoxLeaf activeCoords
   where
-    updatePoint : WaveField -> Integer -> WaveField
+    updatePoint : WaveField -> BoxInt -> WaveField
     updatePoint acc x =
       let lVal = lookupBoxTree (x - 1) curr
           rVal = lookupBoxTree (x + 1) curr
