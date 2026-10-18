@@ -32,8 +32,8 @@ Eq LaughlinState where
 public export
 evaluateQuadStreamLaughlin : QuadStreamMultiset Stage0.BoxInt.BoxInt -> LaughlinState
 evaluateQuadStreamLaughlin (MkQuadStream e h p s) =
-  let pVal = let v = unwrapBox (multisetSum e) in if v <= 0 then 1 else integerToNat v
-      qVal = let v = unwrapBox (multisetSum h) in if v <= 0 then 1 else integerToNat v
+  let pVal = boxIntToPositiveNat (multisetSum e)
+      qVal = boxIntToPositiveNat (multisetSum h)
   in MkLaughlinState pVal qVal
 
 ||| Computes the fractional charge of a Laughlin quasiparticle excitation e* = (p/q) * e:

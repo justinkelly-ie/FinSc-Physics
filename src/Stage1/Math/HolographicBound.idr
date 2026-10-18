@@ -75,7 +75,7 @@ saturateQuadStreamHolographic dimL (MkQuadStream e h p s) =
                   (AddM 0 (Stage0.BoxInt.intToBoxInt (cast totalSubstrate)) ZeroM)
   where
     natVal : Stage0.BoxInt.BoxInt -> Nat
-    natVal b = let v = Stage0.BoxInt.unwrapBox b in if v <= 0 then Z else integerToNat v
+    natVal = boxToNat
 
 ------------------------------------------------------------------------
 -- 2. CONSTRUCTIVE FORMAL AUDIT PROOFS

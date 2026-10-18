@@ -35,7 +35,7 @@ evaluateQuadStreamRunningCoupling : QuadStreamMultiset Stage0.BoxInt.BoxInt -> U
 evaluateQuadStreamRunningCoupling (MkQuadStream e h p s) =
   let alpha0 = mkUnixelFraction (multisetSum e) 137
       qSq = mkUnixelFraction (multisetSum h) 1
-      cutoff = let v = unwrapBox (multisetSum p) in if v <= 0 then 1 else integerToNat v
+      cutoff = boxIntToPositiveNat (multisetSum p)
       loop = MkVacuumPolarization alpha0 qSq cutoff
   in discreteRunningCoupling loop
 

@@ -55,7 +55,7 @@ wBosonMassSquared (MkDiscreteHiggsVacuum vevSq _ g) =
 public export
 evaluateQuadStreamWBosonMassSquared : QuadStreamMultiset BoxInt -> UnixelFraction
 evaluateQuadStreamWBosonMassSquared (MkQuadStream e h p s) =
-  let vevSq = mkUnixelFraction (multisetSum e) (let v = unwrapBox (multisetSum h) in if v <= 0 then 1 else integerToNat v)
+  let vevSq = mkUnixelFractionBox (multisetSum e) (multisetSum h)
       lam = mkUnixelFraction (intToBoxInt 1) 8
       g = mkUnixelFraction (intToBoxInt 2) 3
       vac = MkDiscreteHiggsVacuum vevSq lam g

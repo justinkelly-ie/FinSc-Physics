@@ -50,7 +50,7 @@ discreteCasimirForce (S k) =
 public export
 evaluateQuadStreamCasimirForce : QuadStreamMultiset Stage0.BoxInt.BoxInt -> Stage0.BoxInt.BoxInt
 evaluateQuadStreamCasimirForce (MkQuadStream e h p s) =
-  let d = let v = unwrapBox (multisetSum e) in if v <= 0 then 1 else integerToNat v
+  let d = boxIntToPositiveNat (multisetSum e)
   in discreteCasimirForce d
 
 ------------------------------------------------------------------------

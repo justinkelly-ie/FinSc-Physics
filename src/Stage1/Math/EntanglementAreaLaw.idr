@@ -70,8 +70,8 @@ computeRyuTakayanagiEntropy sys =
 public export
 evaluateQuadStreamRyuTakayanagi : QuadStreamMultiset BoxInt -> HolographicEntanglement
 evaluateQuadStreamRyuTakayanagi (MkQuadStream e h p s) =
-  let lA = let v = unwrapBox (multisetSum e) in if v <= 0 then 1 else integerToNat v
-      tA = let v = unwrapBox (multisetSum e + multisetSum h + multisetSum p + multisetSum s) in if v <= 0 then 1 else integerToNat v
+  let lA = boxIntToPositiveNat (multisetSum e)
+      tA = boxIntToPositiveNat (multisetSum e + multisetSum h + multisetSum p + multisetSum s)
       sys = MkSubsystem lA tA
   in computeRyuTakayanagiEntropy sys
 

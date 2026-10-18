@@ -79,7 +79,7 @@ quadStreamPageEntropyTrajectory fuel (MkQuadStream e h p s) =
   in fusedPageEntropyTrajectory fuel totalB
   where
     unwrapNat : Stage0.BoxInt.BoxInt -> Nat
-    unwrapNat b = let v = Stage0.BoxInt.unwrapBox b in if v <= 0 then Z else integerToNat v
+    unwrapNat = boxToNat
 
 ------------------------------------------------------------------------
 -- 3. CATEGORY-THEORETIC HOM-TENSOR MULTISET ADJUNCTION (L ⊣ R)

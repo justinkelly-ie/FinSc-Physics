@@ -66,7 +66,7 @@ public export
 evaluateQuadStreamTIState : QuadStreamMultiset BoxInt -> DiscreteTIState
 evaluateQuadStreamTIState (MkQuadStream e h p s) =
   let gap = multisetSum e
-      bulkZ2 = let v = unwrapBox (multisetSum h) in if v <= 0 then Z else 1
+      bulkZ2 = if boxToNat (multisetSum h) > 0 then 1 else Z
   in synthesizeTIState gap bulkZ2
 
 ------------------------------------------------------------------------

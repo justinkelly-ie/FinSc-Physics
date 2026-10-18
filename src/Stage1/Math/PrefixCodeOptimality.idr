@@ -39,10 +39,10 @@ isValidPrefixCode maxL lengths =
 public export
 evaluateQuadStreamPrefixCode : QuadStreamMultiset Stage0.BoxInt.BoxInt -> List Nat
 evaluateQuadStreamPrefixCode (MkQuadStream e h p s) =
-  let lE = let v = unwrapBox (multisetSum e) in if v <= 0 then 1 else integerToNat v
-      lH = let v = unwrapBox (multisetSum h) in if v <= 0 then 1 else integerToNat v
-      lP = let v = unwrapBox (multisetSum p) in if v <= 0 then 1 else integerToNat v
-      lS = let v = unwrapBox (multisetSum s) in if v <= 0 then 1 else integerToNat v
+  let lE = boxIntToPositiveNat (multisetSum e)
+      lH = boxIntToPositiveNat (multisetSum h)
+      lP = boxIntToPositiveNat (multisetSum p)
+      lS = boxIntToPositiveNat (multisetSum s)
   in [lE, lH, lP, lS]
 
 ||| Computes Stern-Brocot tree path depth with structural termination fuel:

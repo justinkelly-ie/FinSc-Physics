@@ -49,10 +49,7 @@ netBaryonNumber (MkBaryonState p n _) = p - n
 public export
 baryonAsymmetryRatio : BaryonState -> Stage1.UnixelFraction.UnixelFraction
 baryonAsymmetryRatio state =
-  let bNet = netBaryonNumber state
-      denom = case Stage0.BoxInt.unwrapBox (photonTokens state) of
-                v => if v <= 0 then 1 else integerToNat v
-  in Stage1.UnixelFraction.MkUnixelFraction bNet (Stage1.VexelMaxel.MkUnixel denom)
+  mkUnixelFractionBox (netBaryonNumber state) (photonTokens state)
 
 ||| Evaluates QuadStream Baryogenesis payload across 4 geometric sectors.
 public export

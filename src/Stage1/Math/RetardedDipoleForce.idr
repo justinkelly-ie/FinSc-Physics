@@ -42,7 +42,7 @@ discreteCasimirPolderPotential c7 q =
 public export
 evaluateQuadStreamCasimirPolder : Stage0.BoxInt.BoxInt -> QuadStreamMultiset Stage0.BoxInt.BoxInt -> Stage1.UnixelFraction.UnixelFraction
 evaluateQuadStreamCasimirPolder c7 (MkQuadStream e h p s) =
-  let qVal = let v = unwrapBox (multisetSum e + multisetSum h) in if v <= 0 then 1 else integerToNat v
+  let qVal = boxIntToPositiveNat (multisetSum e + multisetSum h)
   in discreteCasimirPolderPotential c7 qVal
 
 ||| Validates that both London and Casimir-Polder forces are strictly attractive (negative potential):

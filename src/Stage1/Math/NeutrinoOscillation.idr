@@ -39,9 +39,9 @@ public export
 evaluateQuadStreamNeutrinoProbabilities : QuadStreamMultiset Stage0.BoxInt.BoxInt -> NeutrinoProbabilityVector
 evaluateQuadStreamNeutrinoProbabilities (MkQuadStream e h p s) =
   let totalM = multisetSum e + multisetSum h + multisetSum p + multisetSum s
-      pe = mkUnixelFraction (multisetSum e) (let v = unwrapBox totalM in if v <= 0 then 1 else integerToNat v)
-      pmu = mkUnixelFraction (multisetSum h) (let v = unwrapBox totalM in if v <= 0 then 1 else integerToNat v)
-      ptau = mkUnixelFraction (multisetSum p) (let v = unwrapBox totalM in if v <= 0 then 1 else integerToNat v)
+      pe = mkUnixelFractionBox (multisetSum e) totalM
+      pmu = mkUnixelFractionBox (multisetSum h) totalM
+      ptau = mkUnixelFractionBox (multisetSum p) totalM
   in MkNeutrinoProbabilityVector pe pmu ptau
 
 ------------------------------------------------------------------------

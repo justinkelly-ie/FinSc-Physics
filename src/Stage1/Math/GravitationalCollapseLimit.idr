@@ -38,7 +38,7 @@ public export
 isTOVQuadStreamStable : QuadStreamMultiset Stage0.BoxInt.BoxInt -> Bool
 isTOVQuadStreamStable (MkQuadStream e h p s) =
   let totalM = multisetSum e + multisetSum h + multisetSum p + multisetSum s
-      unwrapNat = let v = Stage0.BoxInt.unwrapBox totalM in if v <= 0 then Z else integerToNat v
+      unwrapNat = boxToNat totalM
   in isTOVGravitationallyStable unwrapNat
 
 ||| Discrete Core Evolution State under gravitational accretion:

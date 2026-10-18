@@ -1,6 +1,7 @@
 module Stage1.Math.ThermalDistribution
 
 import Stage0.BoxInt
+import Stage0.BoxNat
 import Stage0.StructuralFuel
 import Stage0.WitnessLedger
 import Stage0.StreamPolynumber
@@ -52,9 +53,9 @@ fastNatPower b exp = loop exp b 1 (exp + 10)
     loop _ _ acc Z = acc
     loop Z _ acc _ = acc
     loop e base acc (S fuel) =
-      let acc' = if (e `mod` 2 == 1) then acc * base else acc
+      let (e', isOdd) = natHalfAndOdd e
+          acc' = if isOdd then acc * base else acc
           base' = base * base
-          e'   = e `div` 2
       in loop e' base' acc' fuel
 
 ||| Backward-compatible alias for fast logarithmic natural power.
@@ -281,7 +282,7 @@ quadStreamPartitionSum (MkQuadStream e h p s) maxLevel numQ denQ =
   in eSum + hSum + pSum + sSum
   where
     natVal : Stage0.BoxInt.BoxInt -> Nat
-    natVal b = let v = Stage0.BoxInt.unwrapBox b in if v <= 0 then Z else integerToNat v
+    natVal = boxToNat
 
 ------------------------------------------------------------------------
 -- 4. CONSTRUCTIVE FORMAL AUDIT PROOFS

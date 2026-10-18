@@ -32,7 +32,7 @@ discreteQuantumPotential lapR r =
 public export
 evaluateQuadStreamBohmianPotential : Stage0.BoxInt.BoxInt -> QuadStreamMultiset Stage0.BoxInt.BoxInt -> Stage1.UnixelFraction.UnixelFraction
 evaluateQuadStreamBohmianPotential lapR (MkQuadStream e h p s) =
-  let rVal = let v = unwrapBox (multisetSum e + multisetSum h) in if v <= 0 then 1 else integerToNat v
+  let rVal = boxIntToPositiveNat (multisetSum e + multisetSum h)
   in discreteQuantumPotential lapR rVal
 
 ||| Total Discrete Bohmian Particle Energy along a causal trajectory:

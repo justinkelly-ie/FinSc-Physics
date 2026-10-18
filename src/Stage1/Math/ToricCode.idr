@@ -77,7 +77,7 @@ synthesizeToricLattice l =
 public export
 evaluateQuadStreamToricLattice : QuadStreamMultiset BoxInt -> ToricCodeLattice
 evaluateQuadStreamToricLattice (MkQuadStream e h p s) =
-  let l = let v = unwrapBox (multisetSum e) in if v <= 0 then 1 else integerToNat v
+  let l = boxIntToPositiveNat (multisetSum e)
   in synthesizeToricLattice l
 
 ||| Evaluates error syndrome for a single bit-flip error (creates 2 plaquette defects):

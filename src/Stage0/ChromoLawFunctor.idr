@@ -2,6 +2,7 @@ module Stage0.ChromoLawFunctor
 
 import public Stage0.BoxInt
 import public Stage1.VexelMaxel
+import public Stage1.MultisetTree
 import public Stage1.ChromoCategory
 import Stage1.MultisetDuality
 
@@ -32,8 +33,9 @@ applyLawFunctor (MkChromoLawFunctor _ _ m) v = actMaxelVexel m v
 ||| Computes transpose of a Maxel matrix: transposeMaxel (sum a_ij [i, j]) = sum a_ij [j, i].
 public export
 transposeMaxel : Maxel -> Maxel
-transposeMaxel (MkMaxel pxs) =
-  MkMaxel (map (\(MkPixel i j, w) => (MkPixel j i, w)) pxs)
+transposeMaxel m =
+  let transposed = foldBoxTreeL (\acc, (MkPixel i j, w) => setBoxTree (MkPixel j i) w acc) BoxLeaf (maxelToBoxTree m)
+  in MkMaxelTree transposed
 
 ||| Executes a ChromoLawFunctor inverse pullback transformation on a macro state Vexel (Right Adjoint Pullback R_m).
 public export

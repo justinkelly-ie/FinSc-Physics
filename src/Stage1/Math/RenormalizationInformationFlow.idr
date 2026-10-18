@@ -53,7 +53,7 @@ evaluateQuadStreamFisherQuadrance (MkQuadStream e h p s) =
   in discreteFisherQuadrance w1 w2
   where
     natVal : Stage0.BoxInt.BoxInt -> Nat
-    natVal b = let v = Stage0.BoxInt.unwrapBox b in if v <= 0 then Z else integerToNat v
+    natVal = boxToNat
 
 ------------------------------------------------------------------------
 -- 3. TOPOLOGICAL RG FIXED POINT COARSE-GRAINING
