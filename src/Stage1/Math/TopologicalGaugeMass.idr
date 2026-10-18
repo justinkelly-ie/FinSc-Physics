@@ -60,8 +60,8 @@ auditTopologicalGaugeMassProof =
       e2Val  = Stage0.BoxInt.intToBoxInt 4
       mPhot  = discreteChernSimonsMass kLevel e2Val
       mZero  = discreteChernSimonsMass (Stage0.BoxInt.intToBoxInt 0) e2Val
-  in unwrapBox mPhot == 12 &&
-     unwrapBox mZero == 0 &&
+  in mPhot == intToBoxInt 12 &&
+     boxIsZero mZero &&
      isChernSimonsParityOdd kLevel e2Val
 
 ------------------------------------------------------------------------

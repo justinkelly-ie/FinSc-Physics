@@ -51,7 +51,7 @@ evaluateQuadStreamBZState (MkQuadStream e h p s) =
 %inline
 public export
 boxNegative : Stage0.BoxInt.BoxInt -> Bool
-boxNegative b = Stage0.BoxInt.unwrapBox b < 0
+boxNegative b = b < Stage0.BoxInt.intToBoxInt 0
 
 ||| Single discrete time-step transition of the BZ reaction network:
 ||| 1. Autocatalysis: X production when Y is depleted (Y < 10).

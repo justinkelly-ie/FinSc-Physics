@@ -78,7 +78,7 @@ traceGaussianLink MinusI   = intToBoxInt 0
 public export
 evaluateQuadStreamHolonomy : QuadStreamMultiset Stage0.BoxInt.BoxInt -> GaussianLink
 evaluateQuadStreamHolonomy (MkQuadStream e h p s) =
-  let wE = unwrapBox (multisetSum e) `mod` 4
+  let wE = (cast {to = Integer} (boxToNat (absBox (multisetSum e)))) `mod` 4
   in case wE of
        0 => PlusOne
        1 => PlusI

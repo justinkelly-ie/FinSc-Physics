@@ -117,5 +117,5 @@ public export
 auditLaw52TripleAlphaProof : Bool
 auditLaw52TripleAlphaProof =
   let c12 = tripleAlphaFusionTokens (intToBoxInt 108)
-  in (unwrapBox c12 == 324) && (unwrapBox phosphorus31MassTokens == 837)
+  in (c12 == intToBoxInt 324) && (phosphorus31MassTokens == intToBoxInt 837)
 

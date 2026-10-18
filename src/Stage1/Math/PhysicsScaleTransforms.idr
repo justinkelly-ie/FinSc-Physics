@@ -27,7 +27,7 @@ Eq ConcretePhysicsState where
 
 public export
 Show ConcretePhysicsState where
-  show (MkConcretePhysics q) = "ConcretePhysics(" ++ show (Stage0.BoxInt.unwrapBox q) ++ ")"
+  show (MkConcretePhysics q) = "ConcretePhysics(" ++ show q ++ ")"
 
 ||| Maps QuadStreamMultiset spatial state to ConcretePhysicsState.
 public export
@@ -47,7 +47,7 @@ Eq PhysicsMacroDomain where
 
 public export
 Show PhysicsMacroDomain where
-  show (MkPhysicsMacro q) = "PhysicsMacro(" ++ show (Stage0.BoxInt.unwrapBox q) ++ ")"
+  show (MkPhysicsMacro q) = "PhysicsMacro(" ++ show q ++ ")"
 
 ||| Heterogeneous MultisetScaleAdjunction instance (f_* ⊣ f^*) between ConcretePhysicsState and PhysicsMacroDomain
 public export
@@ -145,7 +145,7 @@ public export
 auditPhysicsScaleTransformProof : Bool
 auditPhysicsScaleTransformProof =
   let q = scaleTransform (MkCoord2D (Stage0.BoxInt.intToBoxInt 4) (Stage0.BoxInt.intToBoxInt 3))
-  in Stage0.BoxInt.unwrapBox q == 25
+  in q == Stage0.BoxInt.intToBoxInt 25
 
 ||| Evaluates physical pushforward along an AdjointScaleChain scale jump
 public export

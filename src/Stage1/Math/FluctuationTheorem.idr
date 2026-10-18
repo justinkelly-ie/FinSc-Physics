@@ -40,9 +40,7 @@ Eq TrajectoryWork where
 public export
 microscopicDissipatedWork : TrajectoryWork -> Stage0.BoxInt.BoxInt
 microscopicDissipatedWork (MkTrajectoryWork wf _ df) =
-  let wVal = Stage0.BoxInt.unwrapBox wf
-      dfVal = Stage0.BoxInt.unwrapBox df
-  in Stage0.BoxInt.intToBoxInt (wVal - dfVal)
+  subBox wf df
 
 ||| Validates the Discrete Crooks Theorem:
 ||| 1. For reversible processes (w_F = Delta F), forward and backward probabilities are equal (ratio = 1).
@@ -50,13 +48,11 @@ microscopicDissipatedWork (MkTrajectoryWork wf _ df) =
 public export
 isCrooksTheoremSatisfied : TrajectoryWork -> Bool
 isCrooksTheoremSatisfied (MkTrajectoryWork wf wb df) =
-  let wFVal = Stage0.BoxInt.unwrapBox wf
-      wBVal = Stage0.BoxInt.unwrapBox wb
-      dfVal = Stage0.BoxInt.unwrapBox df
-      wDiss = wFVal - dfVal
-  in if wDiss == 0
-        then wFVal == - wBVal && wFVal == dfVal
-        else (wDiss > 0 && wFVal + wBVal == 0)
+  let wDiss = subBox wf df
+      zero = Stage0.BoxInt.intToBoxInt 0
+  in if boxIsZero wDiss
+        then wf == - wb && wf == df
+        else (wDiss > zero && addBox wf wb == zero)
 
 ||| Evaluates microscopic trajectory work and Crooks satisfaction across QuadStreamMultiset payload.
 public export
@@ -153,13 +149,14 @@ auditFluctuationTheoremProof : Bool
 auditFluctuationTheoremProof =
   let revTraj = MkTrajectoryWork (Stage0.BoxInt.intToBoxInt 5) (Stage0.BoxInt.intToBoxInt (-5)) (Stage0.BoxInt.intToBoxInt 5)
       irrevTraj = MkTrajectoryWork (Stage0.BoxInt.intToBoxInt 9) (Stage0.BoxInt.intToBoxInt (-9)) (Stage0.BoxInt.intToBoxInt 5)
-      wDissRev = Stage0.BoxInt.unwrapBox (microscopicDissipatedWork revTraj)
-      wDissIrrev = Stage0.BoxInt.unwrapBox (microscopicDissipatedWork irrevTraj)
+      wDissRev = microscopicDissipatedWork revTraj
+      wDissIrrev = microscopicDissipatedWork irrevTraj
+      zero = Stage0.BoxInt.intToBoxInt 0
   in isCrooksTheoremSatisfied revTraj &&
      isCrooksTheoremSatisfied irrevTraj &&
-     wDissRev == 0 &&
-     wDissIrrev == 4 &&
-     wDissIrrev > 0
+     boxIsZero wDissRev &&
+     wDissIrrev == Stage0.BoxInt.intToBoxInt 4 &&
+     wDissIrrev > zero
 
 ------------------------------------------------------------------------
 -- 4. COINDUCTIVE STREAMING CROOKS FLUCTUATION TRANSDUCER
@@ -185,7 +182,7 @@ streamCrooksFluctuations df wList =
         let wb = - wf
             traj = MkTrajectoryWork wf wb df
             wDiss = microscopicDissipatedWork traj
-            ratioNum = if unwrapBox wDiss >= 0 then S (fromInteger (abs (unwrapBox wDiss))) else 1
+            ratioNum = if wDiss >= intToBoxInt 0 then S (boxToNat wDiss) else 1
             ratio = mkUnixelFraction (intToBoxInt (cast ratioNum)) 1
             step = MkFluctuationStreamStep idx traj ratio wDiss
         in Yield step (idx + 1, rest)

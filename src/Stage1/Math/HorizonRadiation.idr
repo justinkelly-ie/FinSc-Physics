@@ -62,13 +62,13 @@ discreteHawkingTemperature area =
 public export
 stepHawkingEvaporationDiscrete : HorizonState -> HorizonState
 stepHawkingEvaporationDiscrete (MkHorizonState area m r) =
-  let mVal = Stage0.BoxInt.unwrapBox m
-      rVal = Stage0.BoxInt.unwrapBox r
-      dM = if mVal > 0 then 1 else 0
-      newM = mVal - dM
-      newR = rVal + dM
-      newArea = if area > 0 && mVal > 0 then minus area 1 else area
-  in MkHorizonState newArea (Stage0.BoxInt.intToBoxInt newM) (Stage0.BoxInt.intToBoxInt newR)
+  let zero = Stage0.BoxInt.intToBoxInt 0
+      one = Stage0.BoxInt.intToBoxInt 1
+      dM = if m > zero then one else zero
+      newM = subBox m dM
+      newR = addBox r dM
+      newArea = if area > 0 && m > zero then minus area 1 else area
+  in MkHorizonState newArea newM newR
 
 ||| Executes one discrete Hawking evaporation quantum step
 ||| parameterized by QTT 0 metric space parameter (0 space : VexelSpace d c):
@@ -164,8 +164,8 @@ auditHorizonRadiationProof =
   let st0 = MkHorizonState 54 (Stage0.BoxInt.intToBoxInt 10) (Stage0.BoxInt.intToBoxInt 0)
       st1 = stepHawkingEvaporationDiscrete st0
       (Stage1.UnixelFraction.MkUnixelFraction _ den) = discreteHawkingTemperature 54
-  in Stage0.BoxInt.unwrapBox (blackHoleMass st1) == 9 &&
-     Stage0.BoxInt.unwrapBox (emittedRadiation st1) == 1 &&
+  in blackHoleMass st1 == Stage0.BoxInt.intToBoxInt 9 &&
+     emittedRadiation st1 == Stage0.BoxInt.intToBoxInt 1 &&
      Stage1.VexelMaxel.unwrapUnixel den == 108
 
 

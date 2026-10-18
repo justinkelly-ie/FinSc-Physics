@@ -42,7 +42,7 @@ isDissipationlessHallStress : (etaH : Stage1.UnixelFraction.UnixelFraction) -> B
 isDissipationlessHallStress (Stage1.UnixelFraction.MkUnixelFraction num (Stage1.VexelMaxel.MkUnixel den)) =
   let sigma_xy = num
       sigma_yx = Stage0.BoxInt.intToBoxInt 0 - num
-  in Stage0.BoxInt.unwrapBox (sigma_xy + sigma_yx) == 0
+  in Stage0.BoxInt.boxIsZero (sigma_xy + sigma_yx)
 
 
 ------------------------------------------------------------------------

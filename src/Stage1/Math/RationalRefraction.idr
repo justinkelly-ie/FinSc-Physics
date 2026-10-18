@@ -19,7 +19,7 @@ import Data.List
 %inline
 public export
 boxZero : Stage0.BoxInt.BoxInt -> Bool
-boxZero b = Stage0.BoxInt.unwrapBox b == 0
+boxZero b = Stage0.BoxInt.boxIsZero b
 
 ||| Evaluates Rational Snell's Law under Chromogeometric refraction:
 ||| n1^2 * s1 = n2^2 * s2  ==> (n1^2 * s1) - (n2^2 * s2) = 0.

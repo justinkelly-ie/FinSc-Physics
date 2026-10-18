@@ -41,7 +41,7 @@ auditHiggsVacuumStabilityProof =
   let vac = MkDiscreteHiggsVacuum (mkUnixelFraction (intToBoxInt 246) 1) (mkUnixelFraction (intToBoxInt 1) 8) (mkUnixelFraction (intToBoxInt 2) 3)
       phiGround = mkUnixelFraction (intToBoxInt 123) 1
       vMin = discreteHiggsPotential vac phiGround
-  in (unwrapBox (num vMin) == 0)
+  in boxIsZero (num vMin)
 
 ||| Computes the exact rational gauge boson mass squared m_W^2 = (1/4) * g^2 * v^2.
 public export

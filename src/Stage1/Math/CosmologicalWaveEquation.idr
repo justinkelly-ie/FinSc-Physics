@@ -59,7 +59,7 @@ auditDeWittSupermetricProof =
       g22Val = Stage0.BoxInt.intToBoxInt 1
       g12Val = Stage0.BoxInt.intToBoxInt 0
       scaledG1122 = scaledDeWittSupermetric g12Val g12Val g12Val g12Val g11Val g22Val
-  in Stage0.BoxInt.unwrapBox scaledG1122 == (-2)
+  in scaledG1122 == Stage0.BoxInt.intToBoxInt (-2)
 
 ||| Audits Zero Super-Hamiltonian Vanishing on Primorial 210 Ground State across QuadStream state bundles:
 ||| E_total = 4 * 27 + 2 * 128 + 2 * 55 = 108 + 256 + 110 = 474.
@@ -76,7 +76,7 @@ auditZeroWheelerDeWittConstraintProof =
       s = AddM (intToBoxInt 0) dCap ZeroM
       qs = MkQuadStream e h p s
       hTotal = discreteSuperHamiltonianQuadStream qs (Stage0.BoxInt.intToBoxInt 474)
-  in Stage0.BoxInt.unwrapBox hTotal == 0
+  in Stage0.BoxInt.boxIsZero hTotal
 
 ||| Audits Relational Cosmic Energy Conservation:
 ||| 108 (kinetic/matter) + 256 (potential/DE) + 110 (sink/DM) = 474 (invariant total).
@@ -207,7 +207,7 @@ leapfrogWaveStepTree mSq prev curr =
           pVal = lookupBoxTree x prev
           cVal = lookupBoxTree x curr
           nextVal = (lVal + rVal) - pVal - (mSq * cVal)
-      in if unwrapBox nextVal == 0
+      in if boxIsZero nextVal
            then acc
            else setBoxTree x nextVal acc
 

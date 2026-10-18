@@ -116,7 +116,7 @@ auditDensityMatrixBornRuleProof : Bool
 auditDensityMatrixBornRuleProof =
   let dm = fromPolynumber (MkPolynumber [intToBoxInt 1])
       p0 = bornRuleProjection dm 0
-  in case unwrapBox (num p0) == 1 of
+  in case num p0 == intToBoxInt 1 of
        True  => True
        False => False
 

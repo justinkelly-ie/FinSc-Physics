@@ -341,7 +341,7 @@ auditFusedDiscreteActionProof =
               MkCoord2D (Stage0.BoxInt.intToBoxInt 2) (Stage0.BoxInt.intToBoxInt 2)]
       a1 = discreteAction EllipticGeom path zeroPotential
       a2 = fusedDiscreteActionNat (length path) EllipticGeom path zeroPotential
-  in a1 == a2 && unwrapBox a2 == 4
+  in a1 == a2 && a2 == Stage0.BoxInt.intToBoxInt 4
 
 ------------------------------------------------------------------------
 -- 6. COMPILE-TIME NOETHER CONSERVATION WITNESSES & VERIFIED TRAJECTORIES
@@ -354,7 +354,7 @@ isMomentumConserved : Stage1.VexelMaxel.Maxel -> LatticeCoord2D -> LatticeCoord2
 isMomentumConserved m p0 p1 p2 =
   let m0 = discreteCanonicalMomentum m p0 p1
       m1 = discreteCanonicalMomentum m p1 p2
-  in (unwrapBox (posX m0) == unwrapBox (posX m1)) && (unwrapBox (posY m0) == unwrapBox (posY m1))
+  in (posX m0 == posX m1) && (posY m0 == posY m1)
 
 ||| Erased compile-time proof witness verifying Noether momentum conservation along a trajectory step.
 public export

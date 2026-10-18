@@ -62,7 +62,7 @@ genesisQuadStream =
 public export
 isValidGenesisPartition : GenesisState -> Bool
 isValidGenesisPartition (MkGenesisState vm de dm tot) =
-  Stage0.BoxInt.unwrapBox vm == 0 &&
+  Stage0.BoxInt.boxIsZero vm &&
   de == Stage1.FourGeometries.hyperbolicRomCapacity &&
   dm == Stage1.FourGeometries.darkMatterTriangularResidue &&
   (Stage1.FourGeometries.ellipticLatticeCapacity + de + dm == tot) &&
@@ -87,16 +87,11 @@ isValidQuadStreamGenesisPartition qs =
 public export
 freezeOutAntimatterAnnihilation : BaryonState -> BaryonState
 freezeOutAntimatterAnnihilation (MkBaryonState p n g) =
-  let pVal = Stage0.BoxInt.unwrapBox p
-      nVal = Stage0.BoxInt.unwrapBox n
-      gVal = Stage0.BoxInt.unwrapBox g
-      annihilatedPairs = if pVal >= nVal then nVal else pVal
-      survivingP = pVal - annihilatedPairs
-      survivingN = nVal - annihilatedPairs
-      newPhotons = gVal + 2 * annihilatedPairs
-  in MkBaryonState (Stage0.BoxInt.intToBoxInt survivingP) 
-                   (Stage0.BoxInt.intToBoxInt survivingN) 
-                   (Stage0.BoxInt.intToBoxInt newPhotons)
+  let annihilatedPairs = if p >= n then n else p
+      survivingP = p - annihilatedPairs
+      survivingN = n - annihilatedPairs
+      newPhotons = g + (Stage0.BoxInt.intToBoxInt 2 * annihilatedPairs)
+  in MkBaryonState survivingP survivingN newPhotons
 
 ------------------------------------------------------------------------
 -- 3. UNIDIRECTIONAL LANDAUER DISSIPATION & DARK MATTER LOGGING
@@ -131,7 +126,7 @@ auditCosmicGenesisRelicFreezeOutProof =
   let (diss, dm) = landauerFreezeOutStep 10 27 55
       initB = MkBaryonState (Stage0.BoxInt.intToBoxInt 10) (Stage0.BoxInt.intToBoxInt 3) (Stage0.BoxInt.intToBoxInt 100)
       finB = freezeOutAntimatterAnnihilation initB
-  in diss == 270 && dm == 325 && Stage0.BoxInt.unwrapBox (baryonPos finB) == 7
+  in diss == 270 && dm == 325 && baryonPos finB == Stage0.BoxInt.intToBoxInt 7
 
 ||| Multi-Epoch Cosmic Baryon Evolution: Traces Sakharov asymmetry generation through freeze-out.
 public export
@@ -142,9 +137,9 @@ evaluateCompositeBaryonEvolution =
       initState = MkBaryonState (Stage0.BoxInt.intToBoxInt 10) (Stage0.BoxInt.intToBoxInt 3) (Stage0.BoxInt.intToBoxInt 100)
       cpViol = satisfiesCPViolation initState
       frozenState = freezeOutAntimatterAnnihilation initState
-      netSurviving = Stage0.BoxInt.unwrapBox (baryonPos frozenState) - Stage0.BoxInt.unwrapBox (baryonNeg frozenState)
-      photonsProduced = Stage0.BoxInt.unwrapBox (photonTokens frozenState)
-  in bViol && outEq && cpViol && (netSurviving == 7) && (photonsProduced == 106)
+      netSurviving = baryonPos frozenState - baryonNeg frozenState
+      photonsProduced = photonTokens frozenState
+  in bViol && outEq && cpViol && (netSurviving == Stage0.BoxInt.intToBoxInt 7) && (photonsProduced == Stage0.BoxInt.intToBoxInt 106)
 
 --------------------------------------------------------------------------------
 -- 5. CATEGORY-THEORETIC HOM-TENSOR MULTISET ADJUNCTION (L ⊣ R)

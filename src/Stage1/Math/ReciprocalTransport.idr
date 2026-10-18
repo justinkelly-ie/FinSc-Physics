@@ -38,23 +38,16 @@ Eq TransportMatrix2x2 where
 public export
 isOnsagerReciprocal : TransportMatrix2x2 -> Bool
 isOnsagerReciprocal (MkTransportMatrix2x2 _ l12 l21 _) =
-  unwrapBox l12 == unwrapBox l21
+  l12 == l21
 
 ||| Computes discrete entropy production rate:
 ||| sigma = X_1 * (L_11 X_1 + L_12 X_2) + X_2 * (L_21 X_1 + L_22 X_2)
 public export
 entropyProductionRate : TransportMatrix2x2 -> (x1 : Stage0.BoxInt.BoxInt) -> (x2 : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 entropyProductionRate (MkTransportMatrix2x2 l11 l12 l21 l22) x1 x2 =
-  let v1 = unwrapBox x1
-      v2 = unwrapBox x2
-      k11 = unwrapBox l11
-      k12 = unwrapBox l12
-      k21 = unwrapBox l21
-      k22 = unwrapBox l22
-      j1 = k11 * v1 + k12 * v2
-      j2 = k21 * v1 + k22 * v2
-      prod = v1 * j1 + v2 * j2
-  in Stage0.BoxInt.intToBoxInt prod
+  let j1 = l11 * x1 + l12 * x2
+      j2 = l21 * x1 + l22 * x2
+  in x1 * j1 + x2 * j2
 
 ||| Evaluates entropy production rate across QuadStream transport payload.
 public export
@@ -81,8 +74,8 @@ auditReciprocalTransportProof =
       x2 = Stage0.BoxInt.intToBoxInt 1
       sigma = entropyProductionRate lMat x1 x2
   in isOnsagerReciprocal lMat &&
-     unwrapBox sigma == 51 &&
-     unwrapBox sigma >= 0
+     sigma == Stage0.BoxInt.intToBoxInt 51 &&
+     sigma >= Stage0.BoxInt.intToBoxInt 0
 
 ------------------------------------------------------------------------
 -- 3. CATEGORY-THEORETIC MULTISET ADJUNCTION

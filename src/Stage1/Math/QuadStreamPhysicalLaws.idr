@@ -205,10 +205,10 @@ auditDeforestedQuadStreamPipelineProof =
       s = stream [ (intToBoxInt 0, natToBoxInt Stage1.FourGeometries.darkMatterTriangularResidue) ]
       bundle = MkQuadStreamBundle e h p s
       ledger = evalFusedBundleLedger 10 (intToBoxInt 1) bundle
-  in unwrapBox (totalMass ledger) == 210 &&
-     unwrapBox (ellipticMass ledger) == 27 &&
-     unwrapBox (hyperbolicMass ledger) == 128 &&
-     unwrapBox (substrateMass ledger) == 55
+  in totalMass ledger == intToBoxInt 210 &&
+     ellipticMass ledger == intToBoxInt 27 &&
+     hyperbolicMass ledger == intToBoxInt 128 &&
+     substrateMass ledger == intToBoxInt 55
 
 
 ||| A composable physical law transducer operating on deforested channel streams.
@@ -287,12 +287,12 @@ auditPipelineQuadStreamLedgerProof =
                             ZeroM
                             (AddM (intToBoxInt 1) dCap ZeroM)
       ledger = pipelineQuadStreamLedger (intToBoxInt 2) testQs
-  in unwrapBox ledger.totalMass == unwrapBox bTot &&
-     unwrapBox ledger.ellipticMass == unwrapBox eCap &&
-     unwrapBox ledger.hyperbolicMass == unwrapBox hCap &&
-     unwrapBox ledger.substrateMass == unwrapBox dCap &&
-     unwrapBox ledger.helmholtzFreeEnergy == (-1320) &&
-     unwrapBox ledger.chernNumber == cast Stage1.FourGeometries.ellipticLatticeCapacity
+  in ledger.totalMass == bTot &&
+     ledger.ellipticMass == eCap &&
+     ledger.hyperbolicMass == hCap &&
+     ledger.substrateMass == dCap &&
+     ledger.helmholtzFreeEnergy == intToBoxInt (-1320) &&
+     ledger.chernNumber == natToBoxInt Stage1.FourGeometries.ellipticLatticeCapacity
 
 ||| Audit verifying associativity of composable physical law transducers.
 public export

@@ -40,8 +40,8 @@ Eq DiscreteEMCell where
 public export
 Show DiscreteEMCell where
   show (MkDiscreteEMCell e b s j) =
-    "EMCell(E^2=" ++ show (Stage0.BoxInt.unwrapBox e) ++ ", B^2=" ++ show (Stage0.BoxInt.unwrapBox b) ++ 
-    ", divS=" ++ show (Stage0.BoxInt.unwrapBox s) ++ ", J·E=" ++ show (Stage0.BoxInt.unwrapBox j) ++ ")"
+    "EMCell(E^2=" ++ show e ++ ", B^2=" ++ show b ++ 
+    ", divS=" ++ show s ++ ", J·E=" ++ show j ++ ")"
 
 ||| Total electromagnetic energy density u = E^2 + B^2.
 public export
@@ -100,8 +100,8 @@ auditLocalPoyntingBalanceProof =
       s = AddM (intToBoxInt 50) (intToBoxInt 1) ZeroM
       qs = MkQuadStream e h p s
       qsStepped = stepPoyntingEnergyQuadStream qs cell
-  in Stage0.BoxInt.unwrapBox u0 == 100 &&
-     Stage0.BoxInt.unwrapBox u1 == 80 &&
+  in u0 == Stage0.BoxInt.intToBoxInt 100 &&
+     u1 == Stage0.BoxInt.intToBoxInt 80 &&
      verifyLocalPoyntingBalance cell &&
      multisetSum (ellipticStream qsStepped) == intToBoxInt 80
 
@@ -114,7 +114,7 @@ auditVacuumPoyntingInvarianceProof =
   let cell = MkDiscreteEMCell (Stage0.BoxInt.intToBoxInt 64) (Stage0.BoxInt.intToBoxInt 64) (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 0)
       u0 = electromagneticEnergyDensity (MkDiscreteEMCell (Stage0.BoxInt.intToBoxInt 64) (Stage0.BoxInt.intToBoxInt 64) (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 0))
       u1 = stepPoyntingEnergy (MkDiscreteEMCell (Stage0.BoxInt.intToBoxInt 64) (Stage0.BoxInt.intToBoxInt 64) (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 0))
-  in u0 == u1 && Stage0.BoxInt.unwrapBox u0 == 128
+  in u0 == u1 && u0 == Stage0.BoxInt.intToBoxInt 128
 
 ||| Audits Toroidal Boundaryless Flux Closure (Global div S = 0):
 ||| Proves that on the discrete 3-torus, the sum of outgoing Poynting fluxes over opposite faces cancels:
@@ -124,7 +124,7 @@ auditToroidalPoyntingClosureProof : Bool
 auditToroidalPoyntingClosureProof =
   let fluxEast = Stage0.BoxInt.intToBoxInt 10
       fluxWest = Stage0.BoxInt.intToBoxInt (-10)
-  in Stage0.BoxInt.unwrapBox (fluxEast + fluxWest) == 0
+  in Stage0.BoxInt.boxIsZero (fluxEast + fluxWest)
 
 ------------------------------------------------------------------------
 -- 4. MOTIVIC GALOIS POYNTING LAW LIFTING

@@ -33,7 +33,7 @@ Eq MetricShearTT where
 public export
 Show MetricShearTT where
   show (MkMetricShearTT p c) =
-    "MetricShearTT(h_+=" ++ show (unwrapBox p) ++ ", h_x=" ++ show (unwrapBox c) ++ ")"
+    "MetricShearTT(h_+=" ++ show p ++ ", h_x=" ++ show c ++ ")"
 
 ||| Traceless invariant: Tr(h) = h_11 + h_22 = h_+ + (-h_+) == 0.
 public export
@@ -146,7 +146,7 @@ public export
 auditGravitationalWaveTracelessProof : Bool
 auditGravitationalWaveTracelessProof =
   let shear = MkMetricShearTT (Stage0.BoxInt.intToBoxInt 42) (Stage0.BoxInt.intToBoxInt 17)
-  in unwrapBox (traceMetricShear shear) == 0
+  in boxIsZero (traceMetricShear shear)
 
 ||| Audits Discrete d'Alembert Wave Propagation (c = 1 dispersion):
 ||| For resonant lattice mode with spatial laplacian = 100 and temporal curvature d2t = 100:
@@ -155,7 +155,7 @@ public export
 auditGravitationalWavePropagationProof : Bool
 auditGravitationalWavePropagationProof =
   let boxH = evalWaveOperator (Stage0.BoxInt.intToBoxInt 100) (Stage0.BoxInt.intToBoxInt 100)
-  in unwrapBox boxH == 0
+  in boxIsZero boxH
 
 ||| Audits Quadrupole Gravitational Energy Loss Non-Positivity:
 ||| For triple-dot quadrupole moment Q = 7:
@@ -164,5 +164,5 @@ public export
 auditQuadrupoleRadiationLossProof : Bool
 auditQuadrupoleRadiationLossProof =
   let loss = quadrupolePowerLoss (Stage0.BoxInt.intToBoxInt 7)
-  in unwrapBox loss == (-49) && unwrapBox loss <= 0
+  in loss == intToBoxInt (-49) && loss <= intToBoxInt 0
 

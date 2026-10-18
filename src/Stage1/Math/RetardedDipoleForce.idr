@@ -25,18 +25,16 @@ import Data.Nat
 public export
 discreteLondonPotential : (c6 : Stage0.BoxInt.BoxInt) -> (quadranceQ : Nat) -> Stage1.UnixelFraction.UnixelFraction
 discreteLondonPotential c6 q =
-  let c6Val = Stage0.BoxInt.unwrapBox c6
-      denom = if q == 0 then 1 else q * q * q
-  in Stage1.UnixelFraction.MkUnixelFraction (Stage0.BoxInt.intToBoxInt (- c6Val)) (Stage1.VexelMaxel.MkUnixel denom)
+  let denom = if q == 0 then 1 else q * q * q
+  in Stage1.UnixelFraction.MkUnixelFraction (- c6) (Stage1.VexelMaxel.MkUnixel denom)
 
 ||| Computes the long-range retarded Casimir-Polder potential:
 ||| V_CP(Q) = - C7 / Q^4 (in exact UnixelFraction units)
 public export
 discreteCasimirPolderPotential : (c7 : Stage0.BoxInt.BoxInt) -> (quadranceQ : Nat) -> Stage1.UnixelFraction.UnixelFraction
 discreteCasimirPolderPotential c7 q =
-  let c7Val = Stage0.BoxInt.unwrapBox c7
-      denom = if q == 0 then 1 else q * q * q * q
-  in Stage1.UnixelFraction.MkUnixelFraction (Stage0.BoxInt.intToBoxInt (- c7Val)) (Stage1.VexelMaxel.MkUnixel denom)
+  let denom = if q == 0 then 1 else q * q * q * q
+  in Stage1.UnixelFraction.MkUnixelFraction (- c7) (Stage1.VexelMaxel.MkUnixel denom)
 
 ||| Evaluates Casimir-Polder potential across QuadStream payload.
 public export
@@ -48,7 +46,7 @@ evaluateQuadStreamCasimirPolder c7 (MkQuadStream e h p s) =
 ||| Validates that both London and Casimir-Polder forces are strictly attractive (negative potential):
 public export
 isAttractiveDispersion : Stage1.UnixelFraction.UnixelFraction -> Bool
-isAttractiveDispersion (Stage1.UnixelFraction.MkUnixelFraction n _) = Stage0.BoxInt.unwrapBox n < 0
+isAttractiveDispersion (Stage1.UnixelFraction.MkUnixelFraction n _) = n < Stage0.BoxInt.intToBoxInt 0
 
 ------------------------------------------------------------------------
 -- 2. CONSTRUCTIVE FORMAL AUDIT PROOFS

@@ -58,7 +58,7 @@ public export
 auditQCDStringTensionProof : Bool
 auditQCDStringTensionProof =
   let v5 = linearQCDConfinementPotential (Stage0.BoxInt.intToBoxInt 10) 5
-  in unwrapBox v5 == 50 && verifyReggeLinearity 2 4
+  in v5 == intToBoxInt 50 && verifyReggeLinearity 2 4
 
 ------------------------------------------------------------------------
 -- 3. CATEGORY-THEORETIC MULTISET ADJUNCTION

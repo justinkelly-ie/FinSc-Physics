@@ -71,7 +71,7 @@ RGDecimator Plaquette2x2 MacroPlaquette where
   decimate (MkPlaquette2x2 a b c d) =
     MkMacroPlaquette (a + b + c + d)
   isScaleInvariant (MkPlaquette2x2 a b c d) (MkMacroPlaquette m) =
-    unwrapBox m == (unwrapBox a + unwrapBox b + unwrapBox c + unwrapBox d)
+    m == (a + b + c + d)
 
 ------------------------------------------------------------------------
 -- 3. SCALE-INVARIANT TOPOLOGICAL FIXED POINT PRESERVATION
@@ -160,7 +160,7 @@ auditRGDecimatorProof =
       vIn : Vect 4 Nat = [1, 1, 1, 1]
       vOut = applyRGMagicDecimation vIn
   in isScaleInvariant p macroP &&
-     Stage0.BoxInt.unwrapBox (totalFlux macroP) == 10 &&
+     totalFlux macroP == Stage0.BoxInt.intToBoxInt 10 &&
      vectSum vOut == 16
 
 ------------------------------------------------------------------------

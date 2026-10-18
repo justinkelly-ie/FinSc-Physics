@@ -35,8 +35,8 @@ Eq SuperconductingLoop where
 public export
 Show SuperconductingLoop where
   show (MkSuperconductingLoop q f w) =
-    "SuperconductingLoop(q=" ++ show (unwrapBox q) ++ ", Phi_0=" ++ show (unwrapBox f) ++ 
-    ", winding=" ++ show (unwrapBox w) ++ ")"
+    "SuperconductingLoop(q=" ++ show q ++ ", Phi_0=" ++ show f ++ 
+    ", winding=" ++ show w ++ ")"
 
 ||| Evaluates total trapped magnetic flux: Phi = n * Phi_0.
 public export
@@ -147,7 +147,7 @@ public export
 auditCooperPairFluxQuantumProof : Bool
 auditCooperPairFluxQuantumProof =
   let loop = MkSuperconductingLoop (Stage0.BoxInt.intToBoxInt 2) (Stage0.BoxInt.intToBoxInt 1) (Stage0.BoxInt.intToBoxInt 0)
-  in unwrapBox (cooperPairCharge loop) == 2
+  in cooperPairCharge loop == intToBoxInt 2
 
 ||| Audits Exact Integer Magnetic Flux Quantization (Phi = n * Phi_0):
 ||| For winding number n = 5 with flux quantum Phi_0 = 10:
@@ -157,7 +157,7 @@ auditFluxQuantizationIntegerStepsProof : Bool
 auditFluxQuantizationIntegerStepsProof =
   let loop = MkSuperconductingLoop (Stage0.BoxInt.intToBoxInt 2) (Stage0.BoxInt.intToBoxInt 10) (Stage0.BoxInt.intToBoxInt 5)
       flux = trappedMagneticFlux loop
-  in unwrapBox flux == 50
+  in flux == intToBoxInt 50
 
 ||| Audits Josephson Phase Periodicity & Modulo 2*pi Invariance:
 ||| Proves that an initial phase phi = 1 under voltage V = 3 and period 6 (representing 2*pi):
@@ -169,4 +169,4 @@ auditJosephsonPhaseSlipPeriodicityProof =
       v    = Stage0.BoxInt.intToBoxInt 3
       period = Stage0.BoxInt.intToBoxInt 6
       phi1 = stepJosephsonPhase phi0 v period
-  in unwrapBox phi1 == 1 && phi1 == phi0
+  in phi1 == intToBoxInt 1 && phi1 == phi0

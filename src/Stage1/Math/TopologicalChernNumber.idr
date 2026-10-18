@@ -41,7 +41,7 @@ computeChernNumber (p :: ps) =
 public export
 computeBerryCurvatureStream : FusedStream TorusPlaquette -> FusedStream BoxInt
 computeBerryCurvatureStream plaquettes =
-  mapStream (\p => divBox (berryFluxNumerator p) (if unwrapBox (berryFluxDenominator p) == 0 then intToBoxInt 1 else berryFluxDenominator p)) plaquettes
+  mapStream (\p => divBox (berryFluxNumerator p) (if boxIsZero (berryFluxDenominator p) then intToBoxInt 1 else berryFluxDenominator p)) plaquettes
 
 ||| Computes the discrete First Chern Number by streamifying Berry connection curvature sum extractions with parameterized fuel.
 public export
@@ -118,7 +118,7 @@ auditChernNumberIntegerQuantizationProof =
   let totalNum = foldl addBox (intToBoxInt 0) (map berryFluxNumerator canonicalChernInsulatorTorus)
       denom = intToBoxInt 4
       c1 = divBox totalNum denom
-  in unwrapBox totalNum == 4 && unwrapBox c1 == 1
+  in totalNum == intToBoxInt 4 && c1 == intToBoxInt 1
 
 ||| Audits the Topological Hall Conductance Invariant:
 ||| Proves that σ_{xy} = 1 for the Chern insulator and σ_{xy} = 0 for the trivial insulator,
@@ -128,7 +128,7 @@ auditTopologicalHallConductanceProof : Bool
 auditTopologicalHallConductanceProof =
   let sigmaChern = quantizedHallConductance (intToBoxInt 1)
       sigmaTrivial = quantizedHallConductance (intToBoxInt 0)
-  in unwrapBox sigmaChern == 1 && unwrapBox sigmaTrivial == 0
+  in sigmaChern == intToBoxInt 1 && boxIsZero sigmaTrivial
 
 ------------------------------------------------------------------------
 -- 4. CATEGORY-THEORETIC MULTISET ADJUNCTION

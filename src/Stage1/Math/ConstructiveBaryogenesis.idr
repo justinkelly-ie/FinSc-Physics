@@ -37,8 +37,8 @@ Eq BaryonState where
 public export
 Show BaryonState where
   show (MkBaryonState p n g) =
-    "BaryonState(B+=" ++ show (Stage0.BoxInt.unwrapBox p) ++ ", B-=" ++ show (Stage0.BoxInt.unwrapBox n) ++ 
-    ", N_gamma=" ++ show (Stage0.BoxInt.unwrapBox g) ++ ")"
+    "BaryonState(B+=" ++ show p ++ ", B-=" ++ show n ++ 
+    ", N_gamma=" ++ show g ++ ")"
 
 ||| Evaluates net baryon number: B_net = B+ - B-.
 public export
@@ -72,13 +72,13 @@ satisfiesBaryonViolation b0 b1 = b1 /= b0
 ||| Evaluates Sakharov Condition 2 (C and CP Violation): Matter > Antimatter seed asymmetry.
 public export
 satisfiesCPViolation : BaryonState -> Bool
-satisfiesCPViolation (MkBaryonState p n _) = Stage0.BoxInt.unwrapBox p > Stage0.BoxInt.unwrapBox n
+satisfiesCPViolation (MkBaryonState p n _) = p > n
 
 ||| Evaluates Sakharov Condition 3 (Out of Thermal Equilibrium):
 ||| Guaranteed by Substrate causal arrow non-zero expansion step.
 public export
 satisfiesOutOfEquilibrium : (causalArrowG22 : Stage0.BoxInt.BoxInt) -> Bool
-satisfiesOutOfEquilibrium g22 = Stage0.BoxInt.unwrapBox g22 == 0
+satisfiesOutOfEquilibrium g22 = Stage0.BoxInt.boxIsZero g22
 
 ------------------------------------------------------------------------
 -- 3. CONSTRUCTIVE FORMAL AUDIT PROOFS

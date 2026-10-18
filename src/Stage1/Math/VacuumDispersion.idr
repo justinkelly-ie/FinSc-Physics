@@ -65,10 +65,11 @@ auditCasimirAttractiveForceProof : Bool
 auditCasimirAttractiveForceProof =
   let f4 = discreteCasimirForce 4
       f3 = discreteCasimirForce 3
-  in unwrapBox f4 == (-4) &&
-     unwrapBox f3 == (-3) &&
-     unwrapBox f4 < 0 &&
-     unwrapBox f3 < 0
+      zero = intToBoxInt 0
+  in f4 == intToBoxInt (-4) &&
+     f3 == intToBoxInt (-3) &&
+     f4 < zero &&
+     f3 < zero
 
 ||| Audits Discrete Vacuum Mode Confinement:
 ||| Proves that mode capacity strictly decreases with plate contraction:

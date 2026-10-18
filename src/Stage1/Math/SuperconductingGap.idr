@@ -51,7 +51,7 @@ computeBCSGap : (debye : BoxInt) -> (coupling : BoxInt) -> (dos : BoxInt) -> Box
 computeBCSGap debye coupling dos =
   let g = coupling * dos
       denom = g + intToBoxInt 10
-  in if unwrapBox denom > 0
+  in if denom > intToBoxInt 0
         then (intToBoxInt 2 * debye * g) `div` denom
         else intToBoxInt 0
 
@@ -94,7 +94,7 @@ auditSuperconductingGapProof =
   let bcs = synthesizeBCSState (intToBoxInt 100) (intToBoxInt 2) (intToBoxInt 5)
       tGap = energyGap bcs == intToBoxInt 100
       tCond = condensationEnergy bcs == intToBoxInt (-25000)
-      tThermodynamic = unwrapBox (condensationEnergy bcs) < 0
+      tThermodynamic = condensationEnergy bcs < intToBoxInt 0
   in tGap && tCond && tThermodynamic
 
 --------------------------------------------------------------------------------

@@ -21,7 +21,7 @@ import Data.List
 %inline
 public export
 ionizationFraction : BoxInt -> BoxInt -> UnixelFraction
-ionizationFraction nFree nTotal = MkUnixelFraction nFree (MkUnixel (cast (unwrapBox nTotal)))
+ionizationFraction nFree nTotal = MkUnixelFraction nFree (MkUnixel (boxIntToPositiveNat nTotal))
 
 ||| Evaluates ionization fraction from QuadStream payload.
 public export

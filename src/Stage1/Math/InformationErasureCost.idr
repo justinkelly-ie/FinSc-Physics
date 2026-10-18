@@ -35,7 +35,7 @@ Eq BitMemoryState where
 public export
 Show BitMemoryState where
   show (MkBitMemoryState b e s) =
-    "BitMemory(bits=" ++ show b ++ ", E_active=" ++ show (Stage0.BoxInt.unwrapBox e) ++ ", E_sink=" ++ show (Stage0.BoxInt.unwrapBox s) ++ ")"
+    "BitMemory(bits=" ++ show b ++ ", E_active=" ++ show e ++ ", E_sink=" ++ show s ++ ")"
 
 ||| Evaluates the total energy across the active computational register and the parabolic sink.
 public export
@@ -82,8 +82,8 @@ auditLandauerDissipationBoundProof =
       after = eraseBitAndDissipate 4 2 init
       deltaSink = sinkEnergy after - sinkEnergy init
       deltaE = activeEnergy init - activeEnergy after
-  in Stage0.BoxInt.unwrapBox deltaSink == 8 &&
-     Stage0.BoxInt.unwrapBox deltaE == 8 &&
+  in deltaSink == Stage0.BoxInt.intToBoxInt 8 &&
+     deltaE == Stage0.BoxInt.intToBoxInt 8 &&
      activeBits after == 4
 
 ||| Audits Exact QTT Total Energy Conservation during bit erasure:
@@ -103,8 +103,9 @@ auditParabolicSinkMonotonicityProof : Bool
 auditParabolicSinkMonotonicityProof =
   let init = MkBitMemoryState 5 (Stage0.BoxInt.intToBoxInt 50) (Stage0.BoxInt.intToBoxInt 10)
       after = eraseBitAndDissipate 3 1 init
-      deltaSink = Stage0.BoxInt.unwrapBox (sinkEnergy after - sinkEnergy init)
-  in deltaSink >= 0 && deltaSink == 3
+      deltaSink = sinkEnergy after - sinkEnergy init
+      zero = Stage0.BoxInt.intToBoxInt 0
+  in deltaSink >= zero && deltaSink == Stage0.BoxInt.intToBoxInt 3
 
 ------------------------------------------------------------------------
 -- 4. CATEGORY-THEORETIC MULTISET ADJUNCTION

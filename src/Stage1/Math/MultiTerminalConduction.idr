@@ -46,13 +46,16 @@ isBuettikerReciprocal (MkConductanceMatrix3x3 g12 g13 g21 g23 g31 g32) =
 public export
 terminalCurrents : ConductanceMatrix3x3 -> (v1 : Stage0.BoxInt.BoxInt) -> (v2 : Stage0.BoxInt.BoxInt) -> (v3 : Stage0.BoxInt.BoxInt) -> (Stage0.BoxInt.BoxInt, Stage0.BoxInt.BoxInt, Stage0.BoxInt.BoxInt)
 terminalCurrents (MkConductanceMatrix3x3 g12 g13 g21 g23 g31 g32) v1 v2 v3 =
-  let u1 = unwrapBox v1
-      u2 = unwrapBox v2
-      u3 = unwrapBox v3
-      i1 = (cast g12) * (u1 - u2) + (cast g13) * (u1 - u3)
-      i2 = (cast g21) * (u2 - u1) + (cast g23) * (u2 - u3)
-      i3 = (cast g31) * (u3 - u1) + (cast g32) * (u3 - u2)
-  in (Stage0.BoxInt.intToBoxInt i1, Stage0.BoxInt.intToBoxInt i2, Stage0.BoxInt.intToBoxInt i3)
+  let g12B = Stage0.BoxInt.natToBoxInt g12
+      g13B = Stage0.BoxInt.natToBoxInt g13
+      g21B = Stage0.BoxInt.natToBoxInt g21
+      g23B = Stage0.BoxInt.natToBoxInt g23
+      g31B = Stage0.BoxInt.natToBoxInt g31
+      g32B = Stage0.BoxInt.natToBoxInt g32
+      i1 = g12B * (v1 - v2) + g13B * (v1 - v3)
+      i2 = g21B * (v2 - v1) + g23B * (v2 - v3)
+      i3 = g31B * (v3 - v1) + g32B * (v3 - v2)
+  in (i1, i2, i3)
 
 ||| Evaluates 3-terminal currents across QuadStream voltage payloads.
 public export
@@ -64,7 +67,7 @@ evaluateQuadStreamTerminalCurrents gMat (MkQuadStream e h p s) =
 public export
 isKirchhoffConserved : (Stage0.BoxInt.BoxInt, Stage0.BoxInt.BoxInt, Stage0.BoxInt.BoxInt) -> Bool
 isKirchhoffConserved (i1, i2, i3) =
-  unwrapBox i1 + unwrapBox i2 + unwrapBox i3 == 0
+  boxIsZero (i1 + i2 + i3)
 
 ------------------------------------------------------------------------
 -- 2. CONSTRUCTIVE FORMAL AUDIT PROOFS
@@ -88,9 +91,9 @@ auditMultiTerminalConductionProof =
       currs = terminalCurrents gMat v1 v2 v3
       (i1, i2, i3) = currs
   in isBuettikerReciprocal gMat &&
-     unwrapBox i1 == 18 &&
-     unwrapBox i2 == -1 &&
-     unwrapBox i3 == -17 &&
+     i1 == Stage0.BoxInt.intToBoxInt 18 &&
+     i2 == Stage0.BoxInt.intToBoxInt (-1) &&
+     i3 == Stage0.BoxInt.intToBoxInt (-17) &&
      isKirchhoffConserved currs
 
 ------------------------------------------------------------------------

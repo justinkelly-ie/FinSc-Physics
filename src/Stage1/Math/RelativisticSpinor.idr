@@ -149,9 +149,9 @@ auditRelativisticSpinorProof =
   let sp = MkDiracSpinor4 (Stage1.VexelMaxel.MkPixel 3 0) (Stage1.VexelMaxel.MkPixel 4 0) (Stage1.VexelMaxel.MkPixel 0 0) (Stage1.VexelMaxel.MkPixel 0 0)
       j0 = spinorProbabilityDensity sp
       ch = decomposeChiral (Stage0.BoxInt.intToBoxInt 10) (Stage0.BoxInt.intToBoxInt 1)
-  in Stage0.BoxInt.unwrapBox j0 == 25 &&
-     Stage0.BoxInt.unwrapBox (leftHanded ch) == 0 &&
-     Stage0.BoxInt.unwrapBox (rightHanded ch) == 10
+  in j0 == Stage0.BoxInt.intToBoxInt 25 &&
+     Stage0.BoxInt.boxIsZero (leftHanded ch) &&
+     rightHanded ch == Stage0.BoxInt.intToBoxInt 10
 
 ------------------------------------------------------------------------
 -- 4. CATEGORY-THEORETIC MULTISET ADJUNCTION
@@ -232,8 +232,8 @@ auditSpinorDensityPositivityProof =
       sp = MkDiracSpinor4 p p p p
       dDirect = spinorProbabilityDensity sp
       dStream = spinorProbabilityDensityStream sp
-  in Stage0.BoxInt.unwrapBox dDirect == 4 &&
-     Stage0.BoxInt.unwrapBox dStream == 4
+  in dDirect == Stage0.BoxInt.intToBoxInt 4 &&
+     dStream == Stage0.BoxInt.intToBoxInt 4
 
 ------------------------------------------------------------------------
 -- 6. DYNAMIC SPREAD COMPANION BOOST & COORDINATE PERSISTENCE
@@ -316,10 +316,9 @@ toDiracSpinor4 (MkDiracSpinor [p0, p1] [p2, p3]) =
   where
     toPixel : BoxInt -> Stage1.VexelMaxel.Pixel
     toPixel b =
-      let v = unwrapBox b
-      in if v >= 0
-           then Stage1.VexelMaxel.MkPixel (integerToNat v) 0
-           else Stage1.VexelMaxel.MkPixel 0 (integerToNat (-v))
+      if b >= intToBoxInt 0
+        then Stage1.VexelMaxel.MkPixel (boxToNat b) 0
+        else Stage1.VexelMaxel.MkPixel 0 (boxToNat (- b))
 
 ||| Applies a 2x2 Dihedron matrix action on a 2-component vector:
 ||| [v0', v1']^T = [[d00, d01], [d10, d11]] * [v0, v1]^T.

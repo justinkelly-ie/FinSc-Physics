@@ -24,9 +24,8 @@ import Data.Nat
 public export
 discreteQuantumPotential : (laplacianR : Stage0.BoxInt.BoxInt) -> (amplitudeR : Nat) -> Stage1.UnixelFraction.UnixelFraction
 discreteQuantumPotential lapR r =
-  let lapVal = Stage0.BoxInt.unwrapBox lapR
-      denom = if r == 0 then 1 else 2 * r
-  in Stage1.UnixelFraction.MkUnixelFraction (Stage0.BoxInt.intToBoxInt (- lapVal)) (Stage1.VexelMaxel.MkUnixel denom)
+  let denom = if r == 0 then 1 else 2 * r
+  in Stage1.UnixelFraction.MkUnixelFraction (- lapR) (Stage1.VexelMaxel.MkUnixel denom)
 
 ||| Evaluates discrete Bohmian quantum potential across QuadStream payload.
 public export
@@ -39,11 +38,7 @@ evaluateQuadStreamBohmianPotential lapR (MkQuadStream e h p s) =
 ||| E_total = E_kin + V_classical + Q_quantum
 public export
 bohmianTotalEnergy : (kin : Stage0.BoxInt.BoxInt) -> (vClassical : Stage0.BoxInt.BoxInt) -> (qQuantum : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
-bohmianTotalEnergy k v q =
-  let kVal = Stage0.BoxInt.unwrapBox k
-      vVal = Stage0.BoxInt.unwrapBox v
-      qVal = Stage0.BoxInt.unwrapBox q
-  in Stage0.BoxInt.intToBoxInt (kVal + vVal + qVal)
+bohmianTotalEnergy k v q = k + v + q
 
 ------------------------------------------------------------------------
 -- 2. CATEGORY-THEORETIC HOM-TENSOR MULTISET ADJUNCTION (L ⊣ R)

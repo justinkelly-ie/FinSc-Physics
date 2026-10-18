@@ -65,7 +65,7 @@ public export
 auditDiscreteSecondLawProof : Bool
 auditDiscreteSecondLawProof =
   let wDiss = computeDissipatedWork (Stage0.BoxInt.intToBoxInt 100) (Stage0.BoxInt.intToBoxInt 75)
-  in Stage0.BoxInt.unwrapBox wDiss == 25 && Stage0.BoxInt.unwrapBox wDiss >= 0
+  in wDiss == Stage0.BoxInt.intToBoxInt 25 && wDiss >= Stage0.BoxInt.intToBoxInt 0
 
 ||| Audits Discrete Jarzynski Normalization Identity:
 ||| For normalized trajectory weights summing to 100, the Jarzynski sum yields exactly 100 / 100 = 1.
@@ -81,7 +81,7 @@ public export
 auditFluctuationDissipationProof : Bool
 auditFluctuationDissipationProof =
   let wDiss = fluctuationDissipationWork (Stage0.BoxInt.intToBoxInt 2) (Stage0.BoxInt.intToBoxInt 50)
-  in Stage0.BoxInt.unwrapBox wDiss == 50
+  in wDiss == Stage0.BoxInt.intToBoxInt 50
 
 ------------------------------------------------------------------------
 -- 3. CATEGORY-THEORETIC MULTISET ADJUNCTION

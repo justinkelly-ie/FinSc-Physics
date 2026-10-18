@@ -156,7 +156,7 @@ public export
 auditGaugeCovariantDerivativeProof : Bool
 auditGaugeCovariantDerivativeProof =
   let res = gaugeCovariantStep (Stage0.BoxInt.intToBoxInt 10) (Stage0.BoxInt.intToBoxInt 1) (Stage0.BoxInt.intToBoxInt 2) (Stage0.BoxInt.intToBoxInt 3)
-  in unwrapBox res == 4
+  in res == intToBoxInt 4
 
 ||| Audits Gauge-Coupled Dirac Current Positivity (j^0 >= 0):
 ||| For psi = ((1,0), (2,0), (2,0), (0,0)), q = 1, A = (0, 1, 0, 0):
@@ -167,7 +167,7 @@ auditGaugeCoupledCurrentPositivityProof =
   let psi = MkDiracSpinor4 (MkPixel 1 0) (MkPixel 2 0) (MkPixel 2 0) (MkPixel 0 0)
       coupled = MkGaugeCoupledSpinor psi (Stage0.BoxInt.intToBoxInt 1) (Stage0.BoxInt.intToBoxInt 0, Stage0.BoxInt.intToBoxInt 1, Stage0.BoxInt.intToBoxInt 0, Stage0.BoxInt.intToBoxInt 0)
       j0 = coupledDiracDensity coupled
-  in unwrapBox j0 == 9 && unwrapBox j0 >= 0
+  in j0 == intToBoxInt 9 && j0 >= intToBoxInt 0
 
 ||| Audits Metric Shear Coupling Tracelessness & Interaction Energy:
 ||| For pure cross shear (hPlus = 0, hCross = 2) with currents j1 = 3, j2 = 2:
@@ -177,4 +177,4 @@ auditMetricShearSpinorInteractionProof : Bool
 auditMetricShearSpinorInteractionProof =
   let shear = MkMetricShearTT (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 2)
       eInt = metricShearSpinorInteraction shear (Stage0.BoxInt.intToBoxInt 3) (Stage0.BoxInt.intToBoxInt 2)
-  in unwrapBox eInt == 24
+  in eInt == intToBoxInt 24

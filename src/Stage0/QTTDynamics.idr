@@ -39,8 +39,8 @@ Eq PhaseState where
 public export
 Show PhaseState where
   show (MkPhaseState (MkCoord2D px py) (MkCoord2D mx my)) =
-    "PhaseState(pos=(" ++ show (unwrapBox px) ++ ", " ++ show (unwrapBox py) ++
-    "), mom=(" ++ show (unwrapBox mx) ++ ", " ++ show (unwrapBox my) ++ "))"
+    "PhaseState(pos=(" ++ show px ++ ", " ++ show py ++
+    "), mom=(" ++ show mx ++ ", " ++ show my ++ "))"
 
 ||| Unrestricted observable emitted at each symplectic integration step.
 public export
@@ -59,8 +59,8 @@ Eq TrajectoryObservable where
 public export
 Show TrajectoryObservable where
   show (MkTrajectoryObs idx (MkCoord2D px py) (MkCoord2D mx my) e) =
-    "Obs[" ++ show idx ++ "](x=(" ++ show (unwrapBox px) ++ ", " ++ show (unwrapBox py) ++
-    "), p=(" ++ show (unwrapBox mx) ++ ", " ++ show (unwrapBox my) ++ "), E=" ++ show (unwrapBox e) ++ ")"
+    "Obs[" ++ show idx ++ "](x=(" ++ show px ++ ", " ++ show py ++
+    "), p=(" ++ show mx ++ ", " ++ show my ++ "), E=" ++ show e ++ ")"
 
 ||| Discrete total energy: E = T(p) + V(x) = (px^2 + py^2) + V(x).
 public export

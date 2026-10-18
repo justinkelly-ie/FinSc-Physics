@@ -19,7 +19,7 @@ import Data.List
 %inline
 public export
 boxZero : Stage0.BoxInt.BoxInt -> Bool
-boxZero b = Stage0.BoxInt.unwrapBox b == 0
+boxZero b = Stage0.BoxInt.boxIsZero b
 
 ||| Evaluates Kepler's 3rd Law ratio in discrete integer quadrance tokens:
 ||| T^2 = a^3  ==> T^2 - a^3 = 0.

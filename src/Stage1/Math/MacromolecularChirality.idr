@@ -136,5 +136,5 @@ auditLaw49MacromolecularChiralityProof : Bool
 auditLaw49MacromolecularChiralityProof =
   (invertChirality (invertChirality LHand) == LHand) &&
   isHomochiralChain [LHand, LHand, LHand] &&
-  (unwrapBox (condensePeptideBond (intToBoxInt 100) (intToBoxInt 100)) == 182)
+  (condensePeptideBond (intToBoxInt 100) (intToBoxInt 100) == intToBoxInt 182)
 

@@ -28,7 +28,7 @@ chiralDiracIndex nL nR =
 public export
 evaluateDiscreteInstantonCharge : (plaquetteCrossSum : BoxInt) -> (divisor : BoxInt) -> BoxInt
 evaluateDiscreteInstantonCharge sumVal divVal =
-  if unwrapBox divVal == 0 then intToBoxInt 0 else divBox sumVal divVal
+  if boxIsZero divVal then intToBoxInt 0 else divBox sumVal divVal
 
 ||| Computes the discrete axial current divergence (Chiral Anomaly equation):
 ||| ∇ · j_5 = 2 * m * j_5 + 2 * Q_top.
@@ -63,7 +63,7 @@ public export
 auditChiralZeroModeIndexProof : Bool
 auditChiralZeroModeIndexProof =
   let idx = chiralDiracIndex 3 1
-  in unwrapBox idx == 2
+  in idx == intToBoxInt 2
 
 ||| Audits Discrete Second Chern Instanton Charge Quantization:
 ||| For discrete plaquette wedge product sum = 16 and normalization divisor = 8:
@@ -72,7 +72,7 @@ public export
 auditDiscreteSecondChernInstantonProof : Bool
 auditDiscreteSecondChernInstantonProof =
   let qTop = evaluateDiscreteInstantonCharge (intToBoxInt 16) (intToBoxInt 8)
-  in unwrapBox qTop == 2
+  in qTop == intToBoxInt 2
 
 ||| Audits Atiyah-Singer Index Theorem Equivalence:
 ||| Proves that the analytic chiral index Index(D) = 3 - 1 = 2 

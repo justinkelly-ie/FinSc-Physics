@@ -154,6 +154,4 @@ auditNeutrinoOscillationProof : Bool
 auditNeutrinoOscillationProof =
   let initBeam = pureElectronNeutrinoBeam
       step1    = stepNeutrinoOscillation initBeam
-      peNum    = unwrapBox (num (probNuE step1))
-      pmuNum   = unwrapBox (num (probNuMu step1))
-  in (peNum == 1) && (pmuNum == 8)
+  in (num (probNuE step1) == intToBoxInt 1) && (num (probNuMu step1) == intToBoxInt 8)

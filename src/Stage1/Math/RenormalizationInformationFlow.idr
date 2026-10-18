@@ -23,11 +23,10 @@ import Data.List
 public export
 discreteBetaStep : (coupling : Stage1.UnixelFraction.UnixelFraction) -> (dragNat : Nat) -> Stage1.UnixelFraction.UnixelFraction
 discreteBetaStep (Stage1.UnixelFraction.MkUnixelFraction numVal (Stage1.VexelMaxel.MkUnixel denVal)) drag =
-  let numInt = Stage0.BoxInt.unwrapBox numVal
-      dragInt = natToInteger drag
-      newNum = - (numInt * dragInt)
+  let dragBox = Stage0.BoxInt.natToBoxInt drag
+      newNum = - (numVal * dragBox)
       newDen = denVal * (1 + drag)
-  in Stage1.UnixelFraction.MkUnixelFraction (Stage0.BoxInt.intToBoxInt newNum) (Stage1.VexelMaxel.MkUnixel (if newDen == 0 then 1 else newDen))
+  in Stage1.UnixelFraction.MkUnixelFraction newNum (Stage1.VexelMaxel.MkUnixel (if newDen == 0 then 1 else newDen))
 
 ------------------------------------------------------------------------
 -- 2. DISCRETE FISHER INFORMATION METRIC ON PROBABILITY SIMPLICES
@@ -78,9 +77,9 @@ auditRenormalizationInformationFlowProof =
       (Stage1.UnixelFraction.MkUnixelFraction numDg _) = discreteBetaStep g0 1
       (Stage1.UnixelFraction.MkUnixelFraction numFish _) = discreteFisherQuadrance 10 6
       cCoarse = decimateBerryCurvature [Stage0.BoxInt.intToBoxInt 1, Stage0.BoxInt.intToBoxInt 0, Stage0.BoxInt.intToBoxInt 0, Stage0.BoxInt.intToBoxInt 0]
-  in Stage0.BoxInt.unwrapBox cCoarse == 1 &&
-     Stage0.BoxInt.unwrapBox numDg == (-1) &&
-     Stage0.BoxInt.unwrapBox numFish == 16
+  in cCoarse == Stage0.BoxInt.intToBoxInt 1 &&
+     numDg == Stage0.BoxInt.intToBoxInt (-1) &&
+     numFish == Stage0.BoxInt.intToBoxInt 16
 
 ------------------------------------------------------------------------
 -- 5. CATEGORY-THEORETIC MULTISET ADJUNCTION

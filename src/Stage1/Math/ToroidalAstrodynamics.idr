@@ -93,7 +93,7 @@ discreteGravitationalForce g drag epsSq (MkMassToken m1 p1 _) (MkMassToken m2 p2
   let (dx, dy, dz) = toroidalDisplacement p1 p2
       qVal = toroidalQuadrance p1 p2
       denom = (qVal + epsSq) * (Stage0.BoxInt.intToBoxInt 1 + drag)
-      denVal = if unwrapBox denom == 0 then Stage0.BoxInt.intToBoxInt 1 else denom
+      denVal = if Stage0.BoxInt.boxIsZero denom then Stage0.BoxInt.intToBoxInt 1 else denom
       fFactor = (g * m1 * m2) `div` denVal
   in (fFactor * dx, fFactor * dy, fFactor * dz)
 
@@ -112,7 +112,7 @@ auditToroidalPeriodicityProof =
   let p1 = MkToroidalPos (Stage0.BoxInt.intToBoxInt 1) (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 10)
       p2 = MkToroidalPos (Stage0.BoxInt.intToBoxInt 9) (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 10)
       q = toroidalQuadrance p1 p2
-  in unwrapBox q == 4
+  in q == intToBoxInt 4
 
 ||| Audits Center-of-Mass Momentum Conservation under Mutual Pairwise Force:
 ||| For two bodies, F_12 + F_21 = 0 on T^3.
@@ -142,7 +142,7 @@ auditRelativisticPrecessionProof =
       sun   = MkMassToken (Stage0.BoxInt.intToBoxInt 100) pCentral (Stage0.BoxInt.intToBoxInt 0, Stage0.BoxInt.intToBoxInt 0, Stage0.BoxInt.intToBoxInt 0)
       planet = MkMassToken (Stage0.BoxInt.intToBoxInt 1) pOrbit (Stage0.BoxInt.intToBoxInt 0, Stage0.BoxInt.intToBoxInt 10, Stage0.BoxInt.intToBoxInt 0)
       (fx, _, _) = discreteGravitationalForce g drag epsSq planet sun
-  in unwrapBox fx /= 0 && unwrapBox fx > 0
+  in boxIsNonZero fx && fx > intToBoxInt 0
 
 ------------------------------------------------------------------------
 -- 4. RATIONAL KEPLER LAWS & ORBITAL SPREAD (CH. 16, 21, 29)
@@ -194,7 +194,7 @@ auditToroidalAstrodynamicsProof : Bool
 auditToroidalAstrodynamicsProof =
   let orb = MkRationalOrbit (Stage0.BoxInt.intToBoxInt 4) (Stage0.BoxInt.intToBoxInt 16) (Stage0.BoxInt.intToBoxInt 8)
       ratio = keplerHarmonicRatio orb
-  in Stage0.BoxInt.unwrapBox ratio == 64
+  in ratio == Stage0.BoxInt.intToBoxInt 64
 
 ------------------------------------------------------------------------
 -- 5. DEFORESTED SYMPLECTIC ASTRODYNAMICS STREAMS
