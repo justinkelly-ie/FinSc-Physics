@@ -9,6 +9,8 @@ import Data.Fuel
 import Data.List
 import Language.Reflection
 import public Stage1.TypeTheory.Staging
+import Stage1.VexelMaxel
+import Data.Vect
 
 %default total
 
@@ -172,3 +174,70 @@ public export
 0 prfSymplecticAreaPreservation :
   subBox (mulBox (intToBoxInt 1) (intToBoxInt 1)) (mulBox (intToBoxInt 0) (intToBoxInt 0)) = intToBoxInt 1
 prfSymplecticAreaPreservation = Refl
+
+--------------------------------------------------------------------------------
+-- 6. 2LTT STAGED SYMPLECTIC EVOLUTION (MaxelN 2 & VexelN 2)
+--------------------------------------------------------------------------------
+
+||| Constructs a harmonic oscillator discrete symplectic transfer Maxel:
+||| M = [[1, dt], [-k*dt, 1 - k*dt^2]].
+public export
+harmonicSymplecticTransferMaxel : (dt : BoxInt) -> (kSpring : BoxInt) -> MaxelN 2
+harmonicSymplecticTransferMaxel dt kSpring =
+  let m00 = intToBoxInt 1
+      m01 = dt
+      m10 = negate (kSpring * dt)
+      m11 = intToBoxInt 1 - (kSpring * dt * dt)
+  in mkMaxel2 m00 m01 m10 m11
+
+||| Free particle linear drift transfer Maxel: [[1, dt], [0, 1]].
+public export
+freeDriftTransferMaxel : (dt : BoxInt) -> MaxelN 2
+freeDriftTransferMaxel dt = mkMaxel2 (intToBoxInt 1) dt (intToBoxInt 0) (intToBoxInt 1)
+
+||| Deforested 2LTT staged symplectic state step:
+||| Contracts a staged transfer Maxel with a phase space Vexel [x, p].
+public export
+stagedSymplecticStep : Lift (MaxelN 2) -> VexelN 2 -> Code (VexelN 2)
+stagedSymplecticStep = stagedMaxelNVec
+
+||| Deforested 2LTT staged symplectic multi-step evolution:
+||| Evaluates M^steps in O(log steps) squarings and contracts with [x0, p0].
+public export
+stagedSymplecticEvolution : (fuel : Nat) -> Lift (MaxelN 2) -> (steps : Nat) -> VexelN 2 -> Code (VexelN 2)
+stagedSymplecticEvolution fuel qTransfer steps v0 =
+  let qPow = stagedMaxelNPower fuel qTransfer steps
+  in quote (splice (stagedMaxelNVec qPow v0))
+
+||| Linearly consumable staged symplectic transition pairing state with observable:
+public export
+stagedSymplecticTransition :
+  (1 state : PhaseState) ->
+  (dt : BoxInt) ->
+  LinearStatePair PhaseState TrajectoryObservable
+stagedSymplecticTransition (MkPhaseState (MkCoord2D x y) (MkCoord2D px py)) dt =
+  let transferM = freeDriftTransferMaxel dt
+      vX = mkVexel2 x px
+      vY = mkVexel2 y py
+      vX' = splice (stagedSymplecticStep (quote transferM) vX)
+      vY' = splice (stagedSymplecticStep (quote transferM) vY)
+      x' = Vect.index 0 (components vX')
+      px' = Vect.index 1 (components vX')
+      y' = Vect.index 0 (components vY')
+      py' = Vect.index 1 (components vY')
+      pos' = MkCoord2D x' y'
+      mom' = MkCoord2D px' py'
+      newState = MkPhaseState pos' mom'
+      obs = MkTrajectoryObs 0 pos' mom' (phaseEnergy newState zeroPotential)
+  in MkLStatePair newState obs
+
+||| Verified Invariant: Free particle with dt=1, v0=(1, 2) after 10 steps
+||| evaluates definitionally via O(log N) matrix squaring to pos=(21, 2).
+public export
+auditStagedSymplecticEvolution : Bool
+auditStagedSymplecticEvolution =
+  let driftM = freeDriftTransferMaxel (intToBoxInt 1)
+      initV = mkVexel2 (intToBoxInt 1) (intToBoxInt 2) -- x=1, p=2
+      resV = splice (stagedSymplecticEvolution 10 (quote driftM) 10 initV)
+  in components resV == [intToBoxInt 21, intToBoxInt 2]
+
