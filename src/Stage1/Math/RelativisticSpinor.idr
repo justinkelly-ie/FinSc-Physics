@@ -13,6 +13,9 @@ import Stage1.MultisetDuality
 import Stage1.MultisetTensor
 import Stage1.RationalTrig
 import Data.List
+import Data.Vect
+import Stage1.DihedronModel as DM
+import Stage1.TypeTheory.Staging as TTS
 
 %default total
 
@@ -263,5 +266,97 @@ auditSpinorSpreadBoostProof x y u =
       expectedTrans   = qBlue * u
   in boxEq persisted expectedPersist && boxEq transition expectedTrans
 
+------------------------------------------------------------------------
+-- 7. 4-COMPONENT DISCRETE DIRAC SPINOR MULTISET & DIHEDRON BOOSTS
+------------------------------------------------------------------------
 
+||| A discrete 4-component Dirac Spinor Multiset partitioning left and right chiral components:
+||| leftChiral  = (psi_0, psi_1)
+||| rightChiral = (psi_2, psi_3)
+public export
+record DiracSpinorMultiset where
+  constructor MkDiracSpinor
+  leftChiral  : Vect 2 BoxInt
+  rightChiral : Vect 2 BoxInt
 
+public export
+Eq DiracSpinorMultiset where
+  (MkDiracSpinor l1 r1) == (MkDiracSpinor l2 r2) = l1 == l2 && r1 == r2
+
+public export
+Show DiracSpinorMultiset where
+  show (MkDiracSpinor l r) =
+    "DiracSpinorMultiset(L=" ++ show l ++ ", R=" ++ show r ++ ")"
+
+||| Computes positive discrete probability / charge density:
+||| j_0 = psi_0^2 + psi_1^2 + psi_2^2 + psi_3^2 >= 0.
+public export
+spinorMultisetDensity : DiracSpinorMultiset -> BoxInt
+spinorMultisetDensity (MkDiracSpinor [p0, p1] [p2, p3]) =
+  (p0 * p0) + (p1 * p1) + (p2 * p2) + (p3 * p3)
+
+||| Converts DiracSpinorMultiset into a deforested FusedStream of 4 BoxInt components.
+public export
+spinorMultisetToStream : DiracSpinorMultiset -> FusedStream BoxInt
+spinorMultisetToStream (MkDiracSpinor [p0, p1] [p2, p3]) =
+  stream [p0, p1, p2, p3]
+
+||| Computes probability density via deforested stream fold in O(1) auxiliary memory.
+public export
+spinorMultisetDensityStream : DiracSpinorMultiset -> BoxInt
+spinorMultisetDensityStream sp =
+  foldStreamNat 4 (+) (intToBoxInt 0) (mapStream (\v => v * v) (spinorMultisetToStream sp))
+
+||| Converts DiracSpinorMultiset to canonical DiracSpinor4 via Pixel difference pairs.
+public export
+toDiracSpinor4 : DiracSpinorMultiset -> DiracSpinor4
+toDiracSpinor4 (MkDiracSpinor [p0, p1] [p2, p3]) =
+  MkDiracSpinor4 (toPixel p0) (toPixel p1) (toPixel p2) (toPixel p3)
+  where
+    toPixel : BoxInt -> Stage1.VexelMaxel.Pixel
+    toPixel b =
+      let v = unwrapBox b
+      in if v >= 0
+           then Stage1.VexelMaxel.MkPixel (integerToNat v) 0
+           else Stage1.VexelMaxel.MkPixel 0 (integerToNat (-v))
+
+||| Applies a 2x2 Dihedron matrix action on a 2-component vector:
+||| [v0', v1']^T = [[d00, d01], [d10, d11]] * [v0, v1]^T.
+public export
+actDihedronVect2 : DM.Dihedron2 -> Vect 2 BoxInt -> Vect 2 BoxInt
+actDihedronVect2 (DM.MkDihedron2 d00 d01 d10 d11) [v0, v1] =
+  [(d00 * v0) + (d01 * v1), (d10 * v0) + (d11 * v1)]
+
+||| Applies an exact Dihedron Lorentz boost to a DiracSpinorMultiset:
+||| Left chiral component transforms under D, right chiral component transforms under adjugate(D).
+public export
+boostDiracSpinor : DM.Dihedron2 -> DiracSpinorMultiset -> DiracSpinorMultiset
+boostDiracSpinor d (MkDiracSpinor left right) =
+  let left'  = actDihedronVect2 d left
+      right' = actDihedronVect2 (DM.adjugateDihedron2 d) right
+  in MkDiracSpinor left' right'
+
+||| 2LTT Staged Spinor Matrix Unrolling:
+||| Lifts static Dihedron configuration into compile-time specialized matrix multiplication (Level 1),
+||| emitting zero-overhead Level 0 runtime Dirac spinor transformation.
+public export
+stagedTransformSpinor : TTS.Lift DM.Dihedron2 -> DiracSpinorMultiset -> TTS.Code DiracSpinorMultiset
+stagedTransformSpinor qd sp =
+  let d = TTS.splice qd
+  in TTS.quote (boostDiracSpinor d sp)
+
+||| Audit: Identity boost preserves spinor identically.
+public export
+auditDiracSpinorIdentityBoost : DiracSpinorMultiset -> Bool
+auditDiracSpinorIdentityBoost sp =
+  boostDiracSpinor DM.identityDihedron2 sp == sp
+
+||| Audit: DiracSpinorMultiset density stream matches direct algebraic calculation.
+public export
+auditDiracSpinorDensityStreamProof : Bool
+auditDiracSpinorDensityStreamProof =
+  let sp = MkDiracSpinor [intToBoxInt 3, intToBoxInt 4] [intToBoxInt 1, intToBoxInt 2]
+      dDirect = spinorMultisetDensity sp
+      dStream = spinorMultisetDensityStream sp
+      idOk = auditDiracSpinorIdentityBoost sp
+  in dDirect == intToBoxInt 30 && dStream == intToBoxInt 30 && idOk
