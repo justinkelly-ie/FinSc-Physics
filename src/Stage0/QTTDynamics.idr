@@ -8,6 +8,7 @@ import Stage0.OnSeq.FusedStream
 import Data.Fuel
 import Data.List
 import Language.Reflection
+import public Stage1.TypeTheory.Staging
 
 %default total
 
@@ -15,16 +16,7 @@ import Language.Reflection
 -- 1. STRICT QUANTITATIVE TYPE THEORY (QTT) STATE PAIRING (Rule 04)
 --------------------------------------------------------------------------------
 
-||| Linear state pair holding a strictly linear state (multiplicity 1) and
-||| an unrestricted observable (multiplicity omega).
-|||
-||| Standard pairs `(x, y)` have unrestricted multiplicity omega. When both elements
-||| are linear, the observable cannot be collected into an unrestricted list.
-||| `LinearStatePair` guarantees exact linear state consumption while permitting
-||| the observable to be accumulated freely without violating linear multiplicity.
-public export
-data LinearStatePair : Type -> Type -> Type where
-  MkLStatePair : (1 state : s) -> (obs : b) -> LinearStatePair s b
+-- LinearStatePair is canonically imported from Stage1.TypeTheory.Staging
 
 --------------------------------------------------------------------------------
 -- 2. DISCRETE PHASE-SPACE STATE & CANONICAL OBSERVABLES

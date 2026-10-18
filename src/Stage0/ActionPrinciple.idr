@@ -251,7 +251,6 @@ verifyGeodesicEulerLagrangeStationarity _ _ _ _ _ = Refl
 ||| QTT 0 Erased Proof Witness: Discrete Action Equivalence under 2LTT Multiset Path Isomorphism.
 public export
 0 verifyDiscreteActionPathEquivalence :
-    (Eq a, Neg c, Num c, Eq c) =>
     {m1, m2 : Stage0.Multiset.Multiset c a} ->
     (0 p : Stage1.TypeTheory.TwoLevel.MultisetPathIso m1 m2) ->
     True = True
