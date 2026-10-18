@@ -266,20 +266,21 @@ trajectoryActionMultiset geom coords vPot =
       helper k (x0 :: x1 :: rest) = (k, discreteLagrangian geom x0 x1 vPot) :: helper (S k) (x1 :: rest)
   in fromListBox (helper 1 coords)
 
-||| Stationary Action Homotopy Path Witness (δS = 0):
+||| Stationary Action Reaction Path Witness (δS = 0):
 ||| Certifies that an equal-and-opposite perturbation (+δ, -δ) at step k cancels identically
 ||| to the unperturbed stationary trajectory via 2LTT Dirac cancellation.
+||| (Category theory: Homotopy path / 1-cell in multiset groupoid).
 public export
 stationaryDiracVariationPath : (base : Multiset BoxInt Nat) -> (step : Nat) -> (delta : BoxInt) ->
-  MultisetPathIso (AddM step delta (AddM step (negate delta) base)) base
+  ReactionPath (AddM step delta (AddM step (negate delta) base)) base
 stationaryDiracVariationPath base step delta =
   DiracCancelMultisetP
 
-||| Stationary Action Homotopy Path Witness (δS = 0):
+||| Stationary Action Reaction Path Witness (δS = 0):
 ||| Certifies that a null perturbation (0) at step k is isomorphic to the stationary trajectory via 2LTT zero-pruning.
 public export
 stationaryZeroVariationPath : (base : Multiset BoxInt Nat) -> (step : Nat) ->
-  MultisetPathIso (AddM step 0 base) base
+  ReactionPath (AddM step 0 base) base
 stationaryZeroVariationPath base step =
   ZeroCancelMultisetP
 
