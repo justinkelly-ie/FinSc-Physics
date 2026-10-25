@@ -3,7 +3,7 @@ module Stage1.Math.QuantumPotential
 import Stage0.BoxInt
 import Stage0.WitnessLedger
 import Stage0.Multiset
-import Stage1.VexelMaxel
+import Stage1.Basis.Coordinate
 import Stage1.UnixelFraction
 import Stage0.ActionPrinciple
 import Stage1.QuadStream
@@ -25,7 +25,7 @@ public export
 discreteQuantumPotential : (laplacianR : Stage0.BoxInt.BoxInt) -> (amplitudeR : Nat) -> Stage1.UnixelFraction.UnixelFraction
 discreteQuantumPotential lapR r =
   let denom = if r == 0 then 1 else 2 * r
-  in Stage1.UnixelFraction.MkUnixelFraction (- lapR) (Stage1.VexelMaxel.MkUnixel denom)
+  in Stage1.UnixelFraction.MkUnixelFraction (- lapR) (MkUnixel denom)
 
 ||| Evaluates discrete Bohmian quantum potential across QuadStream payload.
 public export

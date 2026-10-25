@@ -2,7 +2,7 @@ module Stage1.Math.ToroidalAstrodynamics
 
 import Stage0.BoxInt
 import Stage0.WitnessLedger
-import Stage1.VexelMaxel
+import Stage1.Basis.Coordinate
 import Stage1.UnixelFraction
 import Stage0.Multiset
 import Stage0.ActionPrinciple
@@ -164,7 +164,7 @@ Eq RationalOrbit where
 ||| Evaluates the Rational Eccentricity Spread s_e = Q_c / Q_a = (c/a)^2 as an exact UnixelFraction.
 public export
 orbitalEccentricitySpread : RationalOrbit -> Stage1.UnixelFraction.UnixelFraction
-orbitalEccentricitySpread (MkRationalOrbit qa qc _) = Stage1.UnixelFraction.MkUnixelFraction qc (Stage1.VexelMaxel.MkUnixel (Stage0.BoxInt.boxToNat qa))
+orbitalEccentricitySpread (MkRationalOrbit qa qc _) = Stage1.UnixelFraction.MkUnixelFraction qc (MkUnixel (Stage0.BoxInt.boxToNat qa))
 
 ||| Evaluates the Semi-Minor Quadrance Q_b = Q_a - Q_c = Q_a * (1 - s_e).
 public export

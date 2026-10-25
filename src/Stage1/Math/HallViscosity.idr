@@ -3,7 +3,7 @@ module Stage1.Math.HallViscosity
 import Stage0.BoxInt
 import Stage0.WitnessLedger
 import Stage0.Multiset
-import Stage1.VexelMaxel
+import Stage1.Basis.Coordinate
 import Stage1.UnixelFraction
 import Stage0.Multiset
 import Stage1.QuadStream
@@ -24,9 +24,11 @@ import Data.Nat
 ||| eta_H = (meanSpin * numFilling) / (4 * denFilling) = (s_bar * p) / (4 * q)
 public export
 discreteHallViscosity : (meanSpin : Stage0.BoxInt.BoxInt) -> (fillingFactor : Stage1.UnixelFraction.UnixelFraction) -> Stage1.UnixelFraction.UnixelFraction
-discreteHallViscosity s (Stage1.UnixelFraction.MkUnixelFraction pNum (Stage1.VexelMaxel.MkUnixel qDen)) =
-  let newDen = 4 * qDen
-  in Stage1.UnixelFraction.MkUnixelFraction (s * pNum) (Stage1.VexelMaxel.MkUnixel (if newDen == 0 then 1 else newDen))
+discreteHallViscosity s filling =
+  let pNum = filling.num
+      qDen = denominatorNat filling
+      newDen = 4 * qDen
+  in Stage1.UnixelFraction.mkUnixelFraction (s * pNum) (if newDen == 0 then 1 else newDen)
 
 ||| Evaluates QuadStream Hall Viscosity state.
 public export
@@ -39,8 +41,9 @@ evaluateQuadStreamHallViscosity (MkQuadStream e h p s) filling =
 ||| Dissipated power P_diss = sigma_ij * v_i * v_j == 0 for anti-symmetric eta_H.
 public export
 isDissipationlessHallStress : (etaH : Stage1.UnixelFraction.UnixelFraction) -> Bool
-isDissipationlessHallStress (Stage1.UnixelFraction.MkUnixelFraction num (Stage1.VexelMaxel.MkUnixel den)) =
-  let sigma_xy = num
+isDissipationlessHallStress etaH =
+  let num = etaH.num
+      sigma_xy = num
       sigma_yx = Stage0.BoxInt.intToBoxInt 0 - num
   in Stage0.BoxInt.boxIsZero (sigma_xy + sigma_yx)
 

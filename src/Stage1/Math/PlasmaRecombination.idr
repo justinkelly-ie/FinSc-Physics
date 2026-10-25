@@ -2,7 +2,7 @@ module Stage1.Math.PlasmaRecombination
 
 import Stage0.BoxInt
 import Stage0.Multiset
-import Stage1.VexelMaxel
+import Stage1.Basis.Coordinate
 import Stage1.UnixelFraction
 import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
@@ -21,7 +21,7 @@ import Data.List
 %inline
 public export
 ionizationFraction : BoxInt -> BoxInt -> UnixelFraction
-ionizationFraction nFree nTotal = MkUnixelFraction nFree (MkUnixel (boxIntToPositiveNat nTotal))
+ionizationFraction nFree nTotal = mkUnixelFraction nFree (boxIntToPositiveNat nTotal)
 
 ||| Evaluates ionization fraction from QuadStream payload.
 public export
@@ -35,7 +35,7 @@ evaluateQuadStreamIonization (MkQuadStream e h p s) =
 %inline
 public export
 isDecoupledPlasma : UnixelFraction -> Bool
-isDecoupledPlasma (MkUnixelFraction (MkBoxInt n) (MkUnixel d)) = (n * 1000) <= cast d
+isDecoupledPlasma frac = (unwrapBox frac.num * 1000) <= cast (denominatorNat frac)
 
 ------------------------------------------------------------------------
 -- 2. CATEGORY-THEORETIC HOM-TENSOR MULTISET ADJUNCTION (L ⊣ R)

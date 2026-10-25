@@ -3,7 +3,9 @@ module Stage1.Math.HorizonRadiation
 import Stage0.BoxInt
 import Stage0.WitnessLedger
 import Stage0.Multiset
-import Stage1.VexelMaxel
+import Stage1.Carrier.Boxel
+import Stage1.Carrier.Maxel
+import Stage1.Basis.Coordinate
 import Stage1.UnixelFraction
 import Stage0.Multiset
 import Stage1.Math.HolographicBound
@@ -56,7 +58,7 @@ public export
 discreteHawkingTemperature : (horizonArea : Nat) -> Stage1.UnixelFraction.UnixelFraction
 discreteHawkingTemperature area =
   let denom = if area == 0 then 1 else 2 * area
-  in Stage1.UnixelFraction.MkUnixelFraction (Stage0.BoxInt.intToBoxInt 1) (Stage1.VexelMaxel.MkUnixel denom)
+  in Stage1.UnixelFraction.MkUnixelFraction (Stage0.BoxInt.intToBoxInt 1) (MkUnixel denom)
 
 ||| Discrete Hawking evaporation step without space witness.
 public export
@@ -166,7 +168,7 @@ auditHorizonRadiationProof =
       (Stage1.UnixelFraction.MkUnixelFraction _ den) = discreteHawkingTemperature 54
   in blackHoleMass st1 == Stage0.BoxInt.intToBoxInt 9 &&
      emittedRadiation st1 == Stage0.BoxInt.intToBoxInt 1 &&
-     Stage1.VexelMaxel.unwrapUnixel den == 108
+     unwrapUnixel den == 108
 
 
 

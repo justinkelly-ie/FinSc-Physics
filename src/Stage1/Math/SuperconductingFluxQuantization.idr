@@ -1,7 +1,6 @@
 module Stage1.Math.SuperconductingFluxQuantization
 
 import Stage0.BoxInt
-import Stage1.VexelMaxel
 import Stage1.UnixelFraction
 import Stage0.Multiset
 import Stage1.QuadStream

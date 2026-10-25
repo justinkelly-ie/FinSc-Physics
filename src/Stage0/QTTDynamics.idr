@@ -9,7 +9,8 @@ import Data.Fuel
 import Data.List
 import Language.Reflection
 import public Stage1.TypeTheory.Staging
-import Stage1.VexelMaxel
+import Stage1.Carrier.Maxel
+import Stage1.Carrier.Vexel
 import Data.Vect
 
 %default total

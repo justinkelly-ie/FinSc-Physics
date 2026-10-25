@@ -4,7 +4,8 @@ import Stage0.BoxInt
 import Stage0.WitnessLedger
 import Stage0.Multiset
 import Stage1.Polynumber
-import Stage1.VexelMaxel
+import Stage1.Carrier.Maxel
+import Stage1.Carrier.BalanceArray
 import Stage1.UnixelFraction
 import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
@@ -132,18 +133,18 @@ auditRGDecimationDegreeProof = Refl
 ||| A 4x4 Magic Maxel RG Decimation Kernel (Sigma = 4):
 ||| Governs discrete token redistribution between 4 micro-cells and 4 macro-channels.
 public export
-rgDecimationMagicMaxel : Stage1.VexelMaxel.MagicMaxel 4
+rgDecimationMagicMaxel : MagicMaxel 4
 rgDecimationMagicMaxel =
-  Stage1.VexelMaxel.MkMagicMaxel [ [1, 2, 0, 1]
-                                 , [2, 0, 1, 1]
-                                 , [0, 1, 2, 1]
-                                 , [1, 1, 1, 1]
-                                 ]
+  MkMagicMaxel [ [1, 2, 0, 1]
+               , [2, 0, 1, 1]
+               , [0, 1, 2, 1]
+               , [1, 1, 1, 1]
+               ]
 
 ||| Applies the 4x4 Doubly Stochastic RG Decimation Kernel to a 4-channel microstate:
 public export
 applyRGMagicDecimation : Vect 4 Nat -> Vect 4 Nat
-applyRGMagicDecimation = Stage1.VexelMaxel.applyMagicMaxel rgDecimationMagicMaxel
+applyRGMagicDecimation = applyMagicMaxel rgDecimationMagicMaxel
 
 ||| Structural sum of natural numbers in a vector ensuring compile-time reduction:
 public export

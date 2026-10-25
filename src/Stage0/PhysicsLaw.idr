@@ -1,7 +1,7 @@
 module Stage0.PhysicsLaw
 
 import public Stage0.BoxInt
-import public Stage1.VexelMaxel
+import public Stage1.Carrier.Vexel
 import public Stage1.ChromoCategory
 import public Stage0.ChromoLawFunctor
 

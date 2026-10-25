@@ -2,7 +2,9 @@ module Stage1.Math.RelativisticSpinor
 
 import Stage0.BoxInt
 import Stage0.WitnessLedger
-import Stage1.VexelMaxel
+import Stage1.Carrier.Vexel
+import Stage1.Carrier.Maxel
+import Stage1.Basis.Coordinate
 import Stage1.MultisetTree
 import Stage1.UnixelFraction
 import Stage1.CliffordAlgebra
@@ -29,10 +31,10 @@ import Stage1.TypeTheory.Staging as TTS
 public export
 record DiracSpinor4 where
   constructor MkDiracSpinor4
-  comp1 : Stage1.VexelMaxel.Pixel
-  comp2 : Stage1.VexelMaxel.Pixel
-  comp3 : Stage1.VexelMaxel.Pixel
-  comp4 : Stage1.VexelMaxel.Pixel
+  comp1 : Pixel
+  comp2 : Pixel
+  comp3 : Pixel
+  comp4 : Pixel
 
 public export
 Eq DiracSpinor4 where
@@ -47,8 +49,8 @@ Show DiracSpinor4 where
 ||| Evaluates the signed integer value of a Pixel component: (pos - neg).
 %inline
 public export
-evalSpinorComponent : Stage1.VexelMaxel.Pixel -> Stage0.BoxInt.BoxInt
-evalSpinorComponent (Stage1.VexelMaxel.MkPixel p n) = Stage0.BoxInt.intToBoxInt (cast p - cast n)
+evalSpinorComponent : Pixel -> Stage0.BoxInt.BoxInt
+evalSpinorComponent px = Stage0.BoxInt.intToBoxInt (cast (pixelRow px) - cast (pixelCol px))
 
 ||| Computes the positive discrete probability / charge density:
 ||| j_0 = sum_{k=1}^4 (eval(comp_k))^2 >= 0.
@@ -64,7 +66,7 @@ spinorProbabilityDensity (MkDiracSpinor4 c1 c2 c3 c4) =
 
 ||| Converts 4-component Dirac Bispinor into a deforested FusedStream of Pixel components.
 public export
-spinorToStream : DiracSpinor4 -> FusedStream Stage1.VexelMaxel.Pixel
+spinorToStream : DiracSpinor4 -> FusedStream Pixel
 spinorToStream (MkDiracSpinor4 c1 c2 c3 c4) = stream [c1, c2, c3, c4]
 
 ||| Computes Dirac probability density directly across spatial spinor components using mapStream and foldStreamNat.
@@ -75,7 +77,7 @@ spinorProbabilityDensityStream spinor =
 
 ||| Applies a Dirac matrix contraction operator across spatial spinor components via fused stream map.
 public export
-contractDiracMatrixStream : (Stage1.VexelMaxel.Pixel -> Stage1.VexelMaxel.Pixel) -> DiracSpinor4 -> FusedStream Stage1.VexelMaxel.Pixel
+contractDiracMatrixStream : (Pixel -> Pixel) -> DiracSpinor4 -> FusedStream Pixel
 contractDiracMatrixStream gammaOp spinor = mapStream gammaOp (spinorToStream spinor)
 
 ||| Evaluates Dirac probability density from deforested FusedStream payload bounded by canonical Primorial 210 capacity (Rule 03).
@@ -83,10 +85,10 @@ public export
 evaluateQuadStreamSpinorDensityStream : FusedStream (QuadStreamChannel, Stage0.BoxInt.BoxInt, Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 evaluateQuadStreamSpinorDensityStream strm =
   let (sumE, sumH, sumP, sumS) = foldStreamFuel substrateFuel updateSums (intToBoxInt 0, intToBoxInt 0, intToBoxInt 0, intToBoxInt 0) strm
-      p1 = Stage1.VexelMaxel.MkPixel (natVal sumE) 0
-      p2 = Stage1.VexelMaxel.MkPixel (natVal sumH) 0
-      p3 = Stage1.VexelMaxel.MkPixel (natVal sumP) 0
-      p4 = Stage1.VexelMaxel.MkPixel (natVal sumS) 0
+      p1 = MkPixel (natVal sumE) 0
+      p2 = MkPixel (natVal sumH) 0
+      p3 = MkPixel (natVal sumP) 0
+      p4 = MkPixel (natVal sumS) 0
       spinor = MkDiracSpinor4 p1 p2 p3 p4
   in spinorProbabilityDensity spinor
   where
@@ -146,7 +148,7 @@ decomposeChiral v chiralWeight =
 public export
 auditRelativisticSpinorProof : Bool
 auditRelativisticSpinorProof =
-  let sp = MkDiracSpinor4 (Stage1.VexelMaxel.MkPixel 3 0) (Stage1.VexelMaxel.MkPixel 4 0) (Stage1.VexelMaxel.MkPixel 0 0) (Stage1.VexelMaxel.MkPixel 0 0)
+  let sp = MkDiracSpinor4 (MkPixel 3 0) (MkPixel 4 0) (MkPixel 0 0) (MkPixel 0 0)
       j0 = spinorProbabilityDensity sp
       ch = decomposeChiral (Stage0.BoxInt.intToBoxInt 10) (Stage0.BoxInt.intToBoxInt 1)
   in j0 == Stage0.BoxInt.intToBoxInt 25 &&
@@ -228,7 +230,7 @@ MultisetAdjunction DiracSpinorFunctor AbstractDiracSpinorFunctor where
 public export
 auditSpinorDensityPositivityProof : Bool
 auditSpinorDensityPositivityProof =
-  let p = Stage1.VexelMaxel.MkPixel 2 1
+  let p = MkPixel 2 1
       sp = MkDiracSpinor4 p p p p
       dDirect = spinorProbabilityDensity sp
       dStream = spinorProbabilityDensityStream sp
@@ -314,11 +316,11 @@ toDiracSpinor4 : DiracSpinorMultiset -> DiracSpinor4
 toDiracSpinor4 (MkDiracSpinor [p0, p1] [p2, p3]) =
   MkDiracSpinor4 (toPixel p0) (toPixel p1) (toPixel p2) (toPixel p3)
   where
-    toPixel : BoxInt -> Stage1.VexelMaxel.Pixel
+    toPixel : BoxInt -> Pixel
     toPixel b =
       if b >= intToBoxInt 0
-        then Stage1.VexelMaxel.MkPixel (boxToNat b) 0
-        else Stage1.VexelMaxel.MkPixel 0 (boxToNat (- b))
+        then MkPixel (boxToNat b) 0
+        else MkPixel 0 (boxToNat (- b))
 
 ||| Applies a 2x2 Dihedron matrix action on a 2-component vector:
 ||| [v0', v1']^T = [[d00, d01], [d10, d11]] * [v0, v1]^T.

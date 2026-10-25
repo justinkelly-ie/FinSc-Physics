@@ -1,7 +1,7 @@
 module Stage1.Empirical.Ratio
 
 import public Stage0.BoxInt
-import public Stage1.VexelMaxel
+import public Stage1.Basis.Coordinate
 import public Stage1.UnixelFraction
 
 %default total

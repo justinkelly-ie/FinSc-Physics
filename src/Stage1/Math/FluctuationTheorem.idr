@@ -3,7 +3,6 @@ module Stage1.Math.FluctuationTheorem
 import Stage0.BoxInt
 import Stage0.Multiset
 import Stage0.OnSeq.FusedStream
-import Stage1.VexelMaxel
 import Stage1.UnixelFraction
 import Stage1.QuadStream
 import Stage1.Math.WorkFreeEnergyEquality

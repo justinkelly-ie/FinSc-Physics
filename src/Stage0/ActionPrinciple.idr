@@ -3,6 +3,7 @@ module Stage0.ActionPrinciple
 import Stage0.Multiset
 import Stage0.StructuralFuel
 import Stage1.FourGeometries
+import Stage1.Carrier.Maxel
 import PhaseUnfolding
 import Geometry
 import Data.Vect
@@ -41,7 +42,7 @@ coordDiff (MkCoord2D x2 y2) (MkCoord2D x1 y1) = MkCoord2D (x2 - x1) (y2 - y1)
 ||| Computes metric kinetic quadrance: T_g(Δx) = Δx^T · g · Δx.
 %inline
 public export
-metricKineticQuadrance : Stage1.VexelMaxel.Maxel -> LatticeCoord2D -> Stage0.BoxInt.BoxInt
+metricKineticQuadrance : Maxel -> LatticeCoord2D -> Stage0.BoxInt.BoxInt
 metricKineticQuadrance m (MkCoord2D dx dy) =
   let g11Val = g11 m
       g12Val = g12 m
@@ -148,7 +149,7 @@ discreteAcceleration (MkCoord2D xPrev yPrev) (MkCoord2D xCurr yCurr) (MkCoord2D 
 ||| For extremal physical trajectories, this residual evaluates strictly to (0, 0).
 %inline
 public export
-discreteEulerLagrangeResidual : Stage1.VexelMaxel.Maxel -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D
+discreteEulerLagrangeResidual : Maxel -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D
 discreteEulerLagrangeResidual m prev curr next (MkCoord2D gradVx gradVy) =
   let accel  = discreteAcceleration prev curr next
       ax     = posX accel
@@ -191,7 +192,7 @@ prfSubstrateActionAsymmetry = Refl
 ||| Computes discrete canonical momentum token: p_k = g · (x_{k+1} - x_k).
 %inline
 public export
-discreteCanonicalMomentum : Stage1.VexelMaxel.Maxel -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D
+discreteCanonicalMomentum : Maxel -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D
 discreteCanonicalMomentum m (MkCoord2D x1 y1) (MkCoord2D x2 y2) =
   let dx = x2 - x1
       dy = y2 - y1
@@ -242,7 +243,7 @@ discreteAction2LTT geom (Stage1.TypeTheory.TwoLevel.MkStrict coords) vPot =
 ||| Proof object is evaluated at compile-time and erased at runtime with zero memory footprint.
 public export
 0 verifyGeodesicEulerLagrangeStationarity :
-    (0 m : Stage1.VexelMaxel.Maxel) ->
+    (0 m : Maxel) ->
     (0 p0, p1, p2 : LatticeCoord2D) ->
     (0 prf : discreteEulerLagrangeResidual m p0 p1 p2 (MkCoord2D (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 0)) = MkCoord2D (Stage0.BoxInt.intToBoxInt 0) (Stage0.BoxInt.intToBoxInt 0)) ->
     True = True
@@ -350,7 +351,7 @@ auditFusedDiscreteActionProof =
 ||| Evaluates discrete momentum conservation along consecutive trajectory steps:
 ||| p_0 == p_1 where p_0 = g · (x_1 - x_0) and p_1 = g · (x_2 - x_1).
 public export
-isMomentumConserved : Stage1.VexelMaxel.Maxel -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> Bool
+isMomentumConserved : Maxel -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> Bool
 isMomentumConserved m p0 p1 p2 =
   let m0 = discreteCanonicalMomentum m p0 p1
       m1 = discreteCanonicalMomentum m p1 p2
@@ -358,7 +359,7 @@ isMomentumConserved m p0 p1 p2 =
 
 ||| Erased compile-time proof witness verifying Noether momentum conservation along a trajectory step.
 public export
-0 ActionConservationWitness : Stage1.VexelMaxel.Maxel -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> Type
+0 ActionConservationWitness : Maxel -> LatticeCoord2D -> LatticeCoord2D -> LatticeCoord2D -> Type
 ActionConservationWitness m p0 p1 p2 = isMomentumConserved m p0 p1 p2 = True
 
 ||| Static compile-time witness for free particle motion along straight geodesic [(0,0), (1,1), (2,2)].
@@ -368,7 +369,7 @@ prfGeodesicNoetherConservation _ = Refl
 
 ||| Verified physical trajectory step carrying compile-time erased Noether momentum conservation witness.
 public export
-record VerifiedPhysicalTrajectory (m : Stage1.VexelMaxel.Maxel) (p0 : LatticeCoord2D) (p1 : LatticeCoord2D) (p2 : LatticeCoord2D) where
+record VerifiedPhysicalTrajectory (m : Maxel) (p0 : LatticeCoord2D) (p1 : LatticeCoord2D) (p2 : LatticeCoord2D) where
   constructor MkVerifiedTrajectory
   startCoord : LatticeCoord2D
   midCoord   : LatticeCoord2D
@@ -409,7 +410,7 @@ fusedActionTrajectoryStream f geom coords vPot =
 
 ||| O(1) allocation deforested stream transducer evaluating total trajectory kinetic quadrance sum.
 public export
-fusedComputeTotalKineticQuadrance : Fuel -> Stage1.VexelMaxel.Maxel -> List LatticeCoord2D -> Stage0.BoxInt.BoxInt
+fusedComputeTotalKineticQuadrance : Fuel -> Maxel -> List LatticeCoord2D -> Stage0.BoxInt.BoxInt
 fusedComputeTotalKineticQuadrance f m coords =
   Stage0.OnSeq.FusedStream.fusedHylomorphism f
     (\(idx, st) => case st of

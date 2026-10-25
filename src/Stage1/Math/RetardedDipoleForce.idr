@@ -3,7 +3,7 @@ module Stage1.Math.RetardedDipoleForce
 import Stage0.BoxInt
 import Stage0.WitnessLedger
 import Stage0.Multiset
-import Stage1.VexelMaxel
+import Stage1.Basis.Coordinate
 import Stage1.UnixelFraction
 import Stage0.Multiset
 import Stage1.QuadStream
@@ -26,7 +26,7 @@ public export
 discreteLondonPotential : (c6 : Stage0.BoxInt.BoxInt) -> (quadranceQ : Nat) -> Stage1.UnixelFraction.UnixelFraction
 discreteLondonPotential c6 q =
   let denom = if q == 0 then 1 else q * q * q
-  in Stage1.UnixelFraction.MkUnixelFraction (- c6) (Stage1.VexelMaxel.MkUnixel denom)
+  in Stage1.UnixelFraction.MkUnixelFraction (- c6) (MkUnixel denom)
 
 ||| Computes the long-range retarded Casimir-Polder potential:
 ||| V_CP(Q) = - C7 / Q^4 (in exact UnixelFraction units)
@@ -34,7 +34,7 @@ public export
 discreteCasimirPolderPotential : (c7 : Stage0.BoxInt.BoxInt) -> (quadranceQ : Nat) -> Stage1.UnixelFraction.UnixelFraction
 discreteCasimirPolderPotential c7 q =
   let denom = if q == 0 then 1 else q * q * q * q
-  in Stage1.UnixelFraction.MkUnixelFraction (- c7) (Stage1.VexelMaxel.MkUnixel denom)
+  in Stage1.UnixelFraction.MkUnixelFraction (- c7) (MkUnixel denom)
 
 ||| Evaluates Casimir-Polder potential across QuadStream payload.
 public export

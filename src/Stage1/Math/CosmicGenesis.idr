@@ -4,7 +4,6 @@ import Stage0.BoxInt
 import Stage0.WitnessLedger
 import Stage0.Multiset
 import Stage1.QuadStream
-import Stage1.VexelMaxel
 import Stage1.UnixelFraction
 import Stage1.LinAlgebra.MetricTensor
 import Stage0.Multiset

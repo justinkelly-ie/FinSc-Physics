@@ -9,7 +9,6 @@ import Stage0.Multiset
 import Stage0.OnSeq.FusedStream
 import Stage1.QuadStream
 import Stage1.Goh
-import Stage1.VexelMaxel
 import Stage1.Math.Transform.MultisetFilter
 import Stage1.Math.Transform.ChromogeometryMetric
 import Stage1.Math.Transform.QuadStreamDuality

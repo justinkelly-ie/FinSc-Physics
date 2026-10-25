@@ -3,7 +3,7 @@ module Stage1.Math.RenormalizationInformationFlow
 import Stage0.BoxInt
 import Stage0.WitnessLedger
 import Stage0.Multiset
-import Stage1.VexelMaxel
+import Stage1.Basis.Coordinate
 import Stage1.UnixelFraction
 import Stage1.QuadStream
 import Stage1.Math.TopologicalChernNumber
@@ -22,11 +22,13 @@ import Data.List
 ||| beta(g) = Delta g_k = - (drag_k * g) / (1 + drag_k)
 public export
 discreteBetaStep : (coupling : Stage1.UnixelFraction.UnixelFraction) -> (dragNat : Nat) -> Stage1.UnixelFraction.UnixelFraction
-discreteBetaStep (Stage1.UnixelFraction.MkUnixelFraction numVal (Stage1.VexelMaxel.MkUnixel denVal)) drag =
-  let dragBox = Stage0.BoxInt.natToBoxInt drag
+discreteBetaStep coupling drag =
+  let numVal = coupling.num
+      denVal = denominatorNat coupling
+      dragBox = Stage0.BoxInt.natToBoxInt drag
       newNum = - (numVal * dragBox)
       newDen = denVal * (1 + drag)
-  in Stage1.UnixelFraction.MkUnixelFraction newNum (Stage1.VexelMaxel.MkUnixel (if newDen == 0 then 1 else newDen))
+  in Stage1.UnixelFraction.mkUnixelFraction newNum (if newDen == 0 then 1 else newDen)
 
 ------------------------------------------------------------------------
 -- 2. DISCRETE FISHER INFORMATION METRIC ON PROBABILITY SIMPLICES
@@ -41,7 +43,7 @@ discreteFisherQuadrance w1 w2 =
   let diff = (natToInteger w1) - (natToInteger w2)
       sqDiff = diff * diff
       den = if w1 == 0 then 1 else w1
-  in Stage1.UnixelFraction.MkUnixelFraction (Stage0.BoxInt.intToBoxInt sqDiff) (Stage1.VexelMaxel.MkUnixel den)
+  in Stage1.UnixelFraction.mkUnixelFraction (Stage0.BoxInt.intToBoxInt sqDiff) den
 
 ||| Evaluates Fisher quadrance from QuadStream payload sector weights.
 public export

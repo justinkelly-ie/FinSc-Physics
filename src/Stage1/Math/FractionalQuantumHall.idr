@@ -2,7 +2,7 @@ module Stage1.Math.FractionalQuantumHall
 
 import Stage0.BoxInt
 import Stage0.WitnessLedger
-import Stage1.VexelMaxel
+import Stage1.Basis.Coordinate
 import Stage1.UnixelFraction
 import Stage0.Multiset
 import Stage1.QuadStream
@@ -40,7 +40,7 @@ evaluateQuadStreamLaughlin (MkQuadStream e h p s) =
 public export
 fractionalQuasiparticleCharge : LaughlinState -> Stage1.UnixelFraction.UnixelFraction
 fractionalQuasiparticleCharge (MkLaughlinState p q) =
-  Stage1.UnixelFraction.MkUnixelFraction (Stage0.BoxInt.natToBoxInt p) (Stage1.VexelMaxel.MkUnixel (if q == 0 then 1 else q))
+  Stage1.UnixelFraction.MkUnixelFraction (Stage0.BoxInt.natToBoxInt p) (MkUnixel (if q == 0 then 1 else q))
 
 ||| Computes the anyonic statistical exchange angle denominator:
 ||| Exchanging two anyons yields topological phase θ = π / q.
@@ -136,7 +136,7 @@ MultisetAdjunction LaughlinFunctor AbstractLaughlinFunctor where
 public export
 0 prfFractionalChargeQuantization :
   fractionalQuasiparticleCharge (MkLaughlinState 1 3) =
-  Stage1.UnixelFraction.MkUnixelFraction (intToBoxInt 1) (Stage1.VexelMaxel.MkUnixel 3)
+  Stage1.UnixelFraction.MkUnixelFraction (intToBoxInt 1) (MkUnixel 3)
 prfFractionalChargeQuantization = Refl
 
 ||| QTT 0 Erased Proof: Anyonic Topological Braiding Phase Period (2 * 3 = 6).

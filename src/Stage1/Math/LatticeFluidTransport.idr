@@ -2,7 +2,6 @@ module Stage1.Math.LatticeFluidTransport
 
 import Stage0.BoxInt
 import Stage1.UnixelFraction
-import Stage1.VexelMaxel
 import Stage0.Multiset
 import Stage1.QuadStream
 import Stage1.Math.QuadStreamPhysicalLaws
