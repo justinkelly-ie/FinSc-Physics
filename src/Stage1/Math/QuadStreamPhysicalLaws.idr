@@ -60,6 +60,15 @@ applyPhysicalQuadStreamFilter lawDegree (MkQuadStream e h p s) =
                (filterStream p)
                (filterStream s)
 
+||| Zero-allocation deforested passband filter transducer operating in O(1) auxiliary registers (Rule 04 §8).
+public export
+filterQuadSectorStream : (lawDegree : Nat) -> FusedStream (BoxInt, BoxInt) -> FusedStream (BoxInt, BoxInt)
+filterQuadSectorStream lawDegree =
+  filterStream (\(v, _) =>
+    let dBox = intToBoxInt (cast lawDegree)
+        rem  = if dBox == intToBoxInt 0 then intToBoxInt 0 else modBox v dBox
+    in rem == intToBoxInt 0)
+
 ||| Applies physical cyclotomic passband filter Φ_p(x) certified by GohPrime p across all 4 sectors.
 public export
 applyPhysicalGohPrimeFilter : {p : Nat} -> GohPrime p -> QuadStreamMultiset BoxInt -> QuadStreamMultiset BoxInt
