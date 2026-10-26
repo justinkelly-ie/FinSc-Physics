@@ -374,7 +374,7 @@ gamma0BoxSquareMaxel =
       t1 = setBoxTree (MkPixel 1 1) (intToBoxInt 1) t0
       t2 = setBoxTree (MkPixel 2 2) (intToBoxInt (-1)) t1
       t3 = setBoxTree (MkPixel 3 3) (intToBoxInt (-1)) t2
-  in MkBoxSquareMaxel t3
+  in MkSquareMaxel t3
 
 ||| Dirac Gamma 1 Matrix as a sparse BoxSquareMaxel 4:
 ||| Supported on exactly 4 active non-zero off-diagonal entries.
@@ -385,7 +385,7 @@ gamma1BoxSquareMaxel =
       t1 = setBoxTree (MkPixel 1 2) (intToBoxInt 1) t0
       t2 = setBoxTree (MkPixel 2 1) (intToBoxInt (-1)) t1
       t3 = setBoxTree (MkPixel 3 0) (intToBoxInt (-1)) t2
-  in MkBoxSquareMaxel t3
+  in MkSquareMaxel t3
 
 ||| Dirac Gamma 3 Matrix as a sparse BoxSquareMaxel 4:
 ||| Supported on exactly 4 active non-zero off-diagonal entries.
@@ -396,7 +396,7 @@ gamma3BoxSquareMaxel =
       t1 = setBoxTree (MkPixel 1 3) (intToBoxInt (-1)) t0
       t2 = setBoxTree (MkPixel 2 0) (intToBoxInt (-1)) t1
       t3 = setBoxTree (MkPixel 3 1) (intToBoxInt 1) t2
-  in MkBoxSquareMaxel t3
+  in MkSquareMaxel t3
 
 ||| Converts DiracSpinorMultiset to a dimensioned VexelN 4 for contraction.
 public export
@@ -435,7 +435,7 @@ auditSparseDiracAlgebraProof =
       g3 = gamma3BoxSquareMaxel
       i4 = identityBoxSquareMaxel 4
       negI4 = scaleBoxSquareMaxel (intToBoxInt (-1)) i4
-      zeroMat : BoxSquareMaxel 4 = MkBoxSquareMaxel BoxLeaf
+      zeroMat : BoxSquareMaxel 4 = MkSquareMaxel BoxLeaf
       
       -- Metric signature (+, -, -, -)
       relG0 = mulBoxSquareMaxel g0 g0 == i4

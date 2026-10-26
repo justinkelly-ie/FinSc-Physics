@@ -72,10 +72,10 @@ evaluateGalacticQuadStreamRotation g slope (MkQuadStream e h p s) r =
 ------------------------------------------------------------------------
 
 ||| Projects a higher-dimensional symmetric bulk metric down to a lower-dimensional physical leaf:
-||| pi_{bulk -> leaf} : BoxSquareMaxel bulkDim -> BoxSquareMaxel leafDim.
+||| pi_{bulk -> leaf} : SquareMaxel bulkDim -> SquareMaxel leafDim.
 public export
-projectMetricBulkToLeaf : (bulkDim : Nat) -> (leafDim : Nat) -> BoxSquareMaxel bulkDim -> BoxSquareMaxel leafDim
-projectMetricBulkToLeaf bulkDim leafDim (MkBoxSquareMaxel tree) =
+projectMetricBulkToLeaf : (bulkDim : Nat) -> (leafDim : Nat) -> SquareMaxel bulkDim -> SquareMaxel leafDim
+projectMetricBulkToLeaf bulkDim leafDim (MkSquareMaxel tree) =
   let leafIndices = the (List Nat) (if leafDim == 0 then [] else [0..(minus leafDim 1)])
       pairs = [ (r, c) | r <- leafIndices, c <- leafIndices ]
       step : BoxMultisetTree Pixel -> (Nat, Nat) -> BoxMultisetTree Pixel
@@ -85,7 +85,7 @@ projectMetricBulkToLeaf bulkDim leafDim (MkBoxSquareMaxel tree) =
               then setBoxTree (MkPixel r c) w acc
               else acc
       subTree = foldl step BoxLeaf pairs
-  in MkBoxSquareMaxel subTree
+  in MkSquareMaxel subTree
 
 ||| Projects a 10D spacetime metric down to the 4D physical spacetime leaf:
 ||| pi_{10 -> 4} : BoxSquareMaxel 10 -> BoxSquareMaxel 4.
