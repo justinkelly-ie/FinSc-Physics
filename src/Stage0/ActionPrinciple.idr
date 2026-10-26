@@ -3,7 +3,7 @@ module Stage0.ActionPrinciple
 import Stage0.Multiset
 import Stage0.StructuralFuel
 import Stage1.FourGeometries
-import Stage1.Carrier.Maxel
+import Stage1.Carrier.CellMultiset
 import PhaseUnfolding
 import Geometry
 import Data.Vect

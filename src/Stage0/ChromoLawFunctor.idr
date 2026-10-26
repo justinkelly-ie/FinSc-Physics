@@ -36,8 +36,7 @@ applyLawFunctor (MkChromoLawFunctor _ _ m) v = actMaxelVexel m v
 public export
 transposeMaxel : Maxel -> Maxel
 transposeMaxel m =
-  let transposed = foldBoxTreeL (\acc, (px, w) => setBoxTree (mkPixel (pixelCol px) (pixelRow px)) w acc) BoxLeaf (maxelToBoxTree m)
-  in MkMaxelTree transposed
+  foldBoxTreeL (\acc, (px, w) => setBoxTree (mkPixel (pixelCol px) (pixelRow px)) w acc) BoxLeaf m
 
 ||| Executes a ChromoLawFunctor inverse pullback transformation on a macro state Vexel (Right Adjoint Pullback R_m).
 public export
