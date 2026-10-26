@@ -30,11 +30,6 @@ applyLawFunctor : {dIn, dOut : Nat} -> {cIn, cOut : MetricColor} ->
                   ChromoLawFunctor dIn cIn dOut cOut -> Vexel -> Vexel
 applyLawFunctor (MkChromoLawFunctor _ _ m) v = actMaxelVexel m v
 
-||| Computes transpose of a Maxel matrix: transposeMaxel (sum a_ij [i, j]) = sum a_ij [j, i].
-public export
-transposeMaxel : Maxel -> Maxel
-transposeMaxel m =
-  foldBoxTreeL (\acc, (px, w) => setBoxTree (mkPixel (pixelCol px) (pixelRow px)) w acc) BoxLeaf m
 
 ||| Executes a ChromoLawFunctor inverse pullback transformation on a macro state Vexel (Right Adjoint Pullback R_m).
 public export
