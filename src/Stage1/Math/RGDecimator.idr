@@ -4,7 +4,7 @@ import Stage0.BoxInt
 import Stage0.WitnessLedger
 import Stage0.Multiset
 import Stage1.Polynumber
-import Stage1.Carrier.Maxel
+import Stage1.Basis.Coordinate
 import Stage1.Carrier.BalanceArray
 import Stage1.UnixelFraction
 import Stage1.QuadStream

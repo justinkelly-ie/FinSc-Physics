@@ -1,8 +1,6 @@
 module Stage0.ChromoLawFunctor
 
 import public Stage0.BoxInt
-import public Stage1.Carrier.Maxel
-import public Stage1.Carrier.Vexel
 import public Stage1.Basis.Coordinate
 import public Stage1.MultisetTree
 import public Stage1.ChromoCategory

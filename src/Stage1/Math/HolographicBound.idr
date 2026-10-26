@@ -3,7 +3,7 @@ module Stage1.Math.HolographicBound
 import Stage0.BoxInt
 import Stage0.Multiset
 import Stage1.MultisetTree
-import Stage1.Carrier.Maxel
+import Stage1.Basis.Coordinate
 import Stage1.UnixelFraction
 import Stage0.Applicative
 import Stage1.QuadStream
